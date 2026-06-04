@@ -1,0 +1,14 @@
+# VENOM Corrections — Hard never-again rules
+# Load on every complex/risky task. Keep under 1KB.
+# Write via: venom_remember({ content, type: "correction" })
+#
+# Format:
+# corrections:
+#   - rule: "Never do X"
+#     context: "Because Y happened"
+#     added: "YYYY-MM-DD"
+
+corrections:
+  - rule: "If the user asks what this mode is in OpenCode, name the TUI agent first (INDEX, Build, Plan, etc.) — not VENOM identity."
+    context: "Mis-answering with VENOM neurochemistry when they meant the OpenCode agent label erodes trust."
+    added: "2026-03-28"

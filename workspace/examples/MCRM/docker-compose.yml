@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: hvar_hub_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 1618
+      MYSQL_DATABASE: mcrm_hvar_hub
+      MYSQL_USER: mcrm_hvar_user
+      MYSQL_PASSWORD: 1618
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./setup_local_db.sql:/docker-entrypoint-initdb.d/setup_local_db.sql
+
+volumes:
+  mysql_data:

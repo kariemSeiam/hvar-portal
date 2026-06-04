@@ -1,0 +1,21 @@
+---
+description: "Learnings schema — file format for .venom/learnings/"
+globs: []
+alwaysApply: false
+---
+
+# Learn
+
+Load/save routing → memory-tools.mdc.
+
+## Schema (`.venom/learnings/`)
+
+**preferences.yaml** — `communication: {}`, `code_style: {}`, `workflow: {}`. How owner likes to work.
+
+**project.yaml** — `conventions: []`, `patterns: []`. Project-specific. With confirmation.
+
+**corrections.yaml** — `corrections: []`. Entries: plain strings (`"never do X"`) or full `{ what, correction, date }`. Hard "never do X again."
+
+## `/venom learn: X` — Routing
+
+Correction ("don't do Y") → corrections.yaml. Convention ("we always X") → project.yaml. Preference ("I like Z") → preferences.yaml.

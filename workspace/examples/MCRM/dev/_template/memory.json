@@ -1,0 +1,11 @@
+{
+  "idea": "[Idea Name]",
+  "status": "planning",
+  "created": "YYYY-MM-DD",
+  "last_chat_update": "YYYY-MM-DD",
+  "our_conversations": [],
+  "decisions": [],
+  "questions": [],
+  "ideas": [],
+  "next_steps": []
+}

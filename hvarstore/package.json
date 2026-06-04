@@ -1,0 +1,21 @@
+{
+  "name": "hvarstore",
+  "private": true,
+  "workspaces": ["api", "web", "shared", "migrations"],
+  "scripts": {
+    "dev": "bun run --parallel dev:api dev:web",
+    "dev:api": "bun --cwd api dev",
+    "dev:web": "bun --cwd web dev",
+    "build": "bun run build:shared && bun run --parallel build:api build:web",
+    "build:api": "bun --cwd api build",
+    "build:web": "bun --cwd web build",
+    "build:shared": "bun --cwd shared build",
+    "db:gen": "bun --cwd migrations generate",
+    "db:push": "bun --cwd migrations push",
+    "db:studio": "bun --cwd migrations studio",
+    "lint": "bun run --parallel lint:api lint:web lint:shared",
+    "lint:api": "bun --cwd api lint",
+    "lint:web": "bun --cwd web lint",
+    "lint:shared": "bun --cwd shared lint"
+  }
+}

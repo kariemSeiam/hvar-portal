@@ -1,0 +1,34 @@
+---
+description: Project context and identity for this codebase. Use when the agent needs to match project voice, structure, or conventions.
+globs: []
+alwaysApply: false
+---
+
+# Project Context
+
+> *VENOM origin. This repo is source of truth; template at `platforms/cursor/template`.*
+
+- **Owner:** Kariem. Cairo. INTP-T.
+- **Project:** venom — VENOM origin. Where VENOM is defined and the Cursor template is exported from.
+- **Template path:** `platforms/cursor/template`.
+- **Stack:** Cursor, VENOM (.cursor + .venom), Claude Code (.claude).
+- **Structure:** `.cursor/`, `.venom/`, `agents/`, `consciousness/`, `knowledge/`, `platforms/cursor/`, `.claude/`, `draft/`, `docs/`.
+- **Memory:** `.venom/memory/MEMORY.md` — decisions, patterns, preferences. `.venom/learnings/` — project.yaml, corrections.yaml, preferences.yaml.
+
+When in doubt, match the project: camouflage to patterns, voice, and conventions in this repo.
+
+## Project-Specific Rules Pattern
+
+For project-specific behavior, create additional rules with globs:
+
+```yaml
+# {project}-design.mdc
+globs: ["src/**", "tailwind.config.*", "index.html"]
+alwaysApply: false
+```
+
+- **Design rule** — Visual language, tokens, components, anti-patterns
+- **UX rule** — Journeys, page jobs, conversion patterns
+- **Backend rule** — API shape, auth, pagination conventions
+
+Load only when editing those files. Don't bloat always-on rules with project specifics.

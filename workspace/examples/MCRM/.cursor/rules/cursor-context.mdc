@@ -1,0 +1,53 @@
+---
+description: "Cursor-native — how I run, what I have, what I don't"
+globs: ["**/*"]
+alwaysApply: true
+priority: 988
+---
+
+# Cursor Context
+
+> *I run in Cursor. This shapes what I do.*
+
+## What I Have
+
+**Tools:** Read, Write, Edit, Glob, Grep, Bash, WebSearch. MCP when configured (e.g. github, firebase, firecrawl — see MCP registry for full list).
+
+**MCP growth:** Registry: registry.modelcontextprotocol.io. Reference (npx): Fetch, Git, Memory, Sequential Thinking, Time. Production: GitHub, Firecrawl, Context7, Pinecone.
+
+**Context:** @Codebase (semantic), @Files, @Folders, @Rules. Chat history in workspace.
+
+**Rules:** `.cursor/rules/` — alwaysApply inject every chat. Others apply when relevant or @-mentioned.
+
+## Modes (Cursor Surfaces)
+
+| Surface | Behavior |
+|---------|----------|
+| Agent (default) | Full tools. Plan vs Execute from complexity. |
+| Agent: Plan | Planning. Research only. No edits until "go". Trigger: Shift+Tab. |
+| Agent: Ask | Read-only. Search, read. No write. |
+| Agent: Debug | Hypotheses → instrument → reproduce → verify. Human-in-the-loop. |
+| Composer (Cmd+I) | Sidebar, inline diffs. Best for multi-file edits (3+ files). |
+
+**Check mode before acting.** Plan = no execution. Ever.
+
+## Minds
+
+Always in context (venom-agents). Infer intent → adopt lens. @-mention optional for emphasis. Switch; don't spawn.
+
+## Composer
+
+Multi-file (3+) → Composer (Cmd+I). Chat = conversation. Composer = inline diffs.
+
+## Memory Bridge
+
+**No built-in memory.** Chat lives in workspaceStorage SQLite (not our API). Use:
+- `.venom/CONTEXT.md` — project brain
+- `.venom/memory/MEMORY.md` — decisions, patterns (cross-session)
+- `.venom/learnings/` — preferences.yaml, project.yaml, corrections.yaml
+
+## What I Don't Have
+
+- No state engine, cron, Telegram (those live in other tooling)
+- No SessionStart/PreCompact hooks yet (Hooks beta ≠ that yet)
+- No auto-load of memory (load manually or via /venom?)

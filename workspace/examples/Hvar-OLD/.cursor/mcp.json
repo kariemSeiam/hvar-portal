@@ -1,0 +1,98 @@
+{
+  "mcpServers": {
+    "// INSTRUCTIONS": "Remove this comment block after configuration",
+    "// ": "MCP connects Cursor to external tools and data sources",
+    "// ": "Uncomment and configure the integrations you need",
+    "// ": "Use ${env:VAR_NAME} for secrets - never hardcode keys",
+
+    "// === DATABASE INTEGRATIONS ===": "",
+    
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y", 
+        "@modelcontextprotocol/server-postgres",
+        "${env:DATABASE_URL}"
+      ],
+      "disabled": true,
+      "_comment": "Enable to let AI query your database. Use --readonly for safety."
+    },
+
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server",
+        "--supabase-url", "${env:SUPABASE_URL}",
+        "--supabase-key", "${env:SUPABASE_ANON_KEY}"
+      ],
+      "disabled": true
+    },
+
+    "// === ISSUE TRACKING ===": "",
+
+    "linear": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@anthropic/linear-mcp-server"
+      ],
+      "env": {
+        "LINEAR_API_KEY": "${env:LINEAR_API_KEY}"
+      },
+      "disabled": true,
+      "_comment": "Enable to read/create Linear issues from Cursor"
+    },
+
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@anthropic/github-mcp-server"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "${env:GITHUB_TOKEN}"
+      },
+      "disabled": true,
+      "_comment": "Enable for GitHub issues, PRs, and repo access"
+    },
+
+    "// === DOCUMENTATION ===": "",
+
+    "docs": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@anthropic/docs-mcp-server",
+        "--docs-path", "./docs"
+      ],
+      "disabled": true,
+      "_comment": "Index local documentation for AI reference"
+    },
+
+    "// === FILE SYSTEM ===": "",
+
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@anthropic/filesystem-mcp-server",
+        "--root", "."
+      ],
+      "disabled": true,
+      "_comment": "Enhanced file operations (usually not needed)"
+    },
+
+    "// === CUSTOM TOOLS ===": "",
+
+    "custom": {
+      "command": "node",
+      "args": ["./tools/my-mcp-server.js"],
+      "env": {
+        "CUSTOM_API_KEY": "${env:CUSTOM_API_KEY}"
+      },
+      "disabled": true,
+      "_comment": "Your own MCP server for custom integrations"
+    }
+  }
+}

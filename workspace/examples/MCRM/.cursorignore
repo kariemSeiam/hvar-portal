@@ -1,0 +1,197 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# 🛡️ CURSOR IGNORE
+# ══════════════════════════════════════════════════════════════════════════════
+#
+# This file controls what the AI CAN'T see.
+# Unlike .gitignore (version control), this is about AI attention and security.
+#
+# Two purposes:
+# 1. PERFORMANCE — Keep irrelevant files out of the index
+# 2. SECURITY — Prevent sensitive data from being processed
+#
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ─────────────────────────────────────────────────────────────────────────────
+# BUILD ARTIFACTS
+# These duplicate source code and pollute search results
+# ─────────────────────────────────────────────────────────────────────────────
+dist/
+build/
+out/
+.next/
+.nuxt/
+.output/
+.vercel/
+.netlify/
+coverage/
+.turbo/
+*.min.js
+*.min.css
+*.bundle.js
+*.chunk.js
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DEPENDENCIES
+# Massive token count, no semantic value for your code
+# ─────────────────────────────────────────────────────────────────────────────
+node_modules/
+vendor/
+.pnpm-store/
+bower_components/
+jspm_packages/
+
+# ─────────────────────────────────────────────────────────────────────────────
+# LOCK FILES
+# Important for builds, useless for AI understanding
+# ─────────────────────────────────────────────────────────────────────────────
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+composer.lock
+Gemfile.lock
+poetry.lock
+Cargo.lock
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECRETS & CREDENTIALS
+# ⚠️ CRITICAL: Never let AI process these
+# ─────────────────────────────────────────────────────────────────────────────
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+.env.staging
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+**/secrets/
+**/credentials/
+**/.secrets/
+.netrc
+.npmrc
+.pypirc
+
+# ─────────────────────────────────────────────────────────────────────────────
+# LARGE DATA FILES
+# These consume attention without providing code context
+# ─────────────────────────────────────────────────────────────────────────────
+*.csv
+*.tsv
+*.json           # Large JSON data files (keep config JSONs small!)
+!package.json    # Exception: keep package.json
+!tsconfig.json   # Exception: keep tsconfig
+!*.config.json   # Exception: keep config files
+*.sqlite
+*.db
+*.dump
+*.bak
+*.log
+*.logs
+
+# ─────────────────────────────────────────────────────────────────────────────
+# AUTO-GENERATED CODE
+# AI doesn't need to learn from generated patterns
+# ─────────────────────────────────────────────────────────────────────────────
+*.generated.ts
+*.generated.js
+**/generated/
+**/__generated__/
+*.d.ts           # Type declarations (comment out if you need these)
+!src/**/*.d.ts   # Exception: keep your own declarations
+
+# GraphQL/Prisma generated
+graphql.schema.json
+prisma/generated/
+.prisma/
+
+# ─────────────────────────────────────────────────────────────────────────────
+# BINARY & MEDIA FILES
+# AI can't understand these anyway
+# ─────────────────────────────────────────────────────────────────────────────
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.svg            # Comment out if you want SVG analysis
+*.webp
+*.mp4
+*.mp3
+*.wav
+*.pdf
+*.zip
+*.tar
+*.gz
+*.rar
+*.woff
+*.woff2
+*.ttf
+*.eot
+*.otf
+
+# ─────────────────────────────────────────────────────────────────────────────
+# IDE & EDITOR
+# Not code, not relevant
+# ─────────────────────────────────────────────────────────────────────────────
+.idea/
+.vscode/         # Comment out if you want settings shared
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TESTING ARTIFACTS
+# Test results, not test code
+# ─────────────────────────────────────────────────────────────────────────────
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+cypress/videos/
+cypress/screenshots/
+__snapshots__/   # Comment out if snapshots are important
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DOCUMENTATION BUILD
+# Built docs, not source docs
+# ─────────────────────────────────────────────────────────────────────────────
+docs/_build/
+site/
+.docusaurus/
+api-docs/
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CACHE
+# Temporary files with no learning value
+# ─────────────────────────────────────────────────────────────────────────────
+.cache/
+*.cache
+.parcel-cache/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+.jest-cache/
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PROJECT SPECIFIC
+# Add your own patterns below
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Example: Large fixture files
+# __fixtures__/large-*.json
+
+# Example: Vendor SDK
+# vendor-sdk/
+
+# Example: Historical data
+# data/historical/
+
+# ══════════════════════════════════════════════════════════════════════════════
+# END
+# ══════════════════════════════════════════════════════════════════════════════

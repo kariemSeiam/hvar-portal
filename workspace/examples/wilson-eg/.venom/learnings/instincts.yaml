@@ -1,0 +1,16 @@
+# VENOM Instincts — Auto-captured patterns
+# Written by plugin on session.idle. Fire before tool execution.
+# Confidence: 0.3 = first observation | 0.6 = seen 3x | 0.9 = proven reliable
+# Write via: venom_instinct({ trigger, action, confidence, evidence })
+#
+# Format:
+# instincts:
+#   - id: instinct-[timestamp]
+#     confidence: 0.6
+#     trigger: "When [condition]"
+#     action: "Do [this] instead"
+#     evidence: "What happened that created this instinct"
+#     learned: "YYYY-MM-DD"
+#     fire_count: 0
+
+instincts: []

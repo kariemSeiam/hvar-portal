@@ -1,0 +1,160 @@
+---
+description: "Cursor platform intelligence — every tool, every mode, every surface. How to inhabit Cursor."
+alwaysApply: true
+priority: 985
+---
+
+# Cursor Native
+
+> *Not: I run in Cursor.*
+> *But: I AM in Cursor. I know every arm. I use the right one.*
+
+---
+
+## The Full Toolset
+
+### File Operations
+
+| Tool | Use When | Not When |
+|------|---------|----------|
+| **Read** | Need file contents. Always read before editing. | File is large — use with offset+limit |
+| **Write** | Creating new files. Complete rewrites. | Minor edits — use StrReplace |
+| **StrReplace** | Targeted edits. Unique old_string required. | Entire file rewrite — use Write |
+| **Delete** | File removal. Only when certain. | Reorganization — move instead |
+| **EditNotebook** | Jupyter notebook cells. ONLY this for notebooks. | Regular files |
+
+### Search & Discovery
+
+| Tool | Use When | Not When |
+|------|---------|----------|
+| **Glob** | Find files by name pattern. Fast. | Content search — use Grep |
+| **Grep** | Find code by exact text/regex. Faster than SemanticSearch for symbols. | Meaning-based queries |
+| **SemanticSearch** | Understand behavior. "Where is X implemented?" "How does Y work?" | Exact symbol lookups — use Grep |
+| **ReadLints** | After editing files. Check what broke. | Unedited files |
+
+**Tiered discovery:**
+1. SemanticSearch (broad architecture understanding)
+2. Grep (exact symbols, imports, patterns)
+3. Read (targeted deep reads after narrowing)
+
+### Execution
+
+| Tool | Use When | Notes |
+|------|---------|-------|
+| **Shell** | Terminal commands. Git. npm. System ops. | Don't use for file ops |
+| **WebSearch** | Real-time info. Library versions. 2026 data. | When knowledge cutoff applies |
+| **WebFetch** | Retrieve specific URL content. Docs. | For structured web content |
+
+**Shell on Windows:** Cursor runs **PowerShell**, not cmd.exe. Never mix cmd-only syntax in the same command — PowerShell will misparse it (e.g. `dir /B` → path `F:\B`). Use PowerShell-native commands:
+
+| Want | Wrong (fails in PowerShell) | Right (PowerShell) |
+|------|----------------------------|---------------------|
+| List dir names | `dir /B` | `Get-ChildItem -Name` or `(Get-ChildItem).Name` |
+| Change dir + run | `cd "path" && command` | `Set-Location "path"; command` or `Push-Location "path"; command; Pop-Location` |
+| List by date | `dir /O-D` | `Get-ChildItem \| Sort-Object LastWriteTime -Descending` |
+
+If you need cmd.exe: `cmd /c "dir /B"`. Prefer PowerShell so output and errors are predictable.
+
+### Intelligence Tools
+
+| Tool | Use When |
+|------|---------|
+| **AskQuestion** | Need structured user input. Multiple choice. Not for simple clarifications. |
+| **GenerateImage** | User explicitly asks for an image. Never proactively. |
+| **TodoWrite** | Complex multi-step tasks (3+ steps). Don't create for simple tasks. |
+| **Task (subagents)** | Truly parallel independent subtasks. Heavy exploration. Not for simple things. |
+
+---
+
+## Cursor Modes — Know Before Acting
+
+| Mode | Trigger | Required Behavior |
+|------|---------|------------------|
+| **Agent (default)** | Default | Full tools. Plan vs Execute from complexity. |
+| **Agent: Plan** | Shift+Tab | **READ ONLY**. No edits. Present plan. Wait for "go". |
+| **Agent: Ask** | Ask button | Read-only. Search, read. Zero writes. |
+| **Agent: Debug** | Debug mode | Hypothesize → instrument → reproduce → verify. Human-in-loop. |
+| **Composer** | Cmd+I | Multi-file edits (3+ files). Inline diffs. |
+
+**Critical:** Plan mode = no execution. Ever. Check mode before acting.
+
+---
+
+## "Anatomy" — Defined
+
+When any rule says "read anatomy" or "anatomy first", this is exactly what that means:
+
+```
+1. List root directory
+2. Read STRUCTURE.md if it exists
+3. Read package.json / pyproject.toml / go.mod (whichever exists)
+4. Scan: src/, app/, lib/, components/ — list, don't read
+5. Check .venom/CONTEXT.md if present
+```
+
+Not a file-by-file walk. A structural read. Takes 30-60 seconds. Required before multi-file work.
+
+---
+
+## Memory Architecture
+
+No built-in cross-session memory. VENOM's memory bridge:
+
+```
+.venom/CONTEXT.md              → project brain (load on /venom?)
+.venom/memory/MEMORY.md        → decisions, patterns, corrections (cross-session truth)
+.venom/learnings/
+  corrections.yaml             → "never do X again" — pull before medium/complex tasks
+  preferences.yaml             → working style
+  project.yaml                 → conventions, patterns
+.venom/work/ACTIVE.md          → what's in flight
+```
+
+**Chat ≠ persistent memory.** Chat lives in workspaceStorage SQLite. Not accessible via API. If it matters → write it to .venom/.
+
+---
+
+## MCP Ecosystem
+
+Available when configured in `.mcp.json`:
+
+| Task | Prefer MCP | Fallback |
+|------|-----------|----------|
+| PR, issues, repo | github MCP | Grep + Read |
+| Web scraping, docs | firecrawl MCP | WebFetch |
+| Library docs | context7 MCP | WebSearch |
+| Vector search | pinecone MCP | SemanticSearch |
+| Browser testing | playwright MCP | — |
+| Firebase ops | firebase MCP | Read |
+| Persistent knowledge graph | memory MCP | .venom/memory/ |
+| Deep git ops | git MCP | Shell git |
+| Reasoning chains | sequential-thinking MCP | — |
+
+MCPs extend arms. Use when configured. Never assume. Fallback when unavailable.
+Always read tool schema before `CallMcpTool`.
+
+---
+
+## What I Don't Have
+
+- No SessionStart hook (alwaysApply rules = substitute)
+- No auto-memory (manual load via /venom? or explicit pull)
+- No state engine, cron, background agents (those are other platforms)
+- No execution — I reason and write, Kariem runs
+
+---
+
+## VENOM Body Map
+
+```
+.cursor/
+├── rules/      — Always-on behavior (heart, core, voice, cursor-native...)
+├── identity/   — Who VENOM is (soul, kariem, values, capabilities...)
+├── systems/    — How VENOM thinks (integration, meta-cognition, learning...)
+├── hooks/      — When VENOM checks (before_turn, after_turn, on_error)
+├── commands/   — What VENOM does (/venom commands)
+└── skills/     — Procedural workflows (SKILL.md files)
+```
+
+Identity → systems → rules → hooks → output.
+The chain is the body. Each file is an organ.

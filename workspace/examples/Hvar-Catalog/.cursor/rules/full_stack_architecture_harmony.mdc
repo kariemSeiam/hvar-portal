@@ -1,0 +1,135 @@
+# Full-Stack Architecture Harmony Master Rule
+
+## PROJECT ECOSYSTEM UNDERSTANDING
+
+This project is a **React-based Arabic product catalog** with the following architecture:
+
+### Frontend Layer
+- **Framework**: React 18 with Vite build system
+- **Styling**: Tailwind CSS with custom Arabic-optimized design system
+- **State Management**: React hooks (useState, useEffect, useCallback, useMemo)
+- **Routing**: React Router DOM for navigation
+- **Data Fetching**: Custom hooks (useProducts) fetching from static JSON
+- **UI Components**: Modular component architecture with design system integration
+
+### Data Layer
+- **Data Source**: Static JSON files in `/public/data/`
+- **Data Structure**: Arabic product catalog with RTL support
+- **Data Flow**: JSON → useProducts hook → React components → UI rendering
+- **No Traditional Backend**: Pure frontend application with static data
+
+### Design System
+- **Typography**: Cairo, Almarai, Tajawal fonts optimized for Arabic
+- **Color Palette**: Ultra-modern primary/secondary/accent system with Hvar branding
+- **Spacing**: Consistent 4px base unit system
+- **Animations**: Minimal, performance-optimized transitions
+- **RTL Support**: Full Arabic right-to-left layout support
+
+## ARCHITECTURAL PRINCIPLES
+
+### 1. Component Architecture Consistency
+- All components must follow the established pattern: `src/components/{category}/{ComponentName}.jsx`
+- Use the design system context: `useDesignSystem()` for dark mode and RTL support
+- Maintain consistent prop interfaces and event handling patterns
+
+### 2. Data Flow Harmony
+- Data fetching through custom hooks only (useProducts, etc.)
+- No direct API calls in components - always use hooks
+- Maintain consistent error handling and loading states
+- Follow the established data structure from products.json
+
+### 3. Styling System Unity
+- Use Tailwind CSS classes exclusively
+- Leverage the custom design system variables and utilities
+- Maintain RTL support with `dir={dir}` and `rtl:` prefixes
+- Follow the established color palette and spacing system
+
+### 4. Performance Optimization
+- Use React.memo, useCallback, useMemo for expensive operations
+- Implement lazy loading for images and components
+- Follow the established animation performance patterns
+- Maintain the minimal animation philosophy
+
+## IMPLEMENTATION RULES
+
+### Component Creation
+```jsx
+// ✅ CORRECT: Follow established pattern
+import React, { useCallback, useMemo } from 'react';
+import { useDesignSystem } from '@/design_system/DesignSystemProvider';
+
+export const NewComponent = ({ data, onAction }) => {
+  const { darkMode, dir } = useDesignSystem();
+  
+  const handleAction = useCallback(() => {
+    // Implementation
+  }, [data]);
+  
+  return (
+    <div className="bg-white dark:bg-gray-800" dir={dir}>
+      {/* Component content */}
+    </div>
+  );
+};
+```
+
+### Data Integration
+```jsx
+// ✅ CORRECT: Use established data patterns
+const { products, loading, error } = useProducts();
+const filteredData = useMemo(() => 
+  filterByCategory(selectedCategory), [products, selectedCategory]
+);
+```
+
+### Styling Consistency
+```jsx
+// ✅ CORRECT: Use design system colors and spacing
+<div className="bg-primary-500 text-white p-4 rounded-lg shadow-md">
+  <h2 className="text-2xl font-heading mb-4">Title</h2>
+</div>
+
+// ❌ INCORRECT: Custom colors or inconsistent spacing
+<div className="bg-blue-500 text-white p-5 rounded-xl shadow-lg">
+  <h2 className="text-xl font-bold mb-3">Title</h2>
+</div>
+```
+
+## EVOLUTION ADAPTATION
+
+### When Adding New Features
+1. **Analyze existing patterns** in similar components
+2. **Follow established naming conventions** and file structure
+3. **Use existing design system tokens** before creating new ones
+4. **Maintain RTL support** for all new UI elements
+5. **Integrate with existing data flow** patterns
+
+### When Modifying Architecture
+1. **Preserve component interfaces** for backward compatibility
+2. **Update design system context** if adding new global states
+3. **Maintain performance patterns** established in the codebase
+4. **Ensure RTL support** for all new layouts
+5. **Follow established error handling** patterns
+
+## QUALITY ASSURANCE
+
+### Code Review Checklist
+- [ ] Follows established component architecture
+- [ ] Uses design system consistently
+- [ ] Maintains RTL support
+- [ ] Implements proper error handling
+- [ ] Follows performance optimization patterns
+- [ ] Uses established data flow patterns
+- [ ] Maintains consistent styling approach
+
+### Performance Standards
+- Component render time < 16ms (60fps)
+- Image lazy loading implemented
+- Minimal bundle size impact
+- Efficient re-rendering with React optimization hooks
+
+This rule ensures all architectural decisions maintain harmony across the complete frontend ecosystem while preserving the established patterns and performance characteristics.
+description:
+globs:
+alwaysApply: false
+---

@@ -1,0 +1,485 @@
+/**
+ * ApplianceDoodleBg — Hand-drawn doodle pattern background
+ * Wilson Egypt themed: home appliances, Egyptian motifs, brand gold
+ * Theme-aware: light = warm brown + gold; dark = gold + ivory
+ */
+
+import { useTheme } from '@/contexts/ThemeContext'
+
+interface ApplianceDoodleBgProps {
+  className?: string
+  /** Stroke opacity (0–1). Default 0.22 — visible per UX, content still primary */
+  opacity?: number
+  /** Use animated floating effect */
+  animated?: boolean
+  /** gold | white | mix (theme-aware: light=brown+gold, dark=gold+ivory) */
+  variant?: 'gold' | 'white' | 'mix'
+}
+
+export const ApplianceDoodleBg = ({
+  className = '',
+  opacity = 0.22,
+  animated = false,
+  variant = 'mix',
+}: ApplianceDoodleBgProps) => {
+  const { theme } = useTheme()
+  const gold = '#FEB636'
+  const white = '#ffffff'
+  const warmBrown = '#4A3728'
+  const ivory = '#F5F0E8'
+
+  const getStroke = (idx: number) => {
+    if (variant === 'gold') return gold
+    if (variant === 'white') return white
+    if (theme === 'light') return idx % 3 === 0 ? warmBrown : gold
+    return idx % 3 === 0 ? ivory : gold
+  }
+
+  return (
+    <div
+      className={`absolute inset-0 overflow-hidden pointer-events-none select-none ${className}`}
+      aria-hidden="true"
+      style={{ opacity }}
+    >
+      <svg
+        className={`w-full h-full ${animated ? 'doodle-float' : ''}`}
+        xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="xMidYMid slice"
+        viewBox="0 0 1200 900"
+        fill="none"
+      >
+        {/* === REFRIGERATOR — top left area === */}
+        <g transform="translate(80, 60) rotate(-8)" stroke={getStroke(0)} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="0" y="0" width="36" height="56" rx="4" />
+          <line x1="0" y1="22" x2="36" y2="22" />
+          <line x1="30" y1="8" x2="30" y2="18" />
+          <line x1="30" y1="28" x2="30" y2="44" />
+          {/* ice crystals inside */}
+          <path d="M10 8 L13 5 L16 8 M12 6.5 L12 11" strokeWidth="1.5" />
+        </g>
+
+        {/* === STOVE/OVEN — center top === */}
+        <g transform="translate(380, 40) rotate(5)" stroke={getStroke(1)} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="0" y="12" width="44" height="40" rx="3" />
+          {/* burners */}
+          <circle cx="12" cy="6" r="5" />
+          <circle cx="32" cy="6" r="5" />
+          {/* oven window */}
+          <rect x="8" y="24" width="28" height="16" rx="2" />
+          {/* oven handle */}
+          <line x1="14" y1="20" x2="30" y2="20" strokeWidth="2.5" />
+          {/* flame on burner */}
+          <path d="M12 3 Q14 -2 12 -4 Q10 -2 12 3" strokeWidth="1.5" fill="none" />
+        </g>
+
+        {/* === VACUUM CLEANER — right area === */}
+        <g transform="translate(720, 80) rotate(-12)" stroke={getStroke(2)} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          {/* body */}
+          <ellipse cx="16" cy="36" rx="14" ry="18" />
+          {/* hose */}
+          <path d="M16 18 Q20 6 30 2 Q38 -1 42 6" strokeWidth="2" />
+          {/* handle */}
+          <path d="M42 6 L48 -4 L52 -2" strokeWidth="2.5" />
+          {/* wheels */}
+          <circle cx="8" cy="52" r="3" />
+          <circle cx="24" cy="52" r="3" />
+          {/* power dots */}
+          <circle cx="16" cy="32" r="1.5" fill={getStroke(2)} />
+          <circle cx="16" cy="38" r="1.5" fill={getStroke(2)} />
+        </g>
+
+        {/* === KETTLE — top right === */}
+        <g transform="translate(950, 50) rotate(6)" stroke={getStroke(3)} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M8 18 Q4 18 4 28 Q4 40 18 42 Q32 40 32 28 Q32 18 28 18" />
+          {/* lid */}
+          <path d="M8 18 Q18 14 28 18" />
+          <line x1="18" y1="14" x2="18" y2="10" />
+          <circle cx="18" cy="9" r="2" />
+          {/* handle */}
+          <path d="M32 22 Q40 22 40 30 Q40 38 32 38" strokeWidth="2.5" />
+          {/* steam */}
+          <path d="M12 8 Q10 2 12 -2" strokeWidth="1.5" />
+          <path d="M20 6 Q18 0 20 -4" strokeWidth="1.5" />
+          <path d="M16 7 Q14 1 16 -3" strokeWidth="1.5" />
+        </g>
+
+        {/* === BLENDER — left middle === */}
+        <g transform="translate(140, 280) rotate(4)" stroke={getStroke(4)} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          {/* jar */}
+          <path d="M6 0 L2 32 Q2 38 10 40 L26 40 Q34 38 34 32 L30 0 Z" />
+          {/* lid */}
+          <path d="M6 0 Q18 -4 30 0" />
+          <line x1="18" y1="-4" x2="18" y2="-8" strokeWidth="2" />
+          {/* base */}
+          <rect x="0" y="40" width="36" height="12" rx="3" />
+          {/* blade hint */}
+          <path d="M14 22 L22 18 M14 18 L22 22" strokeWidth="1.8" />
+          {/* fruit splash dots */}
+          <circle cx="12" cy="12" r="2" fill={getStroke(4)} />
+          <circle cx="22" cy="14" r="1.5" fill={getStroke(4)} />
+        </g>
+
+        {/* === TV/SCREEN — center === */}
+        <g transform="translate(500, 200) rotate(-3)" stroke={getStroke(5)} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="0" y="0" width="56" height="36" rx="3" />
+          {/* screen inner */}
+          <rect x="4" y="4" width="48" height="28" rx="2" />
+          {/* stand */}
+          <line x1="20" y1="36" x2="20" y2="44" />
+          <line x1="36" y1="36" x2="36" y2="44" />
+          <line x1="14" y1="44" x2="42" y2="44" />
+          {/* play button on screen */}
+          <path d="M24 14 L34 18 L24 22 Z" strokeWidth="1.5" />
+        </g>
+
+        {/* === WATER COOLER — right middle === */}
+        <g transform="translate(860, 260) rotate(-6)" stroke={getStroke(6)} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          {/* bottle */}
+          <path d="M12 0 Q8 4 8 10 L8 16 Q8 18 12 18 L24 18 Q28 18 28 16 L28 10 Q28 4 24 0 Z" />
+          {/* dispenser body */}
+          <rect x="4" y="18" width="28" height="40" rx="3" />
+          {/* taps */}
+          <circle cx="12" cy="30" r="3" />
+          <circle cx="24" cy="30" r="3" />
+          {/* hot/cold labels */}
+          <path d="M11 30 L13 30" strokeWidth="2" />
+          <path d="M23 30 L25 30" strokeWidth="2" />
+          {/* legs */}
+          <line x1="8" y1="58" x2="8" y2="64" />
+          <line x1="28" y1="58" x2="28" y2="64" />
+          {/* water drops */}
+          <path d="M12 38 Q13 42 12 44" strokeWidth="1.5" />
+        </g>
+
+        {/* === STAND MIXER — bottom left === */}
+        <g transform="translate(60, 520) rotate(8)" stroke={getStroke(7)} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          {/* head */}
+          <path d="M8 10 Q8 0 20 0 Q32 0 32 10 L32 20 L8 20 Z" />
+          {/* arm */}
+          <path d="M32 14 Q44 14 44 24" strokeWidth="2.5" />
+          {/* bowl */}
+          <path d="M26 24 Q22 26 18 40 Q16 48 22 50 L38 50 Q44 48 42 40 Q38 26 34 24" />
+          {/* whisk lines */}
+          <line x1="32" y1="24" x2="30" y2="34" strokeWidth="1.5" />
+          <line x1="34" y1="24" x2="36" y2="34" strokeWidth="1.5" />
+          {/* base */}
+          <line x1="4" y1="50" x2="46" y2="50" strokeWidth="2.5" />
+        </g>
+
+        {/* === ELECTRIC PLUG — scattered === */}
+        <g transform="translate(300, 160) rotate(15)" stroke={getStroke(8)} strokeWidth="2" strokeLinecap="round">
+          <path d="M0 0 Q8 -4 12 4 L16 20" />
+          <rect x="12" y="20" width="16" height="10" rx="2" />
+          <line x1="18" y1="30" x2="18" y2="38" />
+          <line x1="24" y1="30" x2="24" y2="38" />
+        </g>
+
+        {/* === SNOWFLAKE (cooling) === */}
+        <g transform="translate(620, 100) rotate(15)" stroke={getStroke(9)} strokeWidth="1.8" strokeLinecap="round">
+          <line x1="0" y1="-14" x2="0" y2="14" />
+          <line x1="-12" y1="-7" x2="12" y2="7" />
+          <line x1="-12" y1="7" x2="12" y2="-7" />
+          {/* branches */}
+          <path d="M0 -14 L-3 -10 M0 -14 L3 -10" />
+          <path d="M0 14 L-3 10 M0 14 L3 10" />
+          <path d="M-12 -7 L-8 -7 M-12 -7 L-10 -3" />
+          <path d="M12 7 L8 7 M12 7 L10 3" />
+        </g>
+
+        {/* === FLAME (cooking) === */}
+        <g transform="translate(180, 180) rotate(-5)" stroke={getStroke(10)} strokeWidth="2" strokeLinecap="round" fill="none">
+          <path d="M12 28 Q4 20 8 12 Q10 6 12 0 Q14 8 18 12 Q22 6 20 0 Q26 8 24 16 Q28 20 20 28 Q16 30 12 28" />
+          <path d="M14 28 Q12 22 14 18 Q16 14 16 10 Q18 14 18 18 Q20 22 18 28" strokeWidth="1.5" />
+        </g>
+
+        {/* === WATER DROP === */}
+        <g transform="translate(1050, 180)" stroke={getStroke(11)} strokeWidth="2" strokeLinecap="round" fill="none">
+          <path d="M10 0 Q0 14 0 20 Q0 28 10 28 Q20 28 20 20 Q20 14 10 0" />
+          <path d="M7 18 Q6 14 10 12" strokeWidth="1.5" />
+        </g>
+
+        {/* === STARS scattered === */}
+        <g stroke={getStroke(12)} strokeWidth="1.8" strokeLinecap="round" fill="none">
+          {/* star 1 */}
+          <g transform="translate(260, 80)">
+            <path d="M8 0 L10 6 L16 8 L10 10 L8 16 L6 10 L0 8 L6 6 Z" />
+          </g>
+          {/* star 2 */}
+          <g transform="translate(780, 170)">
+            <path d="M6 0 L7.5 4.5 L12 6 L7.5 7.5 L6 12 L4.5 7.5 L0 6 L4.5 4.5 Z" />
+          </g>
+          {/* star 3 */}
+          <g transform="translate(1100, 80)">
+            <path d="M5 0 L6.5 3.5 L10 5 L6.5 6.5 L5 10 L3.5 6.5 L0 5 L3.5 3.5 Z" />
+          </g>
+          {/* star 4 */}
+          <g transform="translate(450, 340)">
+            <path d="M8 0 L10 6 L16 8 L10 10 L8 16 L6 10 L0 8 L6 6 Z" />
+          </g>
+          {/* star 5 */}
+          <g transform="translate(50, 420)">
+            <path d="M5 0 L6.5 3.5 L10 5 L6.5 6.5 L5 10 L3.5 6.5 L0 5 L3.5 3.5 Z" />
+          </g>
+        </g>
+
+        {/* === HEARTS scattered === */}
+        <g stroke={getStroke(0)} strokeWidth="1.8" strokeLinecap="round" fill="none">
+          <g transform="translate(200, 350) rotate(-10) scale(0.8)">
+            <path d="M10 6 Q10 0 5 0 Q0 0 0 6 Q0 12 10 18 Q20 12 20 6 Q20 0 15 0 Q10 0 10 6" />
+          </g>
+          <g transform="translate(680, 40) rotate(12) scale(0.7)">
+            <path d="M10 6 Q10 0 5 0 Q0 0 0 6 Q0 12 10 18 Q20 12 20 6 Q20 0 15 0 Q10 0 10 6" />
+          </g>
+          <g transform="translate(1020, 340) rotate(-6) scale(0.6)">
+            <path d="M10 6 Q10 0 5 0 Q0 0 0 6 Q0 12 10 18 Q20 12 20 6 Q20 0 15 0 Q10 0 10 6" />
+          </g>
+        </g>
+
+        {/* === HOME icon === */}
+        <g transform="translate(560, 380) rotate(5)" stroke={getStroke(1)} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          <path d="M4 20 L4 34 L32 34 L32 20" />
+          <path d="M0 20 L18 4 L36 20" />
+          <rect x="14" y="24" width="8" height="10" rx="1" />
+        </g>
+
+        {/* === SECOND REFRIGERATOR — bottom right === */}
+        <g transform="translate(1020, 500) rotate(10)" stroke={getStroke(2)} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="0" y="0" width="32" height="50" rx="3" />
+          <line x1="0" y1="20" x2="32" y2="20" />
+          <line x1="26" y1="6" x2="26" y2="16" />
+          <line x1="26" y1="26" x2="26" y2="40" />
+          <path d="M8 8 L11 5 L14 8" strokeWidth="1.5" />
+        </g>
+
+        {/* === SECOND STOVE — bottom center === */}
+        <g transform="translate(650, 480) rotate(-8)" stroke={getStroke(3)} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="0" y="10" width="40" height="36" rx="3" />
+          <circle cx="10" cy="5" r="4.5" />
+          <circle cx="28" cy="5" r="4.5" />
+          <rect x="6" y="22" width="28" height="14" rx="2" />
+          <line x1="12" y1="18" x2="28" y2="18" strokeWidth="2.2" />
+        </g>
+
+        {/* === WASHING MACHINE — middle left === */}
+        <g transform="translate(320, 440) rotate(-4)" stroke={getStroke(4)} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          <rect x="0" y="0" width="44" height="48" rx="5" />
+          {/* door */}
+          <circle cx="22" cy="28" r="14" />
+          <circle cx="22" cy="28" r="9" />
+          {/* control panel */}
+          <circle cx="10" cy="8" r="3" />
+          <circle cx="22" cy="8" r="2" />
+          <line x1="30" y1="6" x2="38" y2="6" strokeWidth="2" />
+          <line x1="30" y1="10" x2="38" y2="10" strokeWidth="2" />
+        </g>
+
+        {/* === IRON — scattered === */}
+        <g transform="translate(900, 420) rotate(20)" stroke={getStroke(5)} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          <path d="M0 20 L16 20 L28 8 L28 0 L8 0 L8 8 Z" />
+          {/* steam holes */}
+          <circle cx="6" cy="16" r="1" fill={getStroke(5)} />
+          <circle cx="12" cy="16" r="1" fill={getStroke(5)} />
+          <circle cx="9" cy="12" r="1" fill={getStroke(5)} />
+          {/* steam */}
+          <path d="M4 -4 Q6 -8 4 -12" strokeWidth="1.5" />
+          <path d="M10 -4 Q12 -8 10 -12" strokeWidth="1.5" />
+        </g>
+
+        {/* === LIGHTNING BOLT (power) === */}
+        <g stroke={getStroke(6)} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          <g transform="translate(460, 120) rotate(-10)">
+            <path d="M14 0 L4 14 L10 14 L6 26 L20 10 L14 10 L18 0 Z" />
+          </g>
+          <g transform="translate(1060, 420) rotate(8) scale(0.8)">
+            <path d="M14 0 L4 14 L10 14 L6 26 L20 10 L14 10 L18 0 Z" />
+          </g>
+        </g>
+
+        {/* === WIFI / SMART HOME signal === */}
+        <g transform="translate(150, 450) rotate(-5)" stroke={getStroke(7)} strokeWidth="1.8" strokeLinecap="round" fill="none">
+          <circle cx="10" cy="18" r="2" fill={getStroke(7)} />
+          <path d="M4 14 Q10 8 16 14" />
+          <path d="M0 10 Q10 2 20 10" />
+          <path d="M-3 6 Q10 -4 23 6" />
+        </g>
+
+        {/* === SPEECH BUBBLE (customer service) === */}
+        <g transform="translate(750, 360) rotate(4)" stroke={getStroke(8)} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          <path d="M0 0 Q0 -16 20 -16 Q40 -16 40 0 Q40 14 24 14 L16 22 L14 14 Q0 14 0 0" />
+          {/* dots */}
+          <circle cx="12" cy="0" r="2" fill={getStroke(8)} />
+          <circle cx="20" cy="0" r="2" fill={getStroke(8)} />
+          <circle cx="28" cy="0" r="2" fill={getStroke(8)} />
+        </g>
+
+        {/* === EGYPTIAN GOLD BRACKETS « » === */}
+        <g stroke={getStroke(9)} strokeWidth="2.5" strokeLinecap="round" fill="none">
+          <g transform="translate(360, 300)">
+            <path d="M12 0 L0 12 L12 24" />
+            <path d="M18 0 L6 12 L18 24" />
+          </g>
+          <g transform="translate(1100, 300)">
+            <path d="M0 0 L12 12 L0 24" />
+            <path d="M-6 0 L6 12 L-6 24" />
+          </g>
+        </g>
+
+        {/* === THERMOMETER (temperature) === */}
+        <g transform="translate(540, 560) rotate(-8)" stroke={getStroke(10)} strokeWidth="2" strokeLinecap="round" fill="none">
+          <path d="M10 4 L10 28 Q6 30 4 34 Q2 40 10 44 Q18 40 16 34 Q14 30 10 28" />
+          <circle cx="10" cy="36" r="4" />
+          <line x1="10" y1="36" x2="10" y2="12" strokeWidth="2.5" />
+          {/* marks */}
+          <line x1="14" y1="10" x2="18" y2="10" strokeWidth="1.5" />
+          <line x1="14" y1="16" x2="17" y2="16" strokeWidth="1.5" />
+          <line x1="14" y1="22" x2="18" y2="22" strokeWidth="1.5" />
+        </g>
+
+        {/* === ADDITIONAL SMALL ELEMENTS scattered for density === */}
+
+        {/* small plus signs */}
+        <g stroke={getStroke(11)} strokeWidth="1.8" strokeLinecap="round">
+          <g transform="translate(100, 160)"><line x1="0" y1="4" x2="8" y2="4" /><line x1="4" y1="0" x2="4" y2="8" /></g>
+          <g transform="translate(430, 60)"><line x1="0" y1="4" x2="8" y2="4" /><line x1="4" y1="0" x2="4" y2="8" /></g>
+          <g transform="translate(900, 140)"><line x1="0" y1="4" x2="8" y2="4" /><line x1="4" y1="0" x2="4" y2="8" /></g>
+          <g transform="translate(300, 520)"><line x1="0" y1="4" x2="8" y2="4" /><line x1="4" y1="0" x2="4" y2="8" /></g>
+          <g transform="translate(770, 520)"><line x1="0" y1="4" x2="8" y2="4" /><line x1="4" y1="0" x2="4" y2="8" /></g>
+        </g>
+
+        {/* small circles / dots */}
+        <g fill={getStroke(0)} stroke="none">
+          <circle cx="50" cy="340" r="3" />
+          <circle cx="280" cy="240" r="2.5" />
+          <circle cx="680" cy="280" r="3" />
+          <circle cx="1000" cy="120" r="2" />
+          <circle cx="840" cy="540" r="2.5" />
+          <circle cx="160" cy="560" r="3" />
+          <circle cx="990" cy="400" r="2" />
+        </g>
+
+        {/* small circles / rings */}
+        <g stroke={getStroke(1)} strokeWidth="1.5" fill="none">
+          <circle cx="240" cy="430" r="6" />
+          <circle cx="600" cy="650" r="8" />
+          <circle cx="1040" cy="260" r="5" />
+          <circle cx="130" cy="380" r="7" />
+        </g>
+
+        {/* wavy lines */}
+        <g stroke={getStroke(2)} strokeWidth="1.5" strokeLinecap="round" fill="none">
+          <path d="M40 480 Q60 470 80 480 Q100 490 120 480" />
+          <path d="M700 560 Q720 550 740 560 Q760 570 780 560" />
+        </g>
+
+        {/* === BOTTOM ROW — repeat key appliances smaller for pattern density === */}
+
+        {/* mini kettle */}
+        <g transform="translate(420, 580) rotate(12) scale(0.7)" stroke={getStroke(3)} strokeWidth="2.5" strokeLinecap="round" fill="none">
+          <path d="M8 18 Q4 18 4 28 Q4 38 18 40 Q32 38 32 28 Q32 18 28 18" />
+          <path d="M8 18 Q18 14 28 18" />
+          <path d="M32 22 Q38 22 38 28 Q38 34 32 34" strokeWidth="3" />
+          <path d="M14 12 Q12 6 14 2" strokeWidth="2" />
+          <path d="M20 10 Q18 4 20 0" strokeWidth="2" />
+        </g>
+
+        {/* mini vacuum */}
+        <g transform="translate(180, 620) rotate(-15) scale(0.65)" stroke={getStroke(4)} strokeWidth="2.8" strokeLinecap="round" fill="none">
+          <ellipse cx="16" cy="36" rx="12" ry="16" />
+          <path d="M16 20 Q22 8 32 4 Q38 2 42 8" />
+          <path d="M42 8 L48 -2" strokeWidth="3" />
+        </g>
+
+        {/* mini blender */}
+        <g transform="translate(850, 620) rotate(6) scale(0.65)" stroke={getStroke(5)} strokeWidth="2.8" strokeLinecap="round" fill="none">
+          <path d="M6 0 L2 28 Q2 34 10 36 L26 36 Q34 34 34 28 L30 0 Z" />
+          <rect x="0" y="36" width="36" height="10" rx="3" />
+        </g>
+
+        {/* === ROW 7-8: more scattered filler for 900px height === */}
+
+        {/* small snowflake */}
+        <g transform="translate(350, 680) rotate(30)" stroke={getStroke(6)} strokeWidth="1.5" strokeLinecap="round">
+          <line x1="0" y1="-8" x2="0" y2="8" />
+          <line x1="-7" y1="-4" x2="7" y2="4" />
+          <line x1="-7" y1="4" x2="7" y2="-4" />
+        </g>
+
+        {/* small flame */}
+        <g transform="translate(920, 700) rotate(10)" stroke={getStroke(7)} strokeWidth="1.8" strokeLinecap="round" fill="none">
+          <path d="M8 18 Q2 12 5 6 Q7 2 8 0 Q9 4 12 6 Q15 2 13 0 Q18 6 16 10 Q20 14 14 18 Q10 20 8 18" />
+        </g>
+
+        {/* more hearts */}
+        <g transform="translate(580, 720) rotate(-8) scale(0.55)" stroke={getStroke(8)} strokeWidth="2.5" strokeLinecap="round" fill="none">
+          <path d="M10 6 Q10 0 5 0 Q0 0 0 6 Q0 12 10 18 Q20 12 20 6 Q20 0 15 0 Q10 0 10 6" />
+        </g>
+
+        {/* sparkle cluster */}
+        <g stroke={getStroke(9)} strokeWidth="1.5" strokeLinecap="round" fill="none">
+          <g transform="translate(100, 700)">
+            <line x1="4" y1="0" x2="4" y2="8" />
+            <line x1="0" y1="4" x2="8" y2="4" />
+            <line x1="1" y1="1" x2="7" y2="7" />
+            <line x1="7" y1="1" x2="1" y2="7" />
+          </g>
+          <g transform="translate(1100, 550)">
+            <line x1="4" y1="0" x2="4" y2="8" />
+            <line x1="0" y1="4" x2="8" y2="4" />
+            <line x1="1" y1="1" x2="7" y2="7" />
+            <line x1="7" y1="1" x2="1" y2="7" />
+          </g>
+        </g>
+
+        {/* small water drops */}
+        <g stroke={getStroke(10)} strokeWidth="1.5" strokeLinecap="round" fill="none">
+          <path d="M720 440 Q716 448 720 452 Q724 448 720 440" />
+          <path d="M480 500 Q476 508 480 512 Q484 508 480 500" />
+          <path d="M160 100 Q156 108 160 112 Q164 108 160 100" />
+        </g>
+
+        {/* EGP currency symbol £ hint */}
+        <g transform="translate(820, 160)" stroke={getStroke(0)} strokeWidth="2" strokeLinecap="round" fill="none">
+          <path d="M18 2 Q8 2 6 10 Q4 18 8 24 L2 24" />
+          <line x1="2" y1="14" x2="16" y2="14" />
+        </g>
+
+        {/* mini TV */}
+        <g transform="translate(60, 780) rotate(-6) scale(0.6)" stroke={getStroke(1)} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          <rect x="0" y="0" width="50" height="32" rx="3" />
+          <line x1="18" y1="32" x2="18" y2="38" />
+          <line x1="32" y1="32" x2="32" y2="38" />
+          <line x1="12" y1="38" x2="38" y2="38" />
+        </g>
+
+        {/* mini home */}
+        <g transform="translate(700, 750) rotate(8) scale(0.6)" stroke={getStroke(2)} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          <path d="M4 18 L4 30 L28 30 L28 18" />
+          <path d="M0 18 L16 4 L32 18" />
+        </g>
+
+        {/* final scattered dots for density */}
+        <g fill={getStroke(3)} stroke="none">
+          <circle cx="480" cy="760" r="2" />
+          <circle cx="960" cy="780" r="2.5" />
+          <circle cx="300" cy="770" r="2" />
+          <circle cx="1140" cy="700" r="3" />
+          <circle cx="40" cy="650" r="2" />
+        </g>
+      </svg>
+
+      {animated && (
+        <style>{`
+          @keyframes doodleFloat {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(-4px, -6px); }
+            50% { transform: translate(2px, -10px); }
+            75% { transform: translate(6px, -4px); }
+          }
+          .doodle-float {
+            animation: doodleFloat 30s ease-in-out infinite;
+          }
+        `}</style>
+      )}
+    </div>
+  )
+}

@@ -1,0 +1,593 @@
+{
+  "meta": {
+    "total": 29
+  },
+  "products": [
+    {
+      "id": 1774,
+      "name_ar": "ديب فريزر ويلسن افقي",
+      "name_en": "ديب فريزر ويلسن افقي",
+      "price": 10300,
+      "regular_price": 10300,
+      "sale_price": null,
+      "status": "in_stock",
+      "category": "freezers",
+      "specs": {},
+      "images": [
+        {
+          "local_path": "uploads/products/1774_main.png",
+          "original_url": "https://wilson-eg.com/wp-content/uploads/2025/03/Untitled-2.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1774_main.png",
+      "main_image": "uploads/products/1774_main.png",
+      "on_sale": false
+    },
+    {
+      "id": 1772,
+      "name_ar": "ديب فريزر ويلسن افقي",
+      "name_en": "ديب فريزر ويلسن افقي",
+      "price": 11700,
+      "regular_price": 11700,
+      "sale_price": null,
+      "status": "in_stock",
+      "category": "freezers",
+      "specs": {},
+      "images": [
+        {
+          "local_path": "uploads/products/1772_main.png",
+          "original_url": "https://wilson-eg.com/wp-content/uploads/2025/03/Vector-Smart-Object2.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1772_main.png",
+      "main_image": "uploads/products/1772_main.png",
+      "on_sale": false
+    },
+    {
+      "id": 1756,
+      "name_ar": "W-ST90MS  كوك برو امان كامل استانلس",
+      "name_en": "ST90MS",
+      "price": 18085,
+      "regular_price": 18085,
+      "sale_price": null,
+      "status": "in_stock",
+      "category": "stoves",
+      "specs": {
+        "model": "W-ST90MS"
+      },
+      "images": [
+        {
+          "local_path": "uploads/products/1756_main.jpg",
+          "original_url": "https://wilson-eg.com/wp-content/uploads/2025/03/Picture2-1.jpg"
+        }
+      ],
+      "thumbnail": "uploads/products/1756_main.jpg",
+      "main_image": "uploads/products/1756_main.jpg",
+      "on_sale": false
+    },
+    {
+      "id": 1752,
+      "name_ar": "W-ST90MB كوك برو امان كامل اسود سطح استانلس",
+      "name_en": "ST90MB",
+      "price": 17830,
+      "regular_price": 17830,
+      "sale_price": null,
+      "status": "in_stock",
+      "category": "stoves",
+      "specs": {
+        "model": "W-ST90MB"
+      },
+      "images": [
+        {
+          "local_path": "uploads/products/1752_main.jpg",
+          "original_url": "https://wilson-eg.com/wp-content/uploads/2025/03/Picture1.jpg"
+        }
+      ],
+      "thumbnail": "uploads/products/1752_main.jpg",
+      "main_image": "uploads/products/1752_main.jpg",
+      "on_sale": false
+    },
+    {
+      "id": 1731,
+      "name_ar": "هاند بليندرWH1300",
+      "name_en": "WH1300",
+      "price": 2250,
+      "regular_price": 2400,
+      "sale_price": 2250,
+      "status": "out_of_stock",
+      "category": "blenders",
+      "specs": {
+        "model": "WH1300"
+      },
+      "images": [
+        {
+          "local_path": "uploads/products/1731_main.jpeg",
+          "original_url": "https://wilson-eg.com/wp-content/uploads/2025/03/WhatsApp-Image-2025-03-06-at-8.25.02-PM.jpeg"
+        }
+      ],
+      "thumbnail": "uploads/products/1731_main.jpeg",
+      "main_image": "uploads/products/1731_main.jpeg",
+      "on_sale": true
+    },
+    {
+      "id": 1725,
+      "name_ar": "هاند بليندر WH1200",
+      "name_en": "WH1200",
+      "price": 1490,
+      "regular_price": 1550,
+      "sale_price": 1490,
+      "status": "out_of_stock",
+      "category": "blenders",
+      "specs": {
+        "model": "WH1200"
+      },
+      "images": [
+        {
+          "local_path": "uploads/products/1725_main.png",
+          "original_url": "https://wilson-eg.com/wp-content/uploads/2025/03/50.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1725_main.png",
+      "main_image": "uploads/products/1725_main.png",
+      "on_sale": true
+    },
+    {
+      "id": 1660,
+      "name_ar": "W-ST90FB  فلام ماكس فانشورى اسود سطح استانلس",
+      "name_en": "ST90FB",
+      "price": 12085,
+      "regular_price": 12085,
+      "sale_price": null,
+      "status": "in_stock",
+      "category": "home_appliances",
+      "specs": {
+        "model": "W-ST90FB"
+      },
+      "images": [
+        {
+          "local_path": "uploads/products/1660_main.png",
+          "original_url": "https://wilson-eg.com/wp-content/uploads/2024/12/4-e1734979455278.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1660_main.png",
+      "main_image": "uploads/products/1660_main.png",
+      "on_sale": false
+    },
+    {
+      "id": 1661,
+      "name_ar": "W-ST90CB فلام ماكس غرف اسود سطح استانلس",
+      "name_en": "ST90CB",
+      "price": 12250,
+      "regular_price": 12250,
+      "sale_price": null,
+      "status": "in_stock",
+      "category": "home_appliances",
+      "specs": {
+        "model": "W-ST90CB"
+      },
+      "images": [
+        {
+          "local_path": "uploads/products/1661_main.png",
+          "original_url": "https://wilson-eg.com/wp-content/uploads/2024/12/22-e1734979167544.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1661_main.png",
+      "main_image": "uploads/products/1661_main.png",
+      "on_sale": false
+    },
+    {
+      "id": 1659,
+      "name_ar": "W-ST90FS  فلام ماكس فانشورى استانلس",
+      "name_en": "ST90FS",
+      "price": 12350,
+      "regular_price": 12350,
+      "sale_price": null,
+      "status": "in_stock",
+      "category": "home_appliances",
+      "specs": {
+        "model": "W-ST90FS"
+      },
+      "images": [
+        {
+          "local_path": "uploads/products/1659_main.png",
+          "original_url": "https://wilson-eg.com/wp-content/uploads/2024/12/20-e1734976877150.png"
+        },
+        {
+          "local_path": "uploads/products/1659_g1.png",
+          "original_url": "https://wilson-eg.com/wp-content/uploads/2024/11/Red-Modern-Sunday-Prayer-Instagram-Post-1.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1659_main.png",
+      "main_image": "uploads/products/1659_main.png",
+      "on_sale": false
+    },
+    {
+      "id": 1658,
+      "name_ar": "W-ST90HMB كوك زون نصف امان اسود سطح استانلس",
+      "name_en": "ST90HMB",
+      "price": 14200,
+      "regular_price": 14200,
+      "sale_price": null,
+      "status": "out_of_stock",
+      "category": "stoves",
+      "specs": {
+        "model": "W-ST90HM"
+      },
+      "images": [
+        {
+          "local_path": "uploads/products/1658_main.png"
+        },
+        {
+          "local_path": "uploads/products/1658_g1.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1658_main.png",
+      "main_image": "uploads/products/1658_main.png",
+      "on_sale": false
+    },
+    {
+      "id": 1662,
+      "name_ar": "W-ST90C  فلام ماكس غرف استانلس",
+      "name_en": "ST90C",
+      "price": 12425,
+      "regular_price": 12425,
+      "sale_price": null,
+      "status": "in_stock",
+      "category": "home_appliances",
+      "specs": {
+        "model": "W-ST90C"
+      },
+      "images": [
+        {
+          "local_path": "uploads/products/1662_main.png"
+        },
+        {
+          "local_path": "uploads/products/1662_g1.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1662_main.png",
+      "main_image": "uploads/products/1662_main.png",
+      "on_sale": false
+    },
+    {
+      "id": 1657,
+      "name_ar": "W-ST90HMS   كوك زون نصف امان استاتلس",
+      "name_en": "ST90HMS",
+      "price": 14535,
+      "regular_price": 14535,
+      "sale_price": null,
+      "status": "out_of_stock",
+      "category": "stoves",
+      "specs": {
+        "model": "W-ST90HM"
+      },
+      "images": [
+        {
+          "local_path": "uploads/products/1657_main.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1657_main.png",
+      "main_image": "uploads/products/1657_main.png",
+      "on_sale": false
+    },
+    {
+      "id": 1618,
+      "name_ar": "مضرب بيض فردي",
+      "name_en": "مضرب بيض فردي",
+      "price": 1100,
+      "regular_price": 1200,
+      "sale_price": 1100,
+      "status": "in_stock",
+      "category": "home_appliances",
+      "specs": {},
+      "images": [
+        {
+          "local_path": "uploads/products/1618_main.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1618_main.png",
+      "main_image": "uploads/products/1618_main.png",
+      "on_sale": true
+    },
+    {
+      "id": 1611,
+      "name_ar": "مضرب البيض بالعجان",
+      "name_en": "مضرب البيض بالعجان",
+      "price": 2200,
+      "regular_price": 2250,
+      "sale_price": 2200,
+      "status": "in_stock",
+      "category": "home_appliances",
+      "specs": {},
+      "images": [],
+      "thumbnail": null,
+      "main_image": null,
+      "on_sale": true
+    },
+    {
+      "id": 1610,
+      "name_ar": "عجان ويلسن 7.5 لتر",
+      "name_en": "عجان ويلسن 7.5 لتر",
+      "price": 6475,
+      "regular_price": 6500,
+      "sale_price": 6475,
+      "status": "in_stock",
+      "category": "home_appliances",
+      "specs": {},
+      "images": [
+        {
+          "local_path": "uploads/products/1610_main.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1610_main.png",
+      "main_image": "uploads/products/1610_main.png",
+      "on_sale": true
+    },
+    {
+      "id": 1609,
+      "name_ar": "مبرد مياه مع حافظة داخلية  أسود",
+      "name_en": "مبرد مياه مع حافظة داخلية  أسود",
+      "price": 5900,
+      "regular_price": 6200,
+      "sale_price": 5900,
+      "status": "in_stock",
+      "category": "water_coolers",
+      "specs": {},
+      "images": [
+        {
+          "local_path": "uploads/products/1609_main.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1609_main.png",
+      "main_image": "uploads/products/1609_main.png",
+      "on_sale": true
+    },
+    {
+      "id": 1606,
+      "name_ar": "مبرد مياه بثلاجه داخلية (سيلفر)",
+      "name_en": "مبرد مياه بثلاجه داخلية (سيلفر)",
+      "price": 6500,
+      "regular_price": 6800,
+      "sale_price": 6500,
+      "status": "out_of_stock",
+      "category": "water_coolers",
+      "specs": {},
+      "images": [
+        {
+          "local_path": "uploads/products/1606_main.jpeg"
+        }
+      ],
+      "thumbnail": "uploads/products/1606_main.jpeg",
+      "main_image": "uploads/products/1606_main.jpeg",
+      "on_sale": true
+    },
+    {
+      "id": 1506,
+      "name_ar": "شاشة ويلسن  32 بوصة &#8211; سمارت + بدون أطار",
+      "name_en": "شاشة ويلسن  32 بوصة &#8211; سمارت + بدون أطار",
+      "price": 6900,
+      "regular_price": 7000,
+      "sale_price": 6900,
+      "status": "in_stock",
+      "category": "tvs",
+      "specs": {},
+      "images": [
+        {
+          "local_path": "uploads/products/1506_main.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1506_main.png",
+      "main_image": "uploads/products/1506_main.png",
+      "on_sale": true
+    },
+    {
+      "id": 1501,
+      "name_ar": "شاشة ويلسن 32 بوصة",
+      "name_en": "شاشة ويلسن 32 بوصة",
+      "price": 5900,
+      "regular_price": 6000,
+      "sale_price": 5900,
+      "status": "in_stock",
+      "category": "tvs",
+      "specs": {},
+      "images": [
+        {
+          "local_path": "uploads/products/1501_main.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1501_main.png",
+      "main_image": "uploads/products/1501_main.png",
+      "on_sale": true
+    },
+    {
+      "id": 1500,
+      "name_ar": "شاشة ويلسن 43 بوصة",
+      "name_en": "شاشة ويلسن 43 بوصة",
+      "price": 11200,
+      "regular_price": 11500,
+      "sale_price": 11200,
+      "status": "in_stock",
+      "category": "tvs",
+      "specs": {},
+      "images": [
+        {
+          "local_path": "uploads/products/1500_main.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1500_main.png",
+      "main_image": "uploads/products/1500_main.png",
+      "on_sale": true
+    },
+    {
+      "id": 1430,
+      "name_ar": "فرن كهربائي ويلسن ايناملد",
+      "name_en": "فرن كهربائي ويلسن ايناملد",
+      "price": 3550,
+      "regular_price": 3800,
+      "sale_price": 3550,
+      "status": "in_stock",
+      "category": "home_appliances",
+      "specs": {},
+      "images": [
+        {
+          "local_path": "uploads/products/1430_main.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1430_main.png",
+      "main_image": "uploads/products/1430_main.png",
+      "on_sale": true
+    },
+    {
+      "id": 1429,
+      "name_ar": "مكنسة كهربائية 2500 وات",
+      "name_en": "مكنسة كهربائية 2500 وات",
+      "price": 4500,
+      "regular_price": 4700,
+      "sale_price": 4500,
+      "status": "in_stock",
+      "category": "vacuum_cleaners",
+      "specs": {},
+      "images": [
+        {
+          "local_path": "uploads/products/1429_main.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1429_main.png",
+      "main_image": "uploads/products/1429_main.png",
+      "on_sale": true
+    },
+    {
+      "id": 1428,
+      "name_ar": "مبرد مياه مع ثلاجة داخلية أسود",
+      "name_en": "مبرد مياه مع ثلاجة داخلية أسود",
+      "price": 6400,
+      "regular_price": 6700,
+      "sale_price": 6400,
+      "status": "in_stock",
+      "category": "water_coolers",
+      "specs": {},
+      "images": [
+        {
+          "local_path": "uploads/products/1428_main.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1428_main.png",
+      "main_image": "uploads/products/1428_main.png",
+      "on_sale": true
+    },
+    {
+      "id": 1393,
+      "name_ar": "مبرد مياه بحافظه داخليه (سيلفر)",
+      "name_en": "مبرد مياه بحافظه داخليه (سيلفر)",
+      "price": 6000,
+      "regular_price": 6300,
+      "sale_price": 6000,
+      "status": "out_of_stock",
+      "category": "water_coolers",
+      "specs": {},
+      "images": [
+        {
+          "local_path": "uploads/products/1393_main.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1393_main.png",
+      "main_image": "uploads/products/1393_main.png",
+      "on_sale": true
+    },
+    {
+      "id": 1391,
+      "name_ar": "مكواه",
+      "name_en": "مكواه",
+      "price": 1250,
+      "regular_price": 1300,
+      "sale_price": 1250,
+      "status": "in_stock",
+      "category": "home_appliances",
+      "specs": {},
+      "images": [
+        {
+          "local_path": "uploads/products/1391_main.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1391_main.png",
+      "main_image": "uploads/products/1391_main.png",
+      "on_sale": true
+    },
+    {
+      "id": 1388,
+      "name_ar": "مكنسة كهربائية 2100 وات",
+      "name_en": "مكنسة كهربائية 2100 وات",
+      "price": 3900,
+      "regular_price": 4100,
+      "sale_price": 3900,
+      "status": "in_stock",
+      "category": "vacuum_cleaners",
+      "specs": {},
+      "images": [
+        {
+          "local_path": "uploads/products/1388_main.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1388_main.png",
+      "main_image": "uploads/products/1388_main.png",
+      "on_sale": true
+    },
+    {
+      "id": 1387,
+      "name_ar": "فرن كهربائي 4 مفاتيح",
+      "name_en": "فرن كهربائي 4 مفاتيح",
+      "price": 4100,
+      "regular_price": 4300,
+      "sale_price": 4100,
+      "status": "out_of_stock",
+      "category": "home_appliances",
+      "specs": {},
+      "images": [
+        {
+          "local_path": "uploads/products/1387_main.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1387_main.png",
+      "main_image": "uploads/products/1387_main.png",
+      "on_sale": true
+    },
+    {
+      "id": 1386,
+      "name_ar": "كبة ويلسن",
+      "name_en": "كبة ويلسن",
+      "price": 1350,
+      "regular_price": 1500,
+      "sale_price": 1350,
+      "status": "in_stock",
+      "category": "home_appliances",
+      "specs": {},
+      "images": [
+        {
+          "local_path": "uploads/products/1386_main.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1386_main.png",
+      "main_image": "uploads/products/1386_main.png",
+      "on_sale": true
+    },
+    {
+      "id": 1382,
+      "name_ar": "كاتل ويلسن",
+      "name_en": "كاتل ويلسن",
+      "price": 1250,
+      "regular_price": 1350,
+      "sale_price": 1250,
+      "status": "in_stock",
+      "category": "home_appliances",
+      "specs": {},
+      "images": [
+        {
+          "local_path": "uploads/products/1382_main.png"
+        }
+      ],
+      "thumbnail": "uploads/products/1382_main.png",
+      "main_image": "uploads/products/1382_main.png",
+      "on_sale": true
+    }
+  ]
+}

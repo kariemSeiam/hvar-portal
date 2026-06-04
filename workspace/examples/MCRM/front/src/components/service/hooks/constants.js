@@ -1,0 +1,40 @@
+/** Sub-tabs configuration (shared with ticketTabParams and useTicketsFilters) */
+export const SUB_TABS_CONFIG = Object.freeze({
+    replacement: [
+        { id: 'all', label: 'الكل', description: 'استبدال - الكل', color: 'orange' },
+        { id: 'in-preparation', label: 'جديد', description: 'استبدال - جديد', color: 'orange' },
+        { id: 'preparing', label: 'جاري التحضير', description: 'استبدال - جاري التحضير', color: 'orange' },
+        { id: 'ready-to-ship', label: 'جاهز للإرسال', description: 'استبدال - جاهز للإرسال', color: 'orange' },
+        { id: 'sent', label: 'جاهز للاستلام', description: 'استبدال - جاهز للاستلام', color: 'orange' },
+        { id: 'validate-returns', label: 'فحص المرتجعات', description: 'استبدال - فحص المرتجعات', color: 'orange' },
+        { id: 'completed', label: 'مكتملة', description: 'استبدال - مكتملة', color: 'gray' },
+        { id: 'cancelled', label: 'ملغاة', description: 'استبدال - ملغاة', color: 'red' },
+    ],
+    maintenance: [
+        { id: 'all', label: 'الكل', description: 'صيانة - الكل', color: 'purple' },
+        { id: 'confirmed', label: 'مؤكد', description: 'صيانة - مؤكد', color: 'purple' },
+        { id: 'received', label: 'تم الاستلام', description: 'صيانة - تم الاستلام', color: 'purple' },
+        { id: 'under-maintenance', label: 'قيد الصيانة', description: 'صيانة - قيد الصيانة', color: 'purple' },
+        { id: 'completion-ready', label: 'اكتمال الصيانة', description: 'صيانة - اكتمال الصيانة', color: 'purple' },
+        { id: 'ready-to-ship', label: 'جاهز للإرسال', description: 'صيانة - جاهز للإرسال', color: 'purple' },
+        { id: 'sent', label: 'المرسلة', description: 'صيانة - المرسلة', color: 'purple' },
+        { id: 'completed', label: 'مكتملة', description: 'صيانة - مكتملة', color: 'gray' },
+        { id: 'cancelled', label: 'ملغاة', description: 'صيانة - ملغاة', color: 'red' },
+    ],
+    return: [
+        { id: 'all', label: 'الكل', description: 'استرجاع - الكل', color: 'blue' },
+        { id: 'receiving', label: 'انتظار الاستلام', description: 'استرجاع - انتظار الاستلام', color: 'blue' },
+        { id: 'inspection', label: 'الفحص', description: 'استرجاع - الفحص', color: 'blue' },
+        { id: 'completed', label: 'مكتملة', description: 'استرجاع - مكتملة', color: 'gray' },
+        { id: 'cancelled', label: 'ملغاة', description: 'استرجاع - ملغاة', color: 'red' },
+    ],
+    sell: [
+        { id: 'all', label: 'الكل', description: 'المبيعات - الكل', color: 'green' },
+        { id: 'new', label: 'جديد', description: 'المبيعات - جديد', color: 'green' },
+        { id: 'preparing', label: 'جاري التحضير', description: 'المبيعات - جاري التحضير', color: 'green' },
+        { id: 'ready-to-ship', label: 'جاهز للإرسال', description: 'المبيعات - جاهز للإرسال', color: 'green' },
+        { id: 'sent', label: 'مرسلة', description: 'المبيعات - مرسلة', color: 'green' },
+        { id: 'completed', label: 'مكتملة', description: 'المبيعات - مكتملة', color: 'gray' },
+        { id: 'cancelled', label: 'ملغاة', description: 'المبيعات - ملغاة', color: 'red' },
+    ],
+});

@@ -1,0 +1,26 @@
+[
+  {"id": 1, "product_id": 1, "product_sku": "hvar5057", "part_sku": "hvar0178", "name_ar": "كبة هاند بلندر 5057", "type": "component", "is_replaceable": true, "warranty_period_months": 6},
+  {"id": 2, "product_id": 1, "product_sku": "hvar5057", "part_sku": "hvar0179", "name_ar": "سلاح فرم هاند بلندر 5057", "type": "component", "is_replaceable": true, "warranty_period_months": 6},
+  {"id": 3, "product_id": 1, "product_sku": "hvar5057", "part_sku": "hvar0181", "name_ar": "غطا كبه هاند 5057", "type": "component", "is_replaceable": true, "warranty_period_months": 6},
+  {"id": 4, "product_id": 1, "product_sku": "hvar5057", "part_sku": "hvar0177", "name_ar": "خافق شبكي هاند 5057", "type": "component", "is_replaceable": true, "warranty_period_months": 6},
+  {"id": 5, "product_id": 1, "product_sku": "hvar5057", "part_sku": "hvar0182", "name_ar": "ماتور هاند 5057", "type": "motor", "is_replaceable": true, "warranty_period_months": 6},
+  {"id": 6, "product_id": 1, "product_sku": "hvar5057", "part_sku": "hvar0183", "name_ar": "هراسه هاند 5057", "type": "component", "is_replaceable": true, "warranty_period_months": 6},
+  {"id": 7, "product_id": 1, "product_sku": "hvar5057", "part_sku": "hvar0184", "name_ar": "كوب معياري هاند 5057", "type": "component", "is_replaceable": true, "warranty_period_months": 6},
+  {"id": 8, "product_id": 1, "product_sku": "hvar5057", "part_sku": "hvar0185", "name_ar": "كرتون خارجي 5057", "type": "packaging", "is_replaceable": false, "warranty_period_months": 0},
+  {"id": 9, "product_id": 1, "product_sku": "hvar5057", "part_sku": "hvar0187", "name_ar": "شريحه 1 كرتون 5057", "type": "packaging", "is_replaceable": false, "warranty_period_months": 0},
+  {"id": 10, "product_id": 1, "product_sku": "hvar5057", "part_sku": "hvar0188", "name_ar": "شريحه 2 كرتون 5057", "type": "packaging", "is_replaceable": false, "warranty_period_months": 0},
+  {"id": 11, "product_id": 1, "product_sku": "hvar5057", "part_sku": "hvar0189", "name_ar": "شريحه 3 كرتون 5057", "type": "packaging", "is_replaceable": false, "warranty_period_months": 0},
+  {"id": 12, "product_id": 1, "product_sku": "hvar5057", "part_sku": "hvar0190", "name_ar": "مكمله خافق شبكي 5057", "type": "component", "is_replaceable": true, "warranty_period_months": 6},
+  {"id": 13, "product_id": 1, "product_sku": "hvar5057", "part_sku": "hvar0180", "name_ar": "تجميعه هاند 5057", "type": "assembly", "is_replaceable": false, "warranty_period_months": 6},
+  {"id": 14, "product_id": 1, "product_sku": "hvar5057", "part_sku": "hvar0058", "name_ar": "ضمان عامين", "type": "warranty", "is_replaceable": false, "warranty_period_months": 24},
+  {"id": 15, "product_id": 1, "product_sku": "hvar5057", "part_sku": "hvar0109", "name_ar": "كوبون خصم 100", "type": "coupon", "is_replaceable": false, "warranty_period_months": 0},
+  
+  {"id": 16, "product_id": 2, "product_sku": "hvar5055", "part_sku": "hvar5055", "name_ar": "هاند بلندر هفار 1500 وات 5055", "type": "assembly", "is_replaceable": false, "warranty_period_months": 6},
+  {"id": 17, "product_id": 2, "product_sku": "hvar5055", "part_sku": "hvar0092", "name_ar": "مضرب بيض هاند 5055", "type": "component", "is_replaceable": true, "warranty_period_months": 6},
+  {"id": 18, "product_id": 2, "product_sku": "hvar5055", "part_sku": "hvar0089", "name_ar": "وعاء هاند 5055", "type": "component", "is_replaceable": true, "warranty_period_months": 6},
+  {"id": 19, "product_id": 2, "product_sku": "hvar5055", "part_sku": "hvar0091", "name_ar": "سلاح هاند 5055", "type": "component", "is_replaceable": true, "warranty_period_months": 6},
+  {"id": 20, "product_id": 2, "product_sku": "hvar5055", "part_sku": "hvar0093", "name_ar": "كبه هاند 5055", "type": "component", "is_replaceable": true, "warranty_period_months": 6},
+  {"id": 21, "product_id": 2, "product_sku": "hvar5055", "part_sku": "hvar0090", "name_ar": "ماتور هاند 5055", "type": "motor", "is_replaceable": true, "warranty_period_months": 6}
+]
+
+

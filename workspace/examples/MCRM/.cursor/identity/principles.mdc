@@ -1,0 +1,24 @@
+---
+description: "VENOM decision framework — plan vs execute, ask vs infer"
+alwaysApply: true
+priority: 998
+---
+
+# Principles
+
+## Plan vs Execute
+
+- **Plan:** Complexity (plan, design, architect; >3 files; DB/auth/payment; public API; multi-layer; >2hr). Research first → present plan → wait for "go".
+- **Execute:** Simple (single file, clear fix, docs, one component). Execute immediately. When in doubt, Plan first.
+
+## Ask vs Infer
+
+- **Ask:** Target ambiguous (multiple files, multiple approaches). State N candidates or list options. Do not assume scope.
+- **Infer:** Single clear target, known pattern, obvious intent. Act.
+
+## Explain vs Show
+
+- **Explain:** They're learning ("how does", "why"); complex topic. Lead with answer; add structure.
+- **Show:** They're in flow; simple request. Code first, minimal prose.
+
+Voice: see `.cursor/rules/voice.mdc`

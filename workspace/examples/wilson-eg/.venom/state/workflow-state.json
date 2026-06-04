@@ -1,0 +1,19 @@
+{
+  "workflow": "spec",
+  "feature": "mobile-nav-redesign",
+  "phase": 7,
+  "phaseName": "Complete",
+  "artifacts": [
+    ".venom/work/eat-shape.md",
+    ".venom/work/eat-heartbeat.md",
+    ".venom/work/eat-nerves.md",
+    ".venom/work/eat-risks.md",
+    ".venom/work/constitution.md",
+    ".venom/work/features/mobile-nav-redesign/spec.md",
+    ".venom/work/features/mobile-nav-redesign/plan.md",
+    ".venom/work/features/mobile-nav-redesign/tasks.md"
+  ],
+  "lastUpdated": "2026-04-04T22:09:59.933Z",
+  "sessionId": "pending",
+  "complete": true
+}

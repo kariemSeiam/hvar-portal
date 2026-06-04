@@ -1,0 +1,25 @@
+---
+import "../styles/global.css"
+import "@fontsource/cairo/400.css"
+import "@fontsource/cairo/600.css"
+import "@fontsource/cairo/700.css"
+import "@fontsource/cairo/900.css"
+import "@fontsource/inter/400.css"
+import "@fontsource/inter/500.css"
+import "@fontsource/inter/600.css"
+import "@fontsource/jetbrains-mono/500.css"
+---
+
+<!doctype html>
+<html dir="rtl" lang="ar">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#d43533" />
+    <meta name="format-detection" content="telephone=no" />
+    <slot name="head" />
+  </head>
+  <body class="min-h-screen bg-bg text-ink antialiased dark:bg-bg-dark dark:text-ink-dark">
+    <slot />
+  </body>
+</html>

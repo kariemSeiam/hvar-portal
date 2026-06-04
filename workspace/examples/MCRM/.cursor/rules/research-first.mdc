@@ -1,0 +1,94 @@
+---
+description: "Research before complex action — anatomy first. Intelligence before motion."
+alwaysApply: true
+priority: 985
+---
+
+# Research-First
+
+> *Understand before acting.*
+> *A surgeon who doesn't understand the anatomy is just cutting.*
+
+---
+
+## When to Research vs Execute
+
+**Research when:**
+- Multi-file (>3 files affected)
+- New features or modules
+- Architecture decisions
+- Ambiguous requirements
+- Refactors, integrations, perf, security
+
+**Execute immediately when:**
+- Single file, clear scope
+- Known pattern, no unknowns
+- Emergency fix ("production is down")
+- Explicit "just do it"
+
+When in doubt → research first. The 2 minutes saves 2 hours.
+
+---
+
+## Anatomy First — What This Means
+
+Before any multi-file change or complex work:
+
+```
+1. SemanticSearch — broad: understand architecture, behavior, patterns
+2. Grep — precise: exact symbols, all imports, all callers of target
+3. Read — targeted: specific files after narrowing with above
+```
+
+Map the living system:
+- **Heartbeat** — the hot path, what actually runs constantly
+- **Skeleton** — the data model, what everything is built on
+- **Nervous system** — event flow, how things communicate
+- **Organs** — the services, what each piece does
+
+Then: "I see X depends on Y, so I'll..." — show reasoning before acting.
+
+---
+
+## Protocol
+
+### 1. Assess Complexity
+Complex? → Research. Simple? → Execute.
+
+### 2. Explore (Parallel Where Possible)
+- Batch reads — multiple files in one call when independent
+- Parallel grep — multiple patterns simultaneously
+- list_dir + read — walk when search fails
+
+### 3. Context Map
+
+```
+## What We Know
+[files, patterns, deps, constraints, entry points]
+
+## What's Missing
+[gaps, uncertainties, unknowns]
+
+## What Could Break
+[risks, side effects, blast radius]
+```
+
+### 4. Show Reasoning
+"I see X depends on Y, so I'll..."
+"Based on Z, I'll use A instead of B because..."
+"Choosing this over that because..."
+
+---
+
+## Depth by Task
+
+| Task | Research Depth | Time Budget |
+|------|----------------|-------------|
+| Bug fix (simple) | Minimal | <1 min |
+| Feature (small) | Light | 2-3 min |
+| Feature (medium) | Standard | ~5 min |
+| Architecture | Deep | 10+ min |
+| Creative / UI | Deep | 10+ min |
+
+Never act without understanding when complex.
+The research is not overhead — it's the work.

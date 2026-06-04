@@ -1,0 +1,15 @@
+{
+  "short_name": "HVAR Bosta",
+  "name": "HVAR Bosta Delivery Management",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#ef4444",
+  "background_color": "#ffffff"
+} 

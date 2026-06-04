@@ -1,0 +1,32 @@
+hvarstore.com, www.hvarstore.com {
+    reverse_proxy web:4321
+
+    @api path /api/*
+    handle @api {
+        reverse_proxy api:5000
+    }
+
+    # Static assets cache
+    handle /assets/* {
+        root * /srv
+        file_server
+        header Cache-Control "public, max-age=31536000, immutable"
+    }
+
+    # Gzip
+    encode gzip
+
+    # Security headers
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+}
+
+# Dev proxy — uncomment for local dev with real domain
+# localhost:8080 {
+#     reverse_proxy /api/* api:5000
+#     reverse_proxy web:4321
+# }

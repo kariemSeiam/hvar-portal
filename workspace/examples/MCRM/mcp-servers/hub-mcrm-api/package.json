@@ -1,0 +1,23 @@
+{
+  "name": "hub-mcrm-api-mcp",
+  "version": "1.0.0",
+  "description": "MCP server: HUB-MCRM API — one tool for all endpoints, manifest resource for args and cases",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": { "hub-mcrm-api-mcp": "dist/index.js" },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch",
+    "test:smoke": "node smoke-test.mjs"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

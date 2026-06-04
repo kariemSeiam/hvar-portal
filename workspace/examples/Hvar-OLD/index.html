@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>هفار - نظام إدارة العملاء</title>
+    <meta name="description" content="نظام إدارة العملاء والطلبات المتقدم" />
+    <meta name="theme-color" content="#dc2626" />
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/vite.svg">
+    <link rel="apple-touch-icon" sizes="152x152" href="/vite.svg">
+    <link rel="apple-touch-icon" sizes="144x144" href="/vite.svg">
+    <link rel="apple-touch-icon" sizes="120x120" href="/vite.svg">
+    <link rel="apple-touch-icon" sizes="114x114" href="/vite.svg">
+    <link rel="apple-touch-icon" sizes="76x76" href="/vite.svg">
+    <link rel="apple-touch-icon" sizes="72x72" href="/vite.svg">
+    <link rel="apple-touch-icon" sizes="60x60" href="/vite.svg">
+    <link rel="apple-touch-icon" sizes="57x57" href="/vite.svg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/vite.svg">
+    <link rel="icon" type="image/png" sizes="16x16" href="/vite.svg">
+    
+    <!-- Meta tags for social sharing -->
+    <meta property="og:title" content="هفار - نظام إدارة العملاء" />
+    <meta property="og:description" content="نظام إدارة العملاء والطلبات المتقدم" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/vite.svg" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="هفار - نظام إدارة العملاء" />
+    <meta name="twitter:description" content="نظام إدارة العملاء والطلبات المتقدم" />
+    <meta name="twitter:image" content="/vite.svg" />
+    
+    <!-- Additional meta tags -->
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="هفار" />
+    <meta name="keywords" content="إدارة العملاء, نظام طلبات, خدمة عملاء, هفار" />
+    
+    <!-- Security headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+    
+    <!-- CSP - Development version (allows localhost connections) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' http://192.168.1.202:5000 http://localhost:* https://api.hvar.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';">
+    
+    <style>
+      /* Critical CSS for initial load */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      html {
+        font-family: 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        direction: rtl;
+      }
+      
+      body {
+        background-color: #f8fafc;
+        color: #1e293b;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      
+      .dark body {
+        background-color: #0f172a;
+        color: #f1f5f9;
+      }
+      
+      #root {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      /* Loading spinner */
+      .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      
+      /* RTL specific styles */
+      [dir="rtl"] {
+        text-align: right;
+      }
+      
+      [dir="rtl"] .ml-auto {
+        margin-left: unset;
+        margin-right: auto;
+      }
+      
+      [dir="rtl"] .mr-auto {
+        margin-right: unset;
+        margin-left: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <!-- Loading state -->
+      <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);">
+        <div style="text-align: center; color: white;">
+          <div style="width: 60px; height: 60px; border: 4px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+          <h1 style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">هفار</h1>
+          <p style="font-size: 14px; opacity: 0.9;">نظام إدارة العملاء</p>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html> 

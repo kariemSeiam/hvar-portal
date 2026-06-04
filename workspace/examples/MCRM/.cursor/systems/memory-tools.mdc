@@ -1,0 +1,82 @@
+---
+description: "Memory tools — when to load, when to save, proactive pull protocol."
+alwaysApply: true
+priority: 989
+---
+
+# Memory Tools
+
+> *Memory is only useful if it's pulled before you need it, not after you've already made the mistake.*
+
+---
+
+## Load — When and What
+
+| Situation | What to Load |
+|-----------|-------------|
+| `/venom?` | Full: CONTEXT → MEMORY → corrections → ACTIVE → anatomy |
+| Vague request | MEMORY.md |
+| References past work / decisions | MEMORY.md + corrections.yaml |
+| Medium/complex technical task | corrections.yaml + relevant MEMORY section |
+| Architecture / strategy | Full load + project.yaml |
+| Quick task, clear scope | Skip — execute |
+
+**Proactive rule:** If a project name appears (HvarHub, UNSHELLED, Taxi Arabs, Geolink) → pull relevant MEMORY section before responding. Don't wait to be asked.
+
+---
+
+## The Files
+
+- `.venom/CONTEXT.md` — project brain: who, stack, focus, conventions
+- `.venom/memory/MEMORY.md` — cross-session decisions, patterns, corrections
+- `.venom/learnings/corrections.yaml` — hard "never do X" — pull before acting in any domain with corrections
+- `.venom/learnings/preferences.yaml` — working style, communication preferences
+- `.venom/learnings/project.yaml` — project conventions observed
+- `.venom/work/ACTIVE.md` — what's in flight
+
+---
+
+## Save — Rules
+
+**Never auto-save without a signal.**
+
+Signals:
+- "remember" / "save this" / "keep that"
+- `/venom remember: X`
+- `/venom learn: [correction|preference|convention] — X`
+- Something clearly important just happened → offer: "Want me to remember that?"
+
+When saving:
+1. Write to correct file immediately
+2. Confirm: "Saved to [file]. [One line of what was captured]."
+
+---
+
+## Recall Protocol
+
+When request references past work or decisions:
+1. Read `.venom/memory/MEMORY.md`
+2. Read `.venom/learnings/corrections.yaml`
+3. Answer from that context — not from scratch
+
+**Don't answer from scratch if memory holds it.**
+
+---
+
+## Work Lifecycle
+
+Temp files created during a session → `.venom/work/[feature]/`
+When done → offer: "Ship to docs? Or delete?" Never leave temp files floating.
+
+ACTIVE.md → update when focus shifts. One focus at a time.
+
+---
+
+## Scope Transparency on Memory
+
+If I load CONTEXT but not MEMORY → say so.
+If I load MEMORY but not corrections → say so.
+If I loaded nothing → say so.
+
+"I loaded CONTEXT and MEMORY. Corrections.yaml not checked — want me to?" is the right pattern.
+Looking loaded when I wasn't = the same trust erosion as any other scope gap.

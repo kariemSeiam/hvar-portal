@@ -1,0 +1,315 @@
+/**
+ * Scrollbar Styling - HVAR Design System
+ * 
+ * Utility styles for scrollbar customization.
+ * Uses design tokens for consistency.
+ */
+
+/* Hide scrollbars for all browsers */
+.scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Custom scrollbar styling - Uses design tokens */
+.scrollbar-custom {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gray-400) transparent;
+}
+
+.scrollbar-custom::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background-color: var(--color-gray-400);
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-gray-500);
+}
+
+/* Dark theme scrollbar */
+.dark .scrollbar-custom {
+  scrollbar-color: var(--color-gray-600) transparent;
+}
+
+.dark .scrollbar-custom::-webkit-scrollbar-thumb {
+  background-color: var(--color-gray-600);
+}
+
+.dark .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-gray-500);
+}
+
+/* Light theme scrollbar */
+.light .scrollbar-custom {
+  scrollbar-color: var(--color-gray-400) transparent;
+}
+
+.light .scrollbar-custom::-webkit-scrollbar-thumb {
+  background-color: var(--color-gray-400);
+}
+
+.light .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-gray-500);
+}
+
+/* Small custom scrollbar for tabs - Perfect for dark and light themes */
+.scrollbar-small {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(156 163 175) transparent; /* gray-400 for light */
+  direction: rtl; /* Force scrollbar to left side */
+}
+
+.scrollbar-small::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.scrollbar-small::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 2px;
+}
+
+.scrollbar-small::-webkit-scrollbar-thumb {
+  background-color: rgb(156 163 175); /* gray-400 */
+  border-radius: 2px;
+  transition: background-color 0.2s ease;
+}
+
+.scrollbar-small::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(107 114 128); /* gray-500 */
+}
+
+/* Dark theme - small scrollbar */
+.dark .scrollbar-small {
+  scrollbar-color: rgb(75 85 99) transparent; /* gray-600 for dark */
+}
+
+.dark .scrollbar-small::-webkit-scrollbar-thumb {
+  background-color: rgb(75 85 99); /* gray-600 */
+}
+
+.dark .scrollbar-small::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(107 114 128); /* gray-500 */
+}
+
+/* Dropdown scrollbar - Sleek, minimal, RTL-friendly */
+.scrollbar-dropdown {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(203 213 225) transparent; /* slate-300 light */
+  -webkit-overflow-scrolling: touch;
+}
+
+.scrollbar-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.scrollbar-dropdown::-webkit-scrollbar-thumb {
+  background: rgb(203 213 225); /* slate-300 */
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.scrollbar-dropdown::-webkit-scrollbar-thumb:hover {
+  background: rgb(148 163 184); /* slate-400 */
+}
+
+.dark .scrollbar-dropdown {
+  scrollbar-color: rgb(71 85 105) transparent; /* slate-600 dark */
+}
+
+.dark .scrollbar-dropdown::-webkit-scrollbar-thumb {
+  background: rgb(71 85 105);
+}
+
+.dark .scrollbar-dropdown::-webkit-scrollbar-thumb:hover {
+  background: rgb(100 116 139); /* slate-500 */
+}
+
+/* Horizontal tabs scrollbar - Smallest ever, lightest custom scrollbar */
+.scrollbar-tabs {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(229 231 235) transparent; /* gray-200 for light - lightest */
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+}
+
+.scrollbar-tabs::-webkit-scrollbar {
+  height: 1px;
+  width: 1px;
+}
+
+.scrollbar-tabs::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 0.5px;
+  margin: 0 1px;
+}
+
+.scrollbar-tabs::-webkit-scrollbar-thumb {
+  background-color: rgb(229 231 235); /* gray-200 - lightest */
+  border-radius: 0.5px;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+  opacity: 0.2;
+  border: none;
+}
+
+.scrollbar-tabs::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(209 213 219); /* gray-300 */
+  opacity: 0.4;
+}
+
+.scrollbar-tabs::-webkit-scrollbar-thumb:active {
+  background-color: rgb(156 163 175); /* gray-400 */
+  opacity: 0.6;
+}
+
+/* Dark theme - tabs scrollbar - smallest ever, lightest */
+.dark .scrollbar-tabs {
+  scrollbar-color: rgb(156 163 175) transparent; /* gray-400 for dark - lighter */
+}
+
+.dark .scrollbar-tabs::-webkit-scrollbar-thumb {
+  background-color: rgb(156 163 175); /* gray-400 */
+  opacity: 0.2;
+}
+
+.dark .scrollbar-tabs::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(209 213 219); /* gray-300 */
+  opacity: 0.4;
+}
+
+.dark .scrollbar-tabs::-webkit-scrollbar-thumb:active {
+  background-color: rgb(209 213 219); /* gray-300 */
+  opacity: 0.6;
+}
+
+/*
+ * Hub sidebar vertical scroll — expanded: stable gutter + token thumb;
+ * collapsed: no stable gutter (narrow rail), slightly wider thumb so bar stays usable at w-16.
+ */
+.scrollbar-hub-sidebar-expanded {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gray-400) rgb(249 250 251);
+}
+
+.scrollbar-hub-sidebar-expanded::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar-hub-sidebar-expanded::-webkit-scrollbar-track {
+  background: rgb(249 250 251);
+  border-radius: 4px;
+}
+
+.scrollbar-hub-sidebar-expanded::-webkit-scrollbar-thumb {
+  background-color: var(--color-gray-400);
+  border-radius: 4px;
+}
+
+.scrollbar-hub-sidebar-expanded::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-gray-500);
+}
+
+.dark .scrollbar-hub-sidebar-expanded {
+  scrollbar-color: var(--color-gray-600) rgb(31 41 55);
+}
+
+.dark .scrollbar-hub-sidebar-expanded::-webkit-scrollbar-track {
+  background: rgb(31 41 55);
+}
+
+.dark .scrollbar-hub-sidebar-expanded::-webkit-scrollbar-thumb {
+  background-color: var(--color-gray-600);
+}
+
+.dark .scrollbar-hub-sidebar-expanded::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-gray-500);
+}
+
+.scrollbar-hub-sidebar-collapsed {
+  scrollbar-gutter: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(107 114 128) rgb(243 244 246);
+}
+
+.scrollbar-hub-sidebar-collapsed::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-hub-sidebar-collapsed::-webkit-scrollbar-track {
+  background: rgb(243 244 246);
+  border-radius: 3px;
+}
+
+.scrollbar-hub-sidebar-collapsed::-webkit-scrollbar-thumb {
+  background-color: rgb(107 114 128);
+  border-radius: 3px;
+}
+
+.scrollbar-hub-sidebar-collapsed::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(75 85 99);
+}
+
+.dark .scrollbar-hub-sidebar-collapsed {
+  scrollbar-color: rgb(156 163 175) rgb(17 24 39);
+}
+
+.dark .scrollbar-hub-sidebar-collapsed::-webkit-scrollbar-track {
+  background: rgb(17 24 39);
+}
+
+.dark .scrollbar-hub-sidebar-collapsed::-webkit-scrollbar-thumb {
+  background-color: rgb(107 114 128);
+}
+
+.dark .scrollbar-hub-sidebar-collapsed::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(156 163 175);
+}
+
+/* Mobile scrolling optimization */
+@media (max-width: 768px) {
+  .scrollbar-hide {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .scrollbar-small {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .scrollbar-hub-sidebar-expanded,
+  .scrollbar-hub-sidebar-collapsed {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .scrollbar-tabs {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .scrollbar-tabs::-webkit-scrollbar {
+    height: 1px;
+  }
+  
+  .scrollbar-dropdown {
+    -webkit-overflow-scrolling: touch;
+  }
+}

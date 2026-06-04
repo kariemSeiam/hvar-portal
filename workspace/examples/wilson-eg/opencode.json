@@ -1,0 +1,61 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "openrouter/qwen/qwen3.6-plus:free",
+  "small_model": "openrouter/openai/gpt-oss-20b:free",
+  "default_agent": "build",
+  "agent": {
+    "build": {
+      "description": "Primary development agent — full tool access",
+      "model": "openrouter/qwen/qwen3.6-plus:free",
+      "color": "accent"
+    },
+    "plan": {
+      "model": "openrouter/qwen/qwen3-next-80b-a3b-instruct:free",
+      "color": "info"
+    },
+    "explore": {
+      "model": "openrouter/arcee-ai/trinity-mini:free"
+    },
+    "general": {
+      "model": "openrouter/qwen/qwen3.6-plus:free"
+    },
+    "venom-architect": {
+      "description": "Brain 0 — System design, trade-offs, implementation contracts. Never implements.",
+      "mode": "subagent",
+      "model": "openrouter/qwen/qwen3.6-plus:free",
+      "temperature": 0.3
+    }
+  },
+  "permission": {
+    "edit": "allow",
+    "bash": "ask"
+  },
+  "instructions": [
+    "AGENTS.md",
+    ".venom/CONTEXT.md",
+    ".venom/learnings/corrections.yaml"
+  ],
+  "command": {},
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "reserved": 10000
+  },
+  "snapshot": true,
+  "share": "manual",
+  "autoupdate": "notify",
+  "watcher": {
+    "ignore": [
+      "node_modules/**",
+      "dist/**",
+      "build/**",
+      ".git/**",
+      "*.lock",
+      ".venom/state/**"
+    ]
+  },
+  "plugin": [
+    ".opencode/plugins/venom-core.ts"
+  ],
+  "mcp": {}
+}

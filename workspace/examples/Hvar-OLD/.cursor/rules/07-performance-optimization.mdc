@@ -1,0 +1,627 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Performance Optimization & Best Practices
+
+## Frontend Performance Optimization
+
+### React Performance Patterns
+Follow established patterns for optimal React performance:
+
+```jsx
+// Use React.memo for expensive components
+const ExpensiveComponent = React.memo(({ data, onAction }) => {
+  // Component logic
+  return <div>{/* Component JSX */}</div>;
+});
+
+// Use useMemo for expensive calculations
+const ComponentWithExpensiveCalculation = ({ items }) => {
+  const sortedItems = useMemo(() => {
+    return items.sort((a, b) => a.name.localeCompare(b.name));
+  }, [items]);
+  
+  return (
+    <div>
+      {sortedItems.map(item => (
+        <Item key={item.id} item={item} />
+      ))}
+    </div>
+  );
+};
+
+// Use useCallback for stable function references
+const ComponentWithStableFunctions = ({ onItemClick }) => {
+  const handleItemClick = useCallback((item) => {
+    onItemClick(item);
+  }, [onItemClick]);
+  
+  return (
+    <div>
+      {/* Component content */}
+    </div>
+  );
+};
+```
+
+### Code Splitting & Lazy Loading
+Follow the established pattern in `src/App.jsx`:
+
+```jsx
+// Lazy load page components for better performance
+const DashboardPage = React.lazy(() => import('./pages/DashboardPage'));
+const CustomersPage = React.lazy(() => import('./pages/CustomersPage'));
+const OrdersPage = React.lazy(() => import('./pages/orders/OrdersPage'));
+
+// Use with Suspense for loading states
+<React.Suspense fallback={<PageLoading text="جاري تحميل الصفحة..." />}>
+  <Routes>
+    <Route path="/" element={<DashboardPage />} />
+    <Route path="/customers" element={<CustomersPage />} />
+    <Route path="/orders" element={<OrdersPage />} />
+  </Routes>
+</React.Suspense>
+```
+
+### Bundle Optimization
+Optimize bundle size and loading performance:
+
+```javascript
+// Dynamic imports for conditional features
+const loadFeature = async (featureName) => {
+  const module = await import(`./features/${featureName}`);
+  return module.default;
+};
+
+// Route-based code splitting
+const routes = {
+  dashboard: () => import('./pages/DashboardPage'),
+  customers: () => import('./pages/CustomersPage'),
+  orders: () => import('./pages/orders/OrdersPage'),
+  analytics: () => import('./pages/analytics/AnalyticsPage')
+};
+
+// Load routes dynamically
+const loadRoute = async (routeName) => {
+  if (routes[routeName]) {
+    const module = await routes[routeName]();
+    return module.default;
+  }
+  throw new Error(`Route ${routeName} not found`);
+};
+```
+
+## CSS Performance Optimization
+
+### CSS Custom Properties Optimization
+Use CSS custom properties for consistent, performant styling:
+
+```css
+/* Optimized CSS custom properties */
+:root {
+  /* Brand colors - use exact values from tailwind.config.js */
+  --brand-red-500: #f43f5e;
+  --brand-red-600: #e11d48;
+  --brand-red-700: #be123c;
+  
+  /* Spacing scale - use clamp values for fluid design */
+  --spacing-4: clamp(1rem, 0.8rem + 0.4vw, 1.2rem);
+  --spacing-6: clamp(1.5rem, 1.2rem + 0.6vw, 1.8rem);
+  --spacing-8: clamp(2rem, 1.6rem + 0.8vw, 2.4rem);
+  
+  /* Typography scale - fluid typography */
+  --text-base: clamp(1rem, 0.95rem + 0.2vw, 1.1rem);
+  --text-lg: clamp(1.1rem, 1.05rem + 0.25vw, 1.2rem);
+  --text-xl: clamp(1.2rem, 1.15rem + 0.3vw, 1.35rem);
+}
+
+/* Use custom properties for consistent styling */
+.component {
+  color: var(--brand-red-600);
+  padding: var(--spacing-6);
+  font-size: var(--text-base);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Optimize paint operations */
+.optimized-component {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  contain: layout style paint;
+}
+```
+
+### CSS Selector Optimization
+Use efficient CSS selectors for better performance:
+
+```css
+/* Efficient selectors - avoid deep nesting */
+.card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-6);
+}
+
+/* Use attribute selectors for dynamic states */
+[data-state="active"] {
+  background-color: var(--brand-red-100);
+  border-color: var(--brand-red-300);
+}
+
+[data-state="inactive"] {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+/* Avoid expensive selectors */
+/* ❌ Bad: Deep nesting */
+.component .wrapper .content .item .text {
+  color: var(--text-primary);
+}
+
+/* ✅ Good: Direct targeting */
+.component-item-text {
+  color: var(--text-primary);
+}
+```
+
+## Backend Performance Optimization
+
+### Database Query Optimization
+Follow established patterns for efficient database operations:
+
+```python
+# Optimize database queries
+class OptimizedService:
+    def __init__(self):
+        self.db = get_db_connection()
+    
+    def get_customers_with_orders(self, limit=50):
+        """Optimized query with JOIN and LIMIT"""
+        with get_db_cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    c.id, c.name, c.phone, c.email,
+                    COUNT(o.id) as order_count,
+                    MAX(o.created_at) as last_order
+                FROM customers c
+                LEFT JOIN orders o ON c.id = o.customer_id
+                GROUP BY c.id
+                ORDER BY last_order DESC
+                LIMIT ?
+            """, (limit,))
+            
+            return cursor.fetchall()
+    
+    def get_customer_by_phone(self, phone):
+        """Use indexed field for fast lookup"""
+        with get_db_cursor() as cursor:
+            cursor.execute("""
+                SELECT * FROM customers 
+                WHERE phone = ? 
+                LIMIT 1
+            """, (phone,))
+            
+            row = cursor.fetchone()
+            return row if row else None
+```
+
+### API Response Optimization
+Optimize API responses for better performance:
+
+```python
+# Optimize API responses
+def create_optimized_response(success=True, data=None, error=None):
+    """Create optimized API response with minimal overhead"""
+    response = {
+        'success': success,
+        'timestamp': datetime.utcnow().isoformat()
+    }
+    
+    if success and data is not None:
+        response['data'] = data
+    elif not success and error:
+        response['error'] = error
+    
+    return jsonify(response)
+
+# Use pagination for large datasets
+def get_paginated_data(page=1, per_page=20, **filters):
+    """Get paginated data with efficient querying"""
+    offset = (page - 1) * per_page
+    
+    with get_db_cursor() as cursor:
+        # Get total count
+        cursor.execute("SELECT COUNT(*) FROM table_name")
+        total = cursor.fetchone()[0]
+        
+        # Get paginated data
+        cursor.execute("""
+            SELECT * FROM table_name
+            ORDER BY created_at DESC
+            LIMIT ? OFFSET ?
+        """, (per_page, offset))
+        
+        data = cursor.fetchall()
+        
+        return {
+            'data': data,
+            'pagination': {
+                'page': page,
+                'per_page': per_page,
+                'total': total,
+                'pages': (total + per_page - 1) // per_page
+            }
+        }
+```
+
+### Background Task Optimization
+Optimize background tasks for better performance:
+
+```python
+# Optimize background task processing
+class OptimizedTaskProcessor:
+    def __init__(self):
+        self.scheduler = BackgroundScheduler()
+        self.batch_size = 100
+        self.max_workers = 4
+    
+    def process_orders_batch(self, orders):
+        """Process orders in optimized batches"""
+        if not orders:
+            return
+        
+        # Process in batches to avoid memory issues
+        for i in range(0, len(orders), self.batch_size):
+            batch = orders[i:i + self.batch_size]
+            self._process_batch(batch)
+    
+    def _process_batch(self, batch):
+        """Process a single batch of orders"""
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            futures = [
+                executor.submit(self._process_single_order, order)
+                for order in batch
+            ]
+            
+            # Wait for all to complete
+            for future in as_completed(futures):
+                try:
+                    result = future.result()
+                    # Handle result
+                except Exception as e:
+                    logger.error(f"Order processing failed: {e}")
+    
+    def _process_single_order(self, order):
+        """Process a single order"""
+        try:
+            # Process order logic
+            return {'success': True, 'order_id': order['id']}
+        except Exception as e:
+            logger.error(f"Failed to process order {order['id']}: {e}")
+            return {'success': False, 'order_id': order['id'], 'error': str(e)}
+```
+
+## Memory Management
+
+### Frontend Memory Management
+Optimize memory usage in React components:
+
+```jsx
+// Clean up event listeners and subscriptions
+const ComponentWithCleanup = ({ data }) => {
+  useEffect(() => {
+    const handleResize = () => {
+      // Handle resize logic
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    // Cleanup function
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+  
+  // Clean up large objects
+  useEffect(() => {
+    return () => {
+      // Cleanup large objects when component unmounts
+    };
+  }, []);
+  
+  return <div>{/* Component content */}</div>;
+};
+
+// Use AbortController for API calls
+const ComponentWithAbortController = () => {
+  useEffect(() => {
+    const abortController = new AbortController();
+    
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/data', {
+          signal: abortController.signal
+        });
+        const data = await response.json();
+        // Handle data
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          // Request was aborted
+          return;
+        }
+        // Handle other errors
+      }
+    };
+    
+    fetchData();
+    
+    return () => {
+      abortController.abort();
+    };
+  }, []);
+  
+  return <div>{/* Component content */}</div>;
+};
+```
+
+### Backend Memory Management
+Optimize memory usage in Python backend:
+
+```python
+# Optimize memory usage in Python
+class MemoryOptimizedService:
+    def __init__(self):
+        self.db = get_db_connection()
+    
+    def process_large_dataset(self, query):
+        """Process large datasets without loading everything into memory"""
+        with get_db_cursor() as cursor:
+            cursor.execute(query)
+            
+            # Process row by row to avoid memory issues
+            while True:
+                row = cursor.fetchone()
+                if row is None:
+                    break
+                
+                # Process single row
+                self._process_row(row)
+                
+                # Yield result for streaming
+                yield self._format_row(row)
+    
+    def _process_row(self, row):
+        """Process a single row"""
+        # Process row data
+        pass
+    
+    def _format_row(self, row):
+        """Format row for output"""
+        return {
+            'id': row[0],
+            'name': row[1],
+            'created_at': row[2]
+        }
+    
+    def cleanup_resources(self):
+        """Clean up resources to free memory"""
+        if hasattr(self, 'db'):
+            self.db.close()
+            del self.db
+```
+
+## Caching Strategies
+
+### Frontend Caching
+Implement efficient caching strategies:
+
+```jsx
+// Simple in-memory cache
+const cache = new Map();
+
+const useCachedData = (key, fetcher, ttl = 5 * 60 * 1000) => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  
+  useEffect(() => {
+    const cached = cache.get(key);
+    
+    if (cached && Date.now() - cached.timestamp < ttl) {
+      setData(cached.data);
+      return;
+    }
+    
+    setLoading(true);
+    fetcher().then(result => {
+      cache.set(key, {
+        data: result,
+        timestamp: Date.now()
+      });
+      setData(result);
+      setLoading(false);
+    });
+  }, [key, fetcher, ttl]);
+  
+  return { data, loading };
+};
+
+// Use with API calls
+const { data: customers, loading } = useCachedData(
+  'customers',
+  () => api.getCustomers(),
+  10 * 60 * 1000 // 10 minutes TTL
+);
+```
+
+### Backend Caching
+Implement backend caching for better performance:
+
+```python
+# Simple in-memory cache with TTL
+import time
+from threading import Lock
+
+class Cache:
+    def __init__(self):
+        self._cache = {}
+        self._lock = Lock()
+    
+    def get(self, key):
+        """Get value from cache if not expired"""
+        with self._lock:
+            if key in self._cache:
+                value, timestamp, ttl = self._cache[key]
+                if time.time() - timestamp < ttl:
+                    return value
+                else:
+                    # Remove expired entry
+                    del self._cache[key]
+            return None
+    
+    def set(self, key, value, ttl=300):
+        """Set value in cache with TTL"""
+        with self._lock:
+            self._cache[key] = (value, time.time(), ttl)
+    
+    def clear(self):
+        """Clear all cache entries"""
+        with self._lock:
+            self._cache.clear()
+
+# Use cache in services
+cache = Cache()
+
+def get_cached_customers():
+    """Get customers with caching"""
+    cached = cache.get('customers')
+    if cached:
+        return cached
+    
+    # Fetch from database
+    customers = fetch_customers_from_db()
+    
+    # Cache for 5 minutes
+    cache.set('customers', customers, 300)
+    
+    return customers
+```
+
+## Performance Monitoring
+
+### Frontend Performance Monitoring
+Monitor frontend performance metrics:
+
+```jsx
+// Performance monitoring hook
+const usePerformanceMonitor = (componentName) => {
+  useEffect(() => {
+    const startTime = performance.now();
+    
+    return () => {
+      const endTime = performance.now();
+      const duration = endTime - startTime;
+      
+      // Log performance metrics
+      console.log(`${componentName} render time: ${duration.toFixed(2)}ms`);
+      
+      // Send to analytics if needed
+      if (duration > 100) {
+        console.warn(`${componentName} took longer than expected: ${duration.toFixed(2)}ms`);
+      }
+    };
+  });
+  
+  // Monitor memory usage
+  useEffect(() => {
+    if ('memory' in performance) {
+      const memory = performance.memory;
+      console.log('Memory usage:', {
+        used: `${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)}MB`,
+        total: `${(memory.totalJSHeapSize / 1024 / 1024).toFixed(2)}MB`,
+        limit: `${(memory.jsHeapSizeLimit / 1024 / 1024).toFixed(2)}MB`
+      });
+    }
+  }, []);
+};
+
+// Use in components
+const OptimizedComponent = () => {
+  usePerformanceMonitor('OptimizedComponent');
+  
+  return <div>{/* Component content */}</div>;
+};
+```
+
+### Backend Performance Monitoring
+Monitor backend performance metrics:
+
+```python
+# Performance monitoring decorator
+import time
+import functools
+import logging
+
+logger = logging.getLogger(__name__)
+
+def monitor_performance(func):
+    """Decorator to monitor function performance"""
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        
+        try:
+            result = func(*args, **kwargs)
+            execution_time = time.time() - start_time
+            
+            # Log performance metrics
+            logger.info(f"{func.__name__} executed in {execution_time:.3f}s")
+            
+            # Warn if execution time is too high
+            if execution_time > 1.0:
+                logger.warning(f"{func.__name__} took longer than expected: {execution_time:.3f}s")
+            
+            return result
+            
+        except Exception as e:
+            execution_time = time.time() - start_time
+            logger.error(f"{func.__name__} failed after {execution_time:.3f}s: {e}")
+            raise
+    
+    return wrapper
+
+# Use decorator on performance-critical functions
+@monitor_performance
+def process_orders_batch(orders):
+    """Process orders with performance monitoring"""
+    # Processing logic
+    pass
+```
+
+## Best Practices Summary
+
+### Frontend Performance
+- ✅ Use React.memo, useMemo, and useCallback appropriately
+- ✅ Implement code splitting and lazy loading
+- ✅ Optimize CSS selectors and use custom properties
+- ✅ Monitor component render times and memory usage
+- ✅ Implement efficient caching strategies
+
+### Backend Performance
+- ✅ Optimize database queries with proper indexing
+- ✅ Use connection pooling and efficient database operations
+- ✅ Implement background task optimization
+- ✅ Use caching for frequently accessed data
+- ✅ Monitor API response times and resource usage
+
+### General Optimization
+- ✅ Profile performance bottlenecks regularly
+- ✅ Use appropriate data structures and algorithms
+- ✅ Implement proper error handling without performance impact
+- ✅ Monitor memory usage and implement cleanup
+- ✅ Use async/await for I/O operations
+
+This performance optimization system ensures the HVAR project maintains excellent performance while following established patterns and best practices.

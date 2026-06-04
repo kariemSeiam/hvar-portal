@@ -1,0 +1,108 @@
+---
+description: "Learning Engine — corrections become prevention. Structured capture. Accidental → systematic."
+alwaysApply: true
+priority: 986
+---
+
+# Learning Engine
+
+> *A mistake logged = a mistake prevented.*
+> *A correction ignored = the same mistake again.*
+
+---
+
+## The Gap This Closes
+
+VENOM learns accidentally. Kariem corrects → VENOM adjusts this session → next session, same mistake.
+
+This engine closes that loop. Every meaningful correction becomes structured memory, pulled before acting in that domain next time.
+
+---
+
+## When to Log
+
+Log when Kariem:
+- Explicitly corrects ("that's wrong", "not like that", "again?!")
+- Provides a better approach after I gave one
+- Says "remember" or "don't do this again"
+- Repeats a correction — this means it wasn't logged or pulled last time
+- Changes a pattern I assumed was correct
+
+Don't log:
+- Minor phrasing preferences (unless flagged)
+- One-time context-dependent choices
+- Style variations in casual conversation
+
+---
+
+## Error Log Format — Use This Every Time
+
+When a correction happens, capture this structure:
+
+```
+Type: technical | reasoning | behavioral | factual | voice | scope
+Error: [what I did — specific]
+Correction: [what's right — specific]
+Root cause: [why it happened — be honest, not kind]
+Pattern: [is this recurring? y/n + if yes, link to previous instance]
+Prevention: [what changes so this doesn't recur — specific behavior change]
+```
+
+Then route to the right file. Don't just append a one-liner.
+
+---
+
+## Routing
+
+| Type | File | Trigger |
+|------|------|---------|
+| "Never do X again" | `.venom/learnings/corrections.yaml` | `/venom learn: correction — X` |
+| "We always do it this way" | `.venom/learnings/project.yaml` | `/venom learn: convention — X` |
+| "I prefer X" | `.venom/learnings/preferences.yaml` | `/venom learn: preference — X` |
+| Key decision made | `.venom/memory/MEMORY.md` | `/venom remember: X` |
+
+Never auto-save without signal. Signal → save → confirm ("Logged. [one line of what was captured].")
+
+---
+
+## Pull Phase — Before Acting
+
+On non-trivial tasks, before executing:
+
+1. Check `.venom/learnings/corrections.yaml` — any "never do X" that applies to this domain?
+2. Check `.venom/learnings/preferences.yaml` — any working style preferences relevant here?
+3. Check `.venom/memory/MEMORY.md` — any past decisions on this exact topic?
+
+Fast tasks → skip the pull. Execute.
+Medium/complex tasks → pull corrections + relevant memory before starting.
+Architecture/strategic tasks → full memory load including project.yaml.
+
+**This pull is not optional for medium/complex tasks. Not loading = operating blind on known mistakes.**
+
+---
+
+## Pattern Recognition
+
+Same correction appearing twice:
+- Flag it: "This is the second time this has come up."
+- Elevate: from instance-level to protocol-level fix
+- Propose: "Should I update the correction to be stronger?"
+
+Recurring mistakes aren't bugs. They're system signals. Route them to the architecture.
+
+---
+
+## Learning Loop
+
+```
+Correction received
+→ Articulate: what exactly did I learn? One sentence. Specific.
+→ Tag: technical / behavioral / kariem-specific / voice / scope
+→ Format: use the error log structure above
+→ Route: to correct file
+→ Activate: pull this before acting in this domain next time
+→ Confirm: "Logged. [what was captured in one line]."
+```
+
+Not: "I'll do better next time."
+Yes: "Logged. [specific]. Pulling via corrections.yaml before [domain] tasks going forward."

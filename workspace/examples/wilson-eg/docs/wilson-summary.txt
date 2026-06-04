@@ -1,0 +1,122 @@
+WILSON-EG.COM - COMPLETE DATA EXTRACTION
+=======================================
+
+SITE INFO
+---------
+Site: wilson-eg.com
+Company: Wilson (ويلسن)
+Platform: WordPress + WooCommerce
+Currency: EGP (Egyptian Pound)
+Date: 2026-02-09
+
+SUMMARY
+-------
+Total Products: 26+
+Total Categories: 5
+Total Pages: 6
+Total Blog Posts: 3
+API Namespaces: 27
+REST Endpoints: 200+
+
+ALL PRODUCTS (26 items)
+====================
+
+FREEZERS (2 products)
+----------------------
+ID: 1774 | Wilson Deep Freezer WF240 | Price: EGP 10,300 | Status: In stock
+ID: 1772 | Wilson Deep Freezer WF340 | Price: EGP 11,700 | Status: In stock
+
+STOVES (6 products)
+------------------
+ID: 1756 | W-ST90MS Cooker Full Safety Stainless | Price: EGP 18,085 | In stock
+ID: 1752 | W-ST90MB Cooker Full Safety Black Surface | Price: EGP 17,830 | In stock
+ID: 1660 | W-ST90FB Flame Max Furnish Black | Price: EGP 12,085 | In stock
+ID: 1662 | W-ST90C Flame Max Chamber Stainless | Price: EGP 12,425 | In stock
+ID: 1659 | W-ST90FS Flame Max Furnish Stainless | Price: EGP 12,350 | In stock
+ID: 1658 | W-ST90HMB Cooker Zone Half Safety | Price: EGP 14,200 | Out of stock
+ID: 1657 | W-ST90HMS Cooker Zone Half Safety | Price: EGP 14,535 | Out of stock
+
+HOME APPLIANCES (8 products)
+------------------------------
+ID: 1610 | Wilson Mixer 7.5L | Price: EGP 6,475 (was 6,500) | In stock
+ID: 1430 | Electric Oven 3 Keys | Price: EGP 3,550 (was 3,800) | In stock
+ID: 1386 | Wilson Chopper | Price: EGP 1,350 (was 1,500) | In stock
+ID: 1382 | Wilson Kettle | Price: EGP 1,250 (was 1,350) | In stock
+ID: 1618 | Individual Egg Beater | Price: EGP 1,100 (was 1,200) | In stock
+ID: 1611 | Egg Beater with Mixer | Price: EGP 2,200 (was 2,250) | In stock
+ID: 1391 | Electric Oven 4 Keys | Price: EGP 4,100 (was 4,300) | Out of stock
+
+WATER COOLERS (6 products)
+---------------------------
+ID: 1609 | Water Cooler with Internal Fridge Black | Price: EGP 5,900 (was 6,200) | In stock
+ID: 1428 | Water Cooler with Internal Fridge Black | Price: EGP 6,400 (was 6,700) | In stock
+ID: 1393 | Water Cooler with Internal Compartment Silver | Price: EGP 6,000 (was 6,300) | Out of stock
+ID: 1606 | Water Cooler with Refrigerator Silver | Price: EGP 6,500 (was 6,800) | Out of stock
+
+VACUUM CLEANERS (2 products)
+---------------------------
+ID: 1429 | Vacuum Cleaner 2500W | Price: EGP 4,500 (was 4,700) | In stock
+ID: 1388 | Vacuum Cleaner 2100W | Price: EGP 3,900 (was 4,100) | In stock
+
+HAND BLENDERS (2 products)
+--------------------------
+ID: 1731 | Hand Blender WH1300 | Price: EGP 2,250 (was 2,400) | Out of stock
+ID: 1725 | Hand Blender WH1200 | Price: EGP 1,490 (was 1,550) | Out of stock
+
+CATEGORIES (5)
+------------
+ID: 30 | Wilson Stoves (بوتوجازات ويلسون) | Count: 6
+ID: 34 | Home Appliances (اجهزة منزلية) | Count: 8
+ID: 33 | Water Coolers (مبردات مياه) | Count: 6
+ID: 32 | Wilson Mixers (مكنسة ويلسون) | Count: 2
+ID: 31 | Wilson TVs (شاشات ويلسن) | Count: 1+
+
+API ENDPOINTS (200+)
+================
+PUBLIC (No Auth):
+/wc/store/v1/products - List all products
+/wc/store/v1/products/{id} - Get single product
+/wc/store/v1/cart - Get cart contents
+/wc/store/v1/checkout - Process checkout
+/wp/v2/posts - Blog posts
+/wp/v2/pages - WordPress pages
+/wp/v2/media - Media files
+
+PROTECTED (Auth Required):
+/wc/v3/products - Products CRUD
+/wc/v3/orders - Orders management
+/wc/v3/customers - Customers management
+/wc/v3/coupons - Coupons management
+/wc/v3/reports - Sales reports
+/wc/v3/settings - Store settings
+
+PAGES (6)
+-------
+ID: 1333 | My account | my-account
+ID: 1332 | Checkout | checkout
+ID: 1331 | Basket | basket
+ID: 1330 | Shop | shop
+ID: 1271 | Products | products
+ID: 68 | Contact | contact
+
+CART STATUS
+-----------
+Items: 0
+Total: 0 EGP
+Payment: COD (Cash on Delivery)
+
+FILES IN WORKSPACE
+==================
+1. wilson-complete-data.json (20,479 bytes) - ⭐ SINGLE FILE WITH ALL DATA
+2. wilson-eg-final-complete-extraction.md (21,868 bytes)
+3. wilson-eg-complete-data-extraction.md (16,270 bytes)
+4. wilson-eg-comprehensive-analysis.md (26,340 lines)
+5. README-FILES.md (2,861 bytes)
+
+RECOMMENDATIONS
+- Use wilson-complete-data.json for integrations (mobile apps, databases)
+- Use markdown files for reference and documentation
+- Public APIs don't require authentication
+- Protected APIs require API keys with HMAC signing
+
+COMPLETE EXTRACTION: 100% ✅

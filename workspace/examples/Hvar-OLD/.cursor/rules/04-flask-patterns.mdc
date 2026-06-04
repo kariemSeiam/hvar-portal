@@ -1,0 +1,535 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Flask Patterns & Best Practices
+
+## Application Structure
+
+### App Factory Pattern
+Follow the established pattern in `Hvar-Bosta-v2/app/__init__.py`:
+
+```python
+from flask import Flask
+from flask_cors import CORS
+from app.routes import register_blueprints
+
+def create_app():
+    """Create and configure the Flask application"""
+    app = Flask(__name__)
+    
+    # Configuration
+    app.config.from_object('app.config.Config')
+    
+    # Extensions
+    CORS(app)
+    
+    # Register blueprints
+    register_blueprints(app)
+    
+    # Error handlers
+    register_error_handlers(app)
+    
+    return app
+```
+
+### Blueprint Organization
+Follow the established pattern in `Hvar-Bosta-v2/app/routes/`:
+
+```python
+from flask import Blueprint, request, jsonify
+from app.services.service_name import ServiceName
+from app.utils.api_response import create_response
+
+# Create blueprint
+bp = Blueprint('feature_name', __name__, url_prefix='/api/feature')
+
+@bp.route('/', methods=['GET'])
+def get_items():
+    """Get list of items"""
+    try:
+        service = ServiceName()
+        result = service.get_items()
+        return create_response(success=True, data=result)
+    except Exception as e:
+        return create_response(success=False, error=str(e))
+
+@bp.route('/<int:item_id>', methods=['GET'])
+def get_item(item_id):
+    """Get specific item by ID"""
+    try:
+        service = ServiceName()
+        result = service.get_item(item_id)
+        if not result:
+            return create_response(success=False, error="Item not found"), 404
+        return create_response(success=True, data=result)
+    except Exception as e:
+        return create_response(success=False, error=str(e))
+```
+
+## Service Layer Pattern
+
+### Service Class Structure
+Follow the established pattern in existing services:
+
+```python
+"""
+Service class description
+Handles business logic for specific domain
+"""
+class ServiceClassName:
+    def __init__(self):
+        """Initialize service with required dependencies"""
+        self.db = get_db_connection()
+        self.logger = logging.getLogger(__name__)
+    
+    def method_name(self, params):
+        """
+        Method description
+        
+        Args:
+            params (dict): Method parameters
+            
+        Returns:
+            dict: Response with success status and data/error
+            
+        Raises:
+            ValidationError: When input validation fails
+            DatabaseError: When database operation fails
+        """
+        try:
+            # Input validation
+            self._validate_params(params)
+            
+            # Business logic
+            result = self._process_data(params)
+            
+            return create_response(success=True, data=result)
+            
+        except ValidationError as e:
+            self.logger.warning(f"Validation error: {e}")
+            return create_response(success=False, error=str(e))
+        except Exception as e:
+            self.logger.error(f"Unexpected error: {e}")
+            return create_response(success=False, error="Internal server error")
+    
+    def _validate_params(self, params):
+        """Validate input parameters"""
+        if not params.get('required_field'):
+            raise ValidationError("Required field is missing")
+    
+    def _process_data(self, params):
+        """Process the data according to business logic"""
+        # Implementation here
+        pass
+```
+
+## Database Integration
+
+### Database Connection Pattern
+Follow the established pattern in `Hvar-Bosta-v2/app/models/database.py`:
+
+```python
+import sqlite3
+from contextlib import contextmanager
+from app.config import DATABASE_PATH
+
+def get_db_connection():
+    """Get database connection"""
+    return sqlite3.connect(DATABASE_PATH)
+
+@contextmanager
+def get_db_cursor():
+    """Context manager for database cursor"""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        yield cursor
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+def init_database():
+    """Initialize database with required tables"""
+    with get_db_cursor() as cursor:
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS table_name (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+```
+
+### Model Classes
+Follow the established pattern:
+
+```python
+"""
+Model class for database entity
+Handles data access and basic operations
+"""
+class ModelClassName:
+    def __init__(self, **kwargs):
+        """Initialize model with data"""
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+    
+    @classmethod
+    def create(cls, data):
+        """Create new record"""
+        with get_db_cursor() as cursor:
+            cursor.execute("""
+                INSERT INTO table_name (field1, field2)
+                VALUES (?, ?)
+            """, (data['field1'], data['field2']))
+            
+            return cls.get_by_id(cursor.lastrowid)
+    
+    @classmethod
+    def get_by_id(cls, record_id):
+        """Get record by ID"""
+        with get_db_cursor() as cursor:
+            cursor.execute("""
+                SELECT * FROM table_name WHERE id = ?
+            """, (record_id,))
+            
+            row = cursor.fetchone()
+            if row:
+                return cls(**dict(zip([col[0] for col in cursor.description], row)))
+            return None
+    
+    @classmethod
+    def get_all(cls, filters=None):
+        """Get all records with optional filters"""
+        query = "SELECT * FROM table_name"
+        params = []
+        
+        if filters:
+            conditions = []
+            for key, value in filters.items():
+                conditions.append(f"{key} = ?")
+                params.append(value)
+            
+            if conditions:
+                query += " WHERE " + " AND ".join(conditions)
+        
+        with get_db_cursor() as cursor:
+            cursor.execute(query, params)
+            rows = cursor.fetchall()
+            
+            return [cls(**dict(zip([col[0] for col in cursor.description], row))) 
+                   for row in rows]
+```
+
+## API Response Handling
+
+### Response Format Pattern
+Follow the established pattern in `Hvar-Bosta-v2/app/utils/api_response.py`:
+
+```python
+from flask import jsonify
+
+def create_response(success=True, data=None, error=None, message=None):
+    """
+    Create standardized API response
+    
+    Args:
+        success (bool): Whether the operation was successful
+        data: Response data
+        error (str): Error message if operation failed
+        message (str): Success message
+        
+    Returns:
+        dict: Standardized response format
+    """
+    response = {
+        'success': success,
+        'timestamp': datetime.utcnow().isoformat()
+    }
+    
+    if success:
+        if data is not None:
+            response['data'] = data
+        if message:
+            response['message'] = message
+    else:
+        if error:
+            response['error'] = error
+    
+    return jsonify(response)
+
+def create_error_response(error, status_code=400):
+    """Create error response with status code"""
+    response = create_response(success=False, error=error)
+    return response, status_code
+```
+
+## Error Handling
+
+### Global Error Handlers
+Follow the established pattern:
+
+```python
+def register_error_handlers(app):
+    """Register global error handlers"""
+    
+    @app.errorhandler(404)
+    def not_found(error):
+        return create_response(
+            success=False, 
+            error="Resource not found"
+        ), 404
+    
+    @app.errorhandler(500)
+    def internal_error(error):
+        app.logger.error(f"Internal server error: {error}")
+        return create_response(
+            success=False, 
+            error="Internal server error"
+        ), 500
+    
+    @app.errorhandler(ValidationError)
+    def validation_error(error):
+        return create_response(
+            success=False, 
+            error=str(error)
+        ), 400
+```
+
+### Custom Exceptions
+```python
+class ValidationError(Exception):
+    """Raised when input validation fails"""
+    pass
+
+class DatabaseError(Exception):
+    """Raised when database operation fails"""
+    pass
+
+class BusinessLogicError(Exception):
+    """Raised when business logic validation fails"""
+    pass
+```
+
+## Configuration Management
+
+### Configuration Pattern
+Follow the established pattern in `Hvar-Bosta-v2/app/config.py`:
+
+```python
+import os
+from pathlib import Path
+
+class Config:
+    """Base configuration class"""
+    # Database
+    DATABASE_PATH = os.getenv('DATABASE_PATH', 'database.db')
+    
+    # API Configuration
+    API_TIMEOUT = int(os.getenv('API_TIMEOUT', 30))
+    MAX_RETRIES = int(os.getenv('MAX_RETRIES', 3))
+    
+    # Security
+    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key')
+    
+    # External Services
+    BOSTA_API_URL = os.getenv('BOSTA_API_URL', 'https://api.bosta.co')
+    BOSTA_API_KEY = os.getenv('BOSTA_API_KEY')
+
+class DevelopmentConfig(Config):
+    """Development configuration"""
+    DEBUG = True
+    LOG_LEVEL = 'DEBUG'
+
+class ProductionConfig(Config):
+    """Production configuration"""
+    DEBUG = False
+    LOG_LEVEL = 'INFO'
+
+# Configuration mapping
+config = {
+    'development': DevelopmentConfig,
+    'production': ProductionConfig,
+    'default': DevelopmentConfig
+}
+```
+
+## Background Tasks
+
+### APScheduler Integration
+Follow the established pattern in the server configuration:
+
+```python
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+
+class BackgroundTaskManager:
+    def __init__(self):
+        """Initialize background task scheduler"""
+        self.scheduler = BackgroundScheduler()
+        self.scheduler.start()
+    
+    def add_periodic_task(self, task_func, interval_minutes=5):
+        """Add periodic task to scheduler"""
+        self.scheduler.add_job(
+            func=task_func,
+            trigger=IntervalTrigger(minutes=interval_minutes),
+            id=f"{task_func.__name__}_task",
+            replace_existing=True
+        )
+    
+    def add_one_time_task(self, task_func, run_date):
+        """Add one-time task to scheduler"""
+        self.scheduler.add_job(
+            func=task_func,
+            trigger='date',
+            run_date=run_date,
+            id=f"{task_func.__name__}_one_time"
+        )
+    
+    def stop(self):
+        """Stop the scheduler"""
+        self.scheduler.shutdown()
+
+# Usage in service
+task_manager = BackgroundTaskManager()
+task_manager.add_periodic_task(sync_orders, interval_minutes=10)
+```
+
+## Logging
+
+### Logging Configuration
+Follow the established pattern:
+
+```python
+import logging
+from logging.handlers import RotatingFileHandler
+import os
+
+def setup_logging(app, log_file='app.log'):
+    """Setup application logging"""
+    if not app.debug:
+        # Production logging
+        if not os.path.exists('logs'):
+            os.mkdir('logs')
+        
+        file_handler = RotatingFileHandler(
+            f'logs/{log_file}', 
+            maxBytes=10240000, 
+            backupCount=10
+        )
+        file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+        ))
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
+        
+        app.logger.setLevel(logging.INFO)
+        app.logger.info('Application startup')
+```
+
+## Testing
+
+### Test Structure
+```python
+import unittest
+from app import create_app
+from app.models.database import init_database
+
+class TestCase(unittest.TestCase):
+    def setUp(self):
+        """Set up test environment"""
+        self.app = create_app()
+        self.app.config['TESTING'] = True
+        self.app.config['DATABASE_PATH'] = ':memory:'
+        self.client = self.app.test_client()
+        
+        with self.app.app_context():
+            init_database()
+    
+    def tearDown(self):
+        """Clean up after tests"""
+        pass
+    
+    def test_endpoint(self):
+        """Test API endpoint"""
+        response = self.client.get('/api/test')
+        self.assertEqual(response.status_code, 200)
+        
+        data = response.get_json()
+        self.assertTrue(data['success'])
+```
+
+## Security
+
+### Input Validation
+```python
+from werkzeug.security import safe_str_cmp
+import re
+
+def validate_phone_number(phone):
+    """Validate phone number format"""
+    if not phone:
+        raise ValidationError("Phone number is required")
+    
+    # Remove non-digit characters
+    clean_phone = re.sub(r'\D', '', phone)
+    
+    if len(clean_phone) < 10:
+        raise ValidationError("Phone number must be at least 10 digits")
+    
+    return clean_phone
+
+def validate_email(email):
+    """Validate email format"""
+    if not email:
+        raise ValidationError("Email is required")
+    
+    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if not re.match(email_pattern, email):
+        raise ValidationError("Invalid email format")
+    
+    return email.lower()
+```
+
+### Authentication & Authorization
+```python
+from functools import wraps
+from flask import request, g
+
+def require_auth(f):
+    """Decorator to require authentication"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        
+        if not token:
+            return create_response(
+                success=False, 
+                error="Authentication required"
+            ), 401
+        
+        # Validate token and set user context
+        user = validate_token(token)
+        if not user:
+            return create_response(
+                success=False, 
+                error="Invalid authentication token"
+            ), 401
+        
+        g.current_user = user
+        return f(*args, **kwargs)
+    
+    return decorated_function
+
+@require_auth
+def protected_endpoint():
+    """Protected endpoint example"""
+    user = g.current_user
+    return create_response(success=True, data={'user_id': user.id})
+```
