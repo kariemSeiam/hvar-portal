@@ -11,6 +11,7 @@ import "@fontsource/jetbrains-mono/500.css"
 import Navbar from "../components/Navbar.astro"
 import Footer from "../components/Footer.astro"
 import CartFab from "../components/cart/CartFab"
+import WhatsAppFab from "../components/WhatsAppFab.astro"
 
 interface Props {
   title?: string
@@ -70,6 +71,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site)
     </main>
 
     <CartFab client:load />
+    <WhatsAppFab />
 
     {!noFooter && <Footer />}
 

@@ -4,10 +4,25 @@
 // DESIGN_DIRECTIONS.md: C gives the bones, A gives the soul, B gives the close
 ---
 
-<section class="relative overflow-hidden grain mesh-red bg-[#fbf7f1] dark:bg-[#12110f] pt-14 pb-20 sm:pt-20 sm:pb-28">
+<!-- Wilson P6: Grain texture is now inline via style block -->
+
+<section class="relative overflow-hidden bg-[#fbf7f1] dark:bg-[#12110f] pt-14 pb-20 sm:pt-20 sm:pb-28">
+
+  <!-- Grain texture overlay -->
+  <div class="absolute inset-0 pointer-events-none opacity-[0.035] dark:opacity-[0.05] z-0" aria-hidden="true"
+    style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E&quot;); mix-blend-mode: multiply;">
+  </div>
+
+  <!-- Red mesh glow -->
+  <div class="absolute inset-0 pointer-events-none z-0" aria-hidden="true"
+    style="background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(212,53,51,0.08) 0%, transparent 70%);">
+  </div>
+  <div class="dark:hidden absolute inset-0 pointer-events-none z-0" aria-hidden="true"
+    style="background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(212,53,51,0.12) 0%, transparent 70%);">
+  </div>
 
   <!-- Appliance doodle background (Wilson P1 — Hvar motifs) -->
-  <div class="absolute inset-0 pointer-events-none opacity-[0.04] dark:opacity-[0.06] overflow-hidden select-none" aria-hidden="true">
+  <div class="absolute inset-0 pointer-events-none opacity-[0.04] dark:opacity-[0.06] overflow-hidden select-none z-0" aria-hidden="true">
     <svg width="100%" height="100%" viewBox="0 0 1200 600" fill="none" preserveAspectRatio="xMidYMid slice">
       <ellipse cx="100" cy="480" rx="55" ry="22" stroke="#d43533" stroke-width="1.5" fill="none"/>
       <rect x="70" y="440" width="60" height="40" rx="8" stroke="#d43533" stroke-width="1.5" fill="none"/>
@@ -29,36 +44,42 @@
     <div class="grid lg:grid-cols-12 gap-8 items-center">
 
       <!-- Left content (RTL: visual right side = content side) -->
-      <div class="lg:col-span-7 max-w-xl">
+      <div class="lg:col-span-7 max-w-xl relative">
+
+        <!-- Ember thread — the signature vertical spine (hidden on mobile) -->
+        <div class="absolute inset-y-0 -start-[26px] w-[3px] z-10 hidden lg:block" aria-hidden="true">
+          <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(212,53,51,0.28), transparent);"></div>
+          <div class="absolute w-[11px] h-[11px] rounded-full bg-[#d43533] spark-embers"
+            style="box-shadow: 0 0 16px 4px rgba(255,107,82,0.6); left: -4px;">
+          </div>
+        </div>
 
         <!-- Premium badge — Direction A warmth cue: brass accent -->
-        <div class="inline-flex items-center gap-2 mb-6">
+        <div class="inline-flex items-center gap-2 mb-6 reveal-fade">
           <span class="w-6 h-px bg-[#C8893B]"></span>
           <span class="text-[#C8893B] text-[10px] font-semibold uppercase tracking-[0.15em] font-inter">أجهزة منزلية موثوقة</span>
         </div>
 
         <!-- Headline — Direction A: editorial Arabic warmth, red like a ribbon -->
-        <h1 class="font-cairo font-black text-[2.6rem] sm:text-[3.4rem] lg:text-[3.8rem] leading-[1.12] text-[#1c1917] dark:text-[#f5f5f4] mb-5">
+        <h1 class="font-cairo font-black text-[2.6rem] sm:text-[3.4rem] lg:text-[3.8rem] leading-[1.12] text-[#1c1917] dark:text-[#f5f5f4] mb-5 reveal-fade" style="transition-delay: 0.1s;">
           <span class="block">في مطبخك</span>
           <span class="relative inline-block">
             يستاهل الأحسن
-            <!-- Brass decorative underline — Direction A warmth signature -->
             <span class="absolute -bottom-2 right-0 left-0 h-[3px] rounded-full"
                   style="background: linear-gradient(90deg, #C8893B 0%, #daa545 50%, #C8893B 100%); opacity:0.6;"></span>
-            <!-- Red accent dot — Direction C: red used like a ribbon -->
             <span class="absolute -bottom-[11px] right-0 w-[7px] h-[7px] rounded-full bg-[#d43533]"></span>
           </span>
         </h1>
 
         <!-- Subline — warm trust prose -->
-        <p class="text-[#57534e] dark:text-[#a8a29e] font-cairo text-base sm:text-lg leading-relaxed mb-8 max-w-lg">
+        <p class="text-[#57534e] dark:text-[#a8a29e] font-cairo text-base sm:text-lg leading-relaxed mb-6 max-w-lg reveal-fade" style="transition-delay: 0.2s;">
           خلاطات، مكاوي، أجهزة مطبخ — كل اللي تحتاجه لمطبخك
           <span class="text-[#C8893B] font-semibold">بضمان سنتين</span>
           وشحن مجاني لباب البيت.
         </p>
 
         <!-- CTAs — Direction B: trust architecture, clear primary/secondary -->
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="flex flex-wrap items-center gap-3 reveal-fade" style="transition-delay: 0.3s;">
           <a
             href="/products"
             class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#d43533] hover:bg-[#b91c1c] text-white font-cairo font-bold text-base transition-all hover:shadow-[0_8px_24px_rgba(212,53,51,0.3)] hover:-translate-y-0.5"
@@ -80,8 +101,24 @@
           </a>
         </div>
 
-        <!-- Trust line — Direction B: icon-enriched, premium feel -->
-        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-8 text-xs font-cairo text-[#57534e] dark:text-[#a8a29e]">
+        <!-- Hero stats — borrowed from vision HTML, trust signals -->
+        <div class="flex flex-wrap items-center gap-x-8 gap-y-2 mt-8 reveal-fade" style="transition-delay: 0.35s;">
+          <div>
+            <div class="font-inter font-black text-[1.4rem] sm:text-[1.7rem] text-[#1c1917] dark:text-[#f5f5f4] tabular-nums" dir="ltr">+50</div>
+            <div class="text-[11px] font-cairo text-[#8c7d73] dark:text-[#a8a29e]">ألف عميل واثق</div>
+          </div>
+          <div>
+            <div class="font-inter font-black text-[1.4rem] sm:text-[1.7rem] text-[#1c1917] dark:text-[#f5f5f4] tabular-nums" dir="ltr">24</div>
+            <div class="text-[11px] font-cairo text-[#8c7d73] dark:text-[#a8a29e]">ساعة خدمة عملاء</div>
+          </div>
+          <div>
+            <div class="font-inter font-black text-[1.4rem] sm:text-[1.7rem] text-[#1c1917] dark:text-[#f5f5f4] tabular-nums" dir="ltr">١-٣</div>
+            <div class="text-[11px] font-cairo text-[#8c7d73] dark:text-[#a8a29e]">أيام للتوصيل</div>
+          </div>
+        </div>
+
+        <!-- Trust line -->
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-6 text-xs font-cairo text-[#57534e] dark:text-[#a8a29e] reveal-fade" style="transition-delay: 0.4s;">
           <span class="inline-flex items-center gap-1.5">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -115,8 +152,39 @@
 
       <!-- Right visual — Direction A: kitchen ritual showcase (RTL layout) -->
       <div class="hidden lg:block lg:col-span-5 relative">
-        <!-- Featured product highlight card -->
-        <div class="relative rounded-3xl bg-white/70 dark:bg-[#1c1917]/70 backdrop-blur-sm border border-[#e7e0d6]/60 dark:border-[#2c2825]/60 p-6 shadow-[0_8px_32px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
+
+        <!-- Stage orb — morphing organic background shape -->
+        <div class="absolute inset-[6%] z-0 stage-orb" aria-hidden="true"
+          style="background: radial-gradient(circle at 32% 28%, rgba(255,107,82,0.6), rgba(212,53,51,0.5) 42%, rgba(168,31,29,0.3) 92%); filter: blur(2px); box-shadow: 0 30px 80px -30px rgba(168,31,29,0.38);">
+        </div>
+
+        <!-- Floating product cards (from vision HTML) -->
+        <div class="absolute top-[6%] -start-[4%] z-10 flex items-center gap-3 bg-white/80 dark:bg-[#1c1917]/80 backdrop-blur-sm border border-[#e7e0d6]/60 dark:border-[#2c2825]/60 rounded-[18px] px-4 py-3 shadow-[0_1px_2px_rgba(35,27,24,0.04),0_18px_40px_-22px_rgba(35,27,24,0.28)] bob-card">
+          <span class="w-[42px] h-[42px] rounded-[11px] bg-red-50 dark:bg-red-950/30 flex items-center justify-center text-xl">🧺</span>
+          <div>
+            <div class="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">مكواة بخار</div>
+            <div class="font-inter font-bold text-xs text-[#d43533] tabular-nums" dir="ltr">١٬٢٥٠ ج.م</div>
+          </div>
+        </div>
+
+        <div class="absolute bottom-[14%] -end-[6%] z-10 flex items-center gap-3 bg-white/80 dark:bg-[#1c1917]/80 backdrop-blur-sm border border-[#e7e0d6]/60 dark:border-[#2c2825]/60 rounded-[18px] px-4 py-3 shadow-[0_1px_2px_rgba(35,27,24,0.04),0_18px_40px_-22px_rgba(35,27,24,0.28)] bob-card" style="animation-delay: 0.8s;">
+          <span class="w-[42px] h-[42px] rounded-[11px] bg-red-50 dark:bg-red-950/30 flex items-center justify-center text-xl">🍳</span>
+          <div>
+            <div class="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">قلاية هوائية</div>
+            <div class="font-inter font-bold text-xs text-[#d43533] tabular-nums" dir="ltr">٢٬١٠٠ ج.م</div>
+          </div>
+        </div>
+
+        <div class="absolute -bottom-[2%] start-[18%] z-10 flex items-center gap-3 bg-white/80 dark:bg-[#1c1917]/80 backdrop-blur-sm border border-[#e7e0d6]/60 dark:border-[#2c2825]/60 rounded-[18px] px-4 py-3 shadow-[0_1px_2px_rgba(35,27,24,0.04),0_18px_40px_-22px_rgba(35,27,24,0.28)] bob-card" style="animation-delay: 1.6s;">
+          <span class="w-[42px] h-[42px] rounded-[11px] bg-green-50 dark:bg-green-950/30 flex items-center justify-center text-xl">✓</span>
+          <div>
+            <div class="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">تم الشحن</div>
+            <div class="font-inter font-bold text-xs text-[#22c55e]">عبر بوسطة</div>
+          </div>
+        </div>
+
+        <!-- Featured product highlight card (existing, with adjusted z-index) -->
+        <div class="relative rounded-3xl bg-white/70 dark:bg-[#1c1917]/70 backdrop-blur-sm border border-[#e7e0d6]/60 dark:border-[#2c2825]/60 p-6 shadow-[0_8px_32px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2)] z-[2]">
           <!-- Premium badge -->
           <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#C8893B]/10 dark:bg-[#C8893B]/15 text-[#C8893B] text-[10px] font-semibold font-inter mb-4">
             <span class="w-1.5 h-1.5 rounded-full bg-[#C8893B]"></span>
@@ -125,7 +193,6 @@
 
           <!-- Appliance showcase grid -->
           <div class="grid grid-cols-2 gap-3">
-            <!-- Blender -->
             <div class="rounded-2xl bg-[#fbf7f1] dark:bg-[#12110f] border border-[#e7e0d6]/50 dark:border-[#2c2825]/50 p-3.5 text-center">
               <svg class="mx-auto mb-2" width="52" height="52" viewBox="0 0 60 60" fill="none">
                 <path d="M25 5 L30 25 L20 25 Z" stroke="#d43533" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
@@ -136,8 +203,6 @@
               <p class="font-cairo font-bold text-[11px] text-[#1c1917] dark:text-[#f5f5f4]">خلاط</p>
               <p class="font-cairo text-[9px] text-[#57534e] dark:text-[#a8a29e]">من ٨٩٩ ج.م</p>
             </div>
-
-            <!-- Air fryer -->
             <div class="rounded-2xl bg-[#fbf7f1] dark:bg-[#12110f] border border-[#e7e0d6]/50 dark:border-[#2c2825]/50 p-3.5 text-center">
               <svg class="mx-auto mb-2" width="52" height="52" viewBox="0 0 60 60" fill="none">
                 <rect x="12" y="18" width="36" height="30" rx="5" stroke="#d43533" stroke-width="1.5" fill="none"/>
@@ -147,8 +212,6 @@
               <p class="font-cairo font-bold text-[11px] text-[#1c1917] dark:text-[#f5f5f4]">قلاية هوائية</p>
               <p class="font-cairo text-[9px] text-[#57534e] dark:text-[#a8a29e]">من ٢٬٧٩٩ ج.م</p>
             </div>
-
-            <!-- Kettle -->
             <div class="rounded-2xl bg-[#fbf7f1] dark:bg-[#12110f] border border-[#e7e0d6]/50 dark:border-[#2c2825]/50 p-3.5 text-center">
               <svg class="mx-auto mb-2" width="52" height="52" viewBox="0 0 60 60" fill="none">
                 <ellipse cx="30" cy="40" rx="18" ry="16" stroke="#d43533" stroke-width="1.5" fill="none"/>
@@ -159,8 +222,6 @@
               <p class="font-cairo font-bold text-[11px] text-[#1c1917] dark:text-[#f5f5f4]">غلاية</p>
               <p class="font-cairo text-[9px] text-[#57534e] dark:text-[#a8a29e]">من ٥٩٩ ج.م</p>
             </div>
-
-            <!-- Iron -->
             <div class="rounded-2xl bg-[#fbf7f1] dark:bg-[#12110f] border border-[#e7e0d6]/50 dark:border-[#2c2825]/50 p-3.5 text-center">
               <svg class="mx-auto mb-2" width="52" height="52" viewBox="0 0 60 60" fill="none">
                 <rect x="14" y="28" width="34" height="22" rx="4" stroke="#d43533" stroke-width="1.5" fill="none"/>
@@ -173,7 +234,6 @@
             </div>
           </div>
 
-          <!-- CTA whisper -->
           <div class="mt-4 text-center">
             <a href="/products" class="inline-flex items-center gap-1 text-xs font-cairo font-semibold text-[#C8893B] hover:text-[#b06f2e] transition-colors">
               تصفح كل المنتجات
@@ -184,10 +244,55 @@
           </div>
         </div>
 
-        <!-- Floating decorative brass accent dot -->
         <div class="absolute -top-3 -left-3 w-6 h-6 rounded-full bg-[#C8893B]/20 dark:bg-[#C8893B]/10 blur-sm"></div>
       </div>
 
     </div>
   </div>
 </section>
+
+<style>
+  /* Ember thread spark travel */
+  .spark-embers {
+    animation: sparkTravel 6s ease-in-out infinite;
+  }
+  @keyframes sparkTravel {
+    0%, 100% { top: 4%; }
+    50% { top: 92%; }
+  }
+
+  /* Floating cards bob animation */
+  .bob-card {
+    animation: bobCard 5s ease-in-out infinite;
+  }
+  .bob-card:nth-child(2) { animation-delay: 0.8s; }
+  .bob-card:nth-child(3) { animation-delay: 1.6s; }
+  @keyframes bobCard {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-13px); }
+  }
+
+  /* Stage orb morph */
+  .stage-orb {
+    animation: morphOrb 14s ease-in-out infinite;
+  }
+  @keyframes morphOrb {
+    0%, 100% { border-radius: 36% 64% 58% 42% / 52% 44% 56% 48%; }
+    50% { border-radius: 58% 42% 38% 62% / 46% 58% 42% 54%; }
+  }
+
+  /* Fade-in reveals */
+  .reveal-fade {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .reveal-fade:nth-child(2) { animation-delay: 0.1s; }
+  .reveal-fade:nth-child(3) { animation-delay: 0.2s; }
+  .reveal-fade:nth-child(4) { animation-delay: 0.3s; }
+  .reveal-fade:nth-child(5) { animation-delay: 0.35s; }
+  .reveal-fade:nth-child(6) { animation-delay: 0.4s; }
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>

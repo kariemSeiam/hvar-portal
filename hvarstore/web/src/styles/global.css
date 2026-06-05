@@ -164,6 +164,23 @@
   font-family: "JetBrains Mono", "Cairo", monospace;
 }
 
+/* ── Shimmer skeleton ── */
+.shimmer-skel {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer-skel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+  transform: translateX(-100%);
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
 /* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
   .reveal-section, .reveal-child {
