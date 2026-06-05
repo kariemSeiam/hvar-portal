@@ -1,0 +1,207 @@
+---
+import Base from '../../layouts/Base.astro'
+import ProductCard from '../../components/ProductCard.astro'
+import { api } from '../../lib/api'
+
+const url = Astro.url
+const categoryId = url.searchParams.get('category')
+  ? Number(url.searchParams.get('category'))
+  : undefined
+const q = url.searchParams.get('q') ?? undefined
+const minPrice = url.searchParams.get('min_price')
+  ? Number(url.searchParams.get('min_price'))
+  : undefined
+const maxPrice = url.searchParams.get('max_price')
+  ? Number(url.searchParams.get('max_price'))
+  : undefined
+const inStock = url.searchParams.get('in_stock') === '1'
+const page = Math.max(1, Number(url.searchParams.get('page') ?? 1))
+const limit = 24
+const offset = (page - 1) * limit
+
+const [productsResult, categoriesResult] = await Promise.allSettled([
+  api.products.list({ category: categoryId, q, min_price: minPrice, max_price: maxPrice, in_stock: inStock || undefined, limit, offset }),
+  api.categories(),
+])
+
+const products = productsResult.status === 'fulfilled' ? productsResult.value.items : []
+const categories = categoriesResult.status === 'fulfilled'
+  ? categoriesResult.value.items.filter((c) => c.productCount > 0)
+  : []
+
+const activeCategory = categories.find((c) => c.id === categoryId)
+const pageTitle = activeCategory
+  ? `${activeCategory.name} — هفارستور`
+  : q
+    ? `نتائج: ${q} — هفارستور`
+    : 'كل المنتجات — هفارستور'
+
+function buildUrl(params: Record<string, string | number | undefined | null>) {
+  const u = new URL(url)
+  for (const [k, v] of Object.entries(params)) {
+    if (v == null || v === '') u.searchParams.delete(k)
+    else u.searchParams.set(k, String(v))
+  }
+  u.searchParams.delete('page')
+  return u.pathname + u.search
+}
+---
+
+<Base title={pageTitle}>
+
+  <!-- Page header -->
+  <div class="bg-white dark:bg-[#1c1917] border-b border-[#e7e0d6] dark:border-[#2c2825] pt-8 pb-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="font-cairo font-black text-2xl text-[#1c1917] dark:text-[#f5f5f4] mb-4">
+        {activeCategory ? activeCategory.name : q ? `نتائج: "${q}"` : 'كل المنتجات'}
+      </h1>
+
+      <!-- Search + filters bar -->
+      <form method="GET" action="/products" class="flex flex-wrap items-center gap-3">
+
+        <!-- Search -->
+        <div class="relative flex-1 min-w-[200px] max-w-sm">
+          <input
+            type="search"
+            name="q"
+            value={q ?? ''}
+            placeholder="ابحث عن منتج..."
+            class="w-full pr-10 pl-4 py-2.5 rounded-xl border border-[#e7e0d6] dark:border-[#2c2825] bg-[#fbf7f1] dark:bg-[#12110f] text-[#1c1917] dark:text-[#f5f5f4] font-cairo text-sm focus:outline-none focus:border-[#d43533] focus:ring-1 focus:ring-[#d43533]/30 transition-colors"
+          />
+          <svg class="absolute top-1/2 right-3 -translate-y-1/2 text-stone-400" width="15" height="15" viewBox="0 0 20 20" fill="none">
+            <circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="14" y1="14" x2="18" y2="18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <!-- In-stock toggle -->
+        <label class="flex items-center gap-2 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            name="in_stock"
+            value="1"
+            checked={inStock}
+            class="w-4 h-4 rounded accent-[#d43533]"
+          />
+          <span class="font-cairo text-sm text-[#57534e] dark:text-[#a8a29e]">متاح فقط</span>
+        </label>
+
+        <button
+          type="submit"
+          class="px-4 py-2.5 rounded-xl bg-[#d43533] hover:bg-[#b91c1c] text-white font-cairo font-semibold text-sm transition-colors"
+        >
+          بحث
+        </button>
+
+        {(q || inStock || categoryId || minPrice || maxPrice) && (
+          <a
+            href="/products"
+            class="px-3 py-2.5 rounded-xl border border-[#e7e0d6] dark:border-[#2c2825] text-[#57534e] dark:text-[#a8a29e] font-cairo text-sm hover:border-[#d43533] hover:text-[#d43533] transition-colors"
+          >
+            مسح الفلاتر
+          </a>
+        )}
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Categories filter chips -->
+  {categories.length > 0 && (
+    <div class="bg-[#fbf7f1] dark:bg-[#12110f] border-b border-[#e7e0d6] dark:border-[#2c2825] py-3">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <a
+            href="/products"
+            class={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-cairo font-semibold transition-colors ${
+              !categoryId
+                ? 'bg-[#d43533] text-white'
+                : 'bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] text-[#57534e] dark:text-[#a8a29e] hover:border-[#d43533] hover:text-[#d43533]'
+            }`}
+          >
+            الكل
+          </a>
+          {categories.map((cat) => (
+            <a
+              href={buildUrl({ category: cat.id })}
+              class={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-cairo font-semibold transition-colors ${
+                categoryId === cat.id
+                  ? 'bg-[#d43533] text-white'
+                  : 'bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] text-[#57534e] dark:text-[#a8a29e] hover:border-[#d43533] hover:text-[#d43533]'
+              }`}
+            >
+              {cat.name}
+              <span class="text-xs opacity-60 ms-1">({cat.productCount})</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  )}
+
+  <!-- Products grid -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    {products.length === 0 ? (
+      <div class="text-center py-24">
+        <div class="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-2xl bg-stone-100 dark:bg-stone-800 text-[#a8a29e]">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"/>
+            <line x1="16.5" y1="16.5" x2="21" y2="21"/>
+          </svg>
+        </div>
+        <p class="font-cairo text-lg text-[#57534e] dark:text-[#a8a29e]">
+          {q ? `لا توجد نتائج لـ "${q}"` : 'لا توجد منتجات متاحة حالياً'}
+        </p>
+        <a href="/products" class="inline-block mt-4 font-cairo text-sm text-[#d43533] hover:underline">
+          عرض كل المنتجات
+        </a>
+      </div>
+    ) : (
+      <>
+        <p class="font-cairo text-sm text-[#57534e] dark:text-[#a8a29e] mb-5">
+          {products.length} منتج
+          {activeCategory && ` في ${activeCategory.name}`}
+        </p>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          {products.map((product) => (
+            <ProductCard product={product} />
+          ))}
+        </div>
+
+        <!-- Pagination -->
+        {(products.length === limit || page > 1) && (
+          <div class="flex items-center justify-center gap-3 mt-10">
+            {page > 1 && (
+              <a
+                href={buildUrl({ page: page - 1, category: categoryId, q, in_stock: inStock ? '1' : null })}
+                class="px-5 py-2.5 rounded-xl border border-[#e7e0d6] dark:border-[#2c2825] font-cairo font-semibold text-sm text-[#1c1917] dark:text-[#f5f5f4] hover:border-[#d43533] hover:text-[#d43533] transition-colors"
+              >
+                السابق
+              </a>
+            )}
+            <span class="font-cairo text-sm text-[#57534e] dark:text-[#a8a29e]">
+              صفحة {page}
+            </span>
+            {products.length === limit && (
+              <a
+                href={buildUrl({ page: page + 1, category: categoryId, q, in_stock: inStock ? '1' : null })}
+                class="px-5 py-2.5 rounded-xl border border-[#e7e0d6] dark:border-[#2c2825] font-cairo font-semibold text-sm text-[#1c1917] dark:text-[#f5f5f4] hover:border-[#d43533] hover:text-[#d43533] transition-colors"
+              >
+                التالي
+              </a>
+            )}
+          </div>
+        )}
+      </>
+    )}
+
+  </div>
+
+</Base>
+
+<style>
+  .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+</style>

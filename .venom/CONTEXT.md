@@ -1,7 +1,7 @@
 # hvarstore.com — Context
 
-> **Last absorbed:** 2026-06-04 (full re-read — all MDs in workspace/docs/, examples, design)
-> **Source:** 7 dev spec files + MCRM/wilson-eg/hvar-pos/hvar-catalog project docs + design studies + Wilson pattern catalog
+> **Last absorbed:** 2026-06-05 (schema recon against live hvar_erp container; doc/schema reconciled)
+> **Source:** 7 dev spec files + MCRM/wilson-eg/hvar-pos/hvar-catalog project docs + design studies + Wilson pattern catalog + `.venom/recon/hvar_erp.schema.sql` (live mysqldump)
 
 ---
 
@@ -197,17 +197,24 @@ All patterns: `prefers-reduced-motion` respected. All CSS variables — no hardc
 
 ---
 
-## Gotchas (from prod experience + code review)
+## Gotchas (from prod experience + code review + 2026-06-05 schema recon)
 
-1. **Schema divergence** — dev docs idealize. Real `hvar_erp` differs: `service_tickets.type` uses R/M/T/S values not HVM/HVR/HVT. Do `mysqldump --no-data` before trusting column names.
-2. **Two stock tables** — only `variation_location_details.qty_available` is correct. `product_stocks.qty` drifts 48h on weekends.
-3. **Live Kashier secret in plaintext** in `03-KASHIER.md` — move to `.env`, rotate, use test creds for dev.
-4. `localhost` DB trap → always `127.0.0.1`.
-5. Arabic addresses: governorate+district dropdowns (from `cities`/`districts`), never free text.
-6. **Single-seller** — ignore all multi-seller complexity from legacy POS.
-7. CORS must include `mcrm.hvarstore.com` + `hvarstore.com` + `localhost:4321` (Astro dev).
-8. Stock drift window — always re-validate `qty_available` at order creation inside DB transaction, not at add-to-cart.
-9. Old POS hard-deletes cancelled orders. New system must soft-delete. This is intentional.
+1. **Service tickets live in `mcrm_hvar_hub`, NOT `hvar_erp`.** Tables: `service_tickets`, `service_ticket_history`, `service_items`, `ticket_sequences`. `hvar_erp` only has `types_of_services` lookup. **3rd DB pool required** — see `MCRM_DB_*` in `.env` and `env.ts`.
+2. **`products` has no `slug` column.** API derives slug as `${slugify(name)}-${id}`; lookup parses trailing `-{id}`. See `api/src/lib/slug.ts`.
+3. **`products` real columns:** `image` (varchar(191), filename only — prepend `PUBLIC_MEDIA_BASE`), `product_description` (NOT `description`), NOT NULL on `created_by`, `tax_type`, `sku`.
+4. **`variations` defaults:** even `type='single'` products require a `product_variations` parent row (`is_dummy=1`, name='DUMMY') AND a `variations` child row. Pricing lives on `variations.sell_price_inc_tax` (final) and `dpp_inc_tax` (compare/strike-through).
+5. **`cities` = governorates** (Arabic `nameAr`, English `name`, `code`); **`districts.city_id` → cities.id**. Governorate dropdown queries `cities`; district dropdown queries `districts WHERE city_id = ?`. Same naming trap as Bosta.
+6. **ONLY_FULL_GROUP_BY is ON.** Aggregations must use `ANY_VALUE()` or be in `GROUP BY`. Affects every product card query.
+7. **mysql2 `execute()` rejects `?` on LIMIT/OFFSET** (ER_WRONG_ARGUMENTS on this build). `db.query` helper uses `.query()` not `.execute()` — still parameterized, still safe.
+8. **Two stock tables** — only `variation_location_details.qty_available` is correct. `product_stocks.qty` drifts 48h on weekends.
+9. **Live Kashier secret in plaintext** in `03-KASHIER.md` — move to `.env`, rotate, use test creds for dev.
+10. `localhost` DB trap → always `127.0.0.1`.
+11. Arabic addresses: governorate+district dropdowns (from `cities`/`districts`), never free text.
+12. **Single-seller** — ignore all multi-seller complexity from legacy POS.
+13. CORS must include `mcrm.hvarstore.com` + `hvarstore.com` + `localhost:4321` (Astro dev).
+14. Stock drift window — always re-validate `qty_available` at order creation inside DB transaction, not at add-to-cart.
+15. Old POS hard-deletes cancelled orders. New system must soft-delete. This is intentional.
+16. **Ultimate POS multi-tenancy:** every product/transaction/category query filters by `business_id` AND `location_id` (see `ERP_BUSINESS_ID=1`, `ERP_LOCATION_ID=1` in `.env`). Forgetting this returns rows from other businesses on a shared install.
 
 ---
 
@@ -233,14 +240,41 @@ All patterns: `prefers-reduced-motion` respected. All CSS variables — no hardc
 7. **Docker + deploy config** — Compose, Caddyfile, Dockerfiles
 8. **Git init** — pushed to github.com/kariemSeiam/hvar-portal
 
-### 🔜 Next
-1. **Schema recon** — `mysqldump --no-data hvar_erp` → reconcile column names
-2. **Vertical slice** — products → detail → cart → COD checkout → order confirm (prove loop)
-3. **Auth** — register/login with JWT, phone normalization
-4. **Kashier** — HPP redirect + HMAC validation on callback
-5. **Bosta tracking** — bill_code display + tracking link
-6. **Service portal** — ticket CRUD + state timeline UI
-7. **Wilson patterns** — P1–P13 integration into components
+### ✅ Done (2026-06-05)
+9. **Schema recon** — live mysqldump saved to `.venom/recon/hvar_erp.schema.sql`. Doc/schema reconciled in Gotchas. `service_tickets` confirmed in `mcrm_hvar_hub`.
+10. **Seed script** — `migrations/seed-erp.ts` produces 3 Arabic categories, 8 Hvar kitchen products w/ stock, 5 governorates, 16 districts. Idempotent (wipes `HVR-DEMO-*` SKUs). Run: `bun --cwd migrations run seed`.
+11. **Products API (live)** — `GET /api/products`, `/api/products/:slug`, `/api/products/featured`, `/api/categories`, `/api/locations/{governorates,districts/:govId}` all returning real Arabic data from hvar_erp. Filters: category, q, min_price, max_price, in_stock.
+12. **Env corrected** — `MCRM_DB_*`, `ERP_BUSINESS_ID`, `ERP_LOCATION_ID`, `PUBLIC_MEDIA_BASE` added.
+
+### 🔜 Phase 1 — Shell (pure read, zero auth, zero cart)
+1. **Base layout** — Navbar + Footer + RTL shell. Every page inherits this. Build once.
+2. **Home page** — Hero (mesh + grain + doodle BG) + categories strip + featured products + chef strip + trust block.
+3. **Products listing** — `/products` — filters (category, price, in-stock) + card grid + pagination.
+4. **Product detail (PDP)** — `/products/[slug]` — gallery + CTA action bar + trust line + description accordion.
+
+### 🔜 Phase 2 — Cart
+5. **Cart island** — nanostores + localStorage + CartFAB (mobile) + CartDrawer. No auth needed — client state only.
+
+### 🔜 Phase 3 — Auth
+6. **Register + Login** — phone + password, phone normalization (`shared/phone.ts`), JWT (httpOnly cookie), protected route middleware.
+7. **Account page** — basic profile shell so protected routes are testable end-to-end.
+
+### 🔜 Phase 4 — Checkout + Orders
+8. **Checkout page** — smart address (geo → reverse geocode → dropdowns, from `checkout-demo.html`) + COD/Kashier selector + order summary.
+9. **COD order creation** — stock re-check inside DB transaction + ERP webhook + confirmation screen.
+10. **Orders list + detail** — status, line items, Bosta tracking link (`bill_code`).
+
+### 🔜 Phase 5 — Payments
+11. **Kashier flow** — `initiate` (pending_payments row → HPP redirect) + `callback` (HMAC validate → complete order).
+
+### 🔜 Phase 6 — Service Portal
+12. **New ticket form** — type selector (صيانة / استبدال / مرتجع) + optional linked order.
+13. **Tickets list + detail** — ServiceStepper state timeline for all 3 machines (HVM/HVR/HVT).
+
+### 🔜 Phase 7 — Polish
+14. **Wilson patterns** — grain (P2), doodle BGs (P1), card shine (P6), scroll reveals (P7), mobile nav drawer 3D RTL door-swing (P5/P13).
+15. **Dark mode** — CSS class strategy, theme toggle. Tokens already defined.
+16. **SEO + perf** — OG tags, structured data, image lazy-load, font subsetting.
 
 ---
 

@@ -1,13 +1,112 @@
 ---
-import Base from "../layouts/Base.astro"
+import Base from '../layouts/Base.astro'
+import Hero from '../components/Hero.astro'
+import CategoriesStrip from '../components/CategoriesStrip.astro'
+import TrustBlock from '../components/TrustBlock.astro'
+import ChefStrip from '../components/ChefStrip.astro'
+import ProductCard from '../components/ProductCard.astro'
+import { api } from '../lib/api'
+
+const [featuredResult, categoriesResult] = await Promise.allSettled([
+  api.products.featured(8),
+  api.categories(),
+])
+
+const featured = featuredResult.status === 'fulfilled' ? featuredResult.value.items : []
+const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.value.items : []
 ---
 
-<Base>
-  <main slot="head">
-    <title>هفارستور — hvarstore</title>
-    <meta name="description" content="هفارستور — تسوق أحدث الأجهزة المنزلية والإلكترونيات" />
-  </main>
-  <main>
-    <h1 class="text-2xl font-bold text-hvar-red-600">هفارستور</h1>
-  </main>
+<Base title="هفارستور — أجهزة منزلية موثوقة">
+
+  <Hero />
+
+  <TrustBlock />
+
+  <CategoriesStrip categories={categories} />
+
+  <!-- Featured products -->
+  {featured.length > 0 && (
+    <section class="py-12 reveal-section">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div class="flex items-center justify-between mb-7">
+          <h2 class="font-cairo font-bold text-xl text-[#1c1917] dark:text-[#f5f5f4]">
+            منتجات مختارة
+          </h2>
+          <a
+            href="/products"
+            class="font-cairo text-sm text-[#d43533] hover:text-[#b91c1c] font-semibold transition-colors flex items-center gap-1"
+          >
+            عرض الكل
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <path d="M4 8h8M8 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          {featured.map((product) => (
+            <div class="reveal-child">
+              <ProductCard product={product} />
+            </div>
+          ))}
+        </div>
+
+      </div>
+    </section>
+  )}
+
+  <ChefStrip />
+
+  <!-- Service section -->
+  <section class="py-14 reveal-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="font-cairo font-bold text-xl text-[#1c1917] dark:text-[#f5f5f4] mb-7 text-center">
+        خدمة ما بعد البيع
+      </h2>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {([
+          {
+            label: 'صيانة',
+            desc: 'طلب صيانة منزلية',
+            href: '/service/new?type=HVM',
+            svg: `<path d="M14.5 4.5A4.5 4.5 0 0 0 6 8c0 .9.3 1.8.7 2.5L3 14.1A2 2 0 1 0 5.9 17l3.6-3.7A4.5 4.5 0 1 0 14.5 4.5Z"/>`,
+          },
+          {
+            label: 'استبدال',
+            desc: 'استبدال منتج معطوب',
+            href: '/service/new?type=HVR',
+            svg: `<path d="M21 12a9 9 0 0 0-9-9 9 9 0 0 0-6.36 2.64L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9 9 0 0 0 6.36-2.64L21 16"/><path d="M16 16h5v5"/>`,
+          },
+          {
+            label: 'مرتجع',
+            desc: 'إرجاع منتج',
+            href: '/service/new?type=HVT',
+            svg: `<path d="M9 14H4v5"/><path d="M20 9a9 9 0 0 0-15-3.8L4 8"/><path d="M4 14a9 9 0 0 0 15 3.8l1-3.8"/>`,
+          },
+          {
+            label: 'تواصل',
+            desc: 'كلمنا مباشرة',
+            href: '/contact',
+            svg: `<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2-.5c.9.3 1.9.6 2.9.7A2 2 0 0 1 22 16.9Z"/>`,
+          },
+        ] as const).map(({ svg, label, desc, href }) => (
+          <a
+            href={href}
+            class="reveal-child group flex flex-col items-center text-center gap-3 p-5 rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] hover:border-[#d43533] dark:hover:border-[#d43533] hover:shadow-[0_4px_20px_rgba(212,53,51,0.08)] transition-all duration-300"
+          >
+            <div class="w-11 h-11 flex items-center justify-center rounded-xl bg-red-50 dark:bg-red-950/20 text-[#d43533] group-hover:bg-[#d43533] group-hover:text-white transition-all duration-300">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" set:html={svg} />
+            </div>
+            <div>
+              <p class="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">{label}</p>
+              <p class="font-cairo text-xs text-[#57534e] dark:text-[#a8a29e] mt-0.5">{desc}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
 </Base>

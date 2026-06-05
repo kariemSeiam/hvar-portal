@@ -1,0 +1,266 @@
+import { useEffect, useState } from "react";
+import { useStore } from "@nanostores/react";
+import {
+	Package,
+	MapPin,
+	Loader2,
+	ExternalLink,
+	Phone,
+	FileText,
+} from "lucide-react";
+import { isLoggedIn, getAuthHeaders } from "../../lib/auth";
+
+interface OrderData {
+	id: number;
+	paymentMethod: string;
+	status: string;
+	subtotal: number;
+	shippingFee: number;
+	total: number;
+	billCode: string | null;
+	erpTransactionId: number | null;
+	cancelledAt: string | null;
+	createdAt: string;
+	address: {
+		governorate: string;
+		district: string;
+		street: string;
+		building: string;
+		apartment: string | null;
+		phone: string;
+		notes: string | null;
+	};
+	items: Array<{
+		productId: number;
+		variationId: number;
+		name: string;
+		sku: string | null;
+		quantity: number;
+		unitPrice: number;
+		subtotal: number;
+	}>;
+}
+
+const STATUS_LABELS: Record<string, string> = {
+	pending: "قيد المراجعة",
+	confirmed: "تم التأكيد",
+	processing: "قيد التجهيز",
+	shipped: "تم الشحن",
+	delivered: "تم التوصيل",
+	cancelled: "ملغي",
+	payment_failed: "فشل الدفع",
+};
+
+const STATUS_COLORS: Record<string, string> = {
+	pending:
+		"bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400",
+	confirmed: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
+	processing:
+		"bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400",
+	shipped:
+		"bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400",
+	delivered:
+		"bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400",
+	cancelled: "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400",
+	payment_failed:
+		"bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400",
+};
+
+const PAYMENT_LABELS: Record<string, string> = {
+	cod: "الدفع عند الاستلام",
+	kashier_card: "بطاقة ائتمان",
+	kashier_installments: "تقسيط",
+};
+
+const API = import.meta.env?.PUBLIC_API_URL ?? "http://localhost:5000";
+
+export default function OrderDetail() {
+	const loggedIn = useStore(isLoggedIn);
+	const [order, setOrder] = useState<OrderData | null>(null);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (!loggedIn) {
+			window.location.href = "/login?redirect=" + window.location.pathname;
+			return;
+		}
+
+		const id = window.location.pathname.split("/").pop();
+		if (!id) return;
+
+		fetch(`${API}/api/orders/${id}`, { headers: getAuthHeaders() })
+			.then((r) => {
+				if (!r.ok) throw new Error("not_found");
+				return r.json();
+			})
+			.then((d) => setOrder(d))
+			.catch(() => setError("الطلب غير موجود"))
+			.finally(() => setLoading(false));
+	}, [loggedIn]);
+
+	if (loading) {
+		return (
+			<div className="flex items-center justify-center py-20">
+				<Loader2 size={24} className="animate-spin text-[#d43533]" />
+			</div>
+		);
+	}
+
+	if (error || !order) {
+		return (
+			<div className="text-center py-20">
+				<p className="font-cairo text-lg text-[#57534e] dark:text-[#a8a29e]">
+					{error ?? "الطلب غير موجود"}
+				</p>
+				<a
+					href="/orders"
+					className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#d43533] hover:bg-[#b91c1c] text-white font-cairo font-bold text-sm transition-all mt-4"
+				>
+					العودة لطلباتي
+				</a>
+			</div>
+		);
+	}
+
+	return (
+		<div className="space-y-6">
+			{/* Header */}
+			<div className="flex items-center justify-between flex-wrap gap-3">
+				<div>
+					<div className="flex items-center gap-3">
+						<h2 className="font-mono font-bold text-lg text-[#1c1917] dark:text-[#f5f5f4]">
+							#{order.id}
+						</h2>
+						<span
+							className={`px-2.5 py-1 rounded-lg text-xs font-cairo font-bold ${
+								STATUS_COLORS[order.status] ?? STATUS_COLORS.pending
+							}`}
+						>
+							{STATUS_LABELS[order.status] ?? order.status}
+						</span>
+					</div>
+					<p className="font-cairo text-xs text-[#57534e] dark:text-[#a8a29e] mt-1">
+						{new Date(order.createdAt).toLocaleDateString("ar-EG", {
+							weekday: "long",
+							year: "numeric",
+							month: "long",
+							day: "numeric",
+						})}
+					</p>
+				</div>
+
+				{order.billCode && (
+					<a
+						href={`https://bosta.co/ar-eg/tracking-shipments?shipment-number=${order.billCode}`}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400 font-cairo font-bold text-xs hover:bg-blue-100 dark:hover:bg-blue-950/30 transition-colors"
+					>
+						<ExternalLink size={13} />
+						تتبع الشحن
+					</a>
+				)}
+			</div>
+
+			{/* Items */}
+			<section className="rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] p-5">
+				<div className="flex items-center gap-2 mb-4">
+					<Package size={16} className="text-[#d43533]" />
+					<h3 className="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">
+						المنتجات
+					</h3>
+				</div>
+				<div className="space-y-3">
+					{order.items.map((item, i) => (
+						<div
+							key={i}
+							className="flex items-center justify-between py-2 border-b border-stone-100 dark:border-stone-800 last:border-0"
+						>
+							<div className="flex-1 min-w-0">
+								<p className="font-cairo text-sm text-[#1c1917] dark:text-[#f5f5f4]">
+									{item.name}
+								</p>
+								<p className="font-cairo text-xs text-[#a8a29e]">
+									{item.quantity} x {item.unitPrice.toLocaleString("ar-EG")} ج.م
+								</p>
+							</div>
+							<p className="font-inter font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4] mr-4">
+								{item.subtotal.toLocaleString("ar-EG")} ج.م
+							</p>
+						</div>
+					))}
+				</div>
+				<div className="border-t border-[#e7e0d6] dark:border-[#2c2825] pt-3 mt-3 space-y-2">
+					<div className="flex justify-between text-sm">
+						<span className="font-cairo text-[#57534e] dark:text-[#a8a29e]">
+							المنتجات
+						</span>
+						<span className="font-inter font-bold">
+							{order.subtotal.toLocaleString("ar-EG")} ج.م
+						</span>
+					</div>
+					<div className="flex justify-between text-sm">
+						<span className="font-cairo text-[#57534e] dark:text-[#a8a29e]">
+							الشحن
+						</span>
+						<span className="font-cairo text-green-600 font-semibold">
+							{order.shippingFee === 0
+								? "مجاني"
+								: `${order.shippingFee.toLocaleString("ar-EG")} ج.م`}
+						</span>
+					</div>
+					<div className="flex justify-between pt-2 border-t border-[#e7e0d6] dark:border-[#2c2825]">
+						<span className="font-cairo font-bold text-[#1c1917] dark:text-[#f5f5f4]">
+							الإجمالي
+						</span>
+						<span className="font-inter font-black text-lg text-[#d43533]">
+							{order.total.toLocaleString("ar-EG")} ج.م
+						</span>
+					</div>
+				</div>
+			</section>
+
+			{/* Address */}
+			<section className="rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] p-5">
+				<div className="flex items-center gap-2 mb-3">
+					<MapPin size={16} className="text-[#d43533]" />
+					<h3 className="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">
+						عنوان التوصيل
+					</h3>
+				</div>
+				<div className="font-cairo text-sm text-[#57534e] dark:text-[#a8a29e] space-y-1">
+					<p>
+						{order.address.building}، {order.address.street}
+					</p>
+					{order.address.apartment && <p>شقة {order.address.apartment}</p>}
+					<p>
+						{order.address.district}، {order.address.governorate}
+					</p>
+					<div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-stone-100 dark:border-stone-800">
+						<Phone size={12} />
+						<span dir="ltr" className="font-inter tabular-nums">
+							{order.address.phone}
+						</span>
+					</div>
+					{order.address.notes && (
+						<div className="flex items-start gap-1.5 mt-1">
+							<FileText size={12} className="mt-0.5" />
+							<span>{order.address.notes}</span>
+						</div>
+					)}
+				</div>
+			</section>
+
+			{/* Payment info */}
+			<section className="rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] p-5">
+				<h3 className="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4] mb-2">
+					طريقة الدفع
+				</h3>
+				<p className="font-cairo text-sm text-[#57534e] dark:text-[#a8a29e]">
+					{PAYMENT_LABELS[order.paymentMethod] ?? order.paymentMethod}
+				</p>
+			</section>
+		</div>
+	);
+}

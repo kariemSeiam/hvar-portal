@@ -8,6 +8,25 @@ import "@fontsource/inter/400.css"
 import "@fontsource/inter/500.css"
 import "@fontsource/inter/600.css"
 import "@fontsource/jetbrains-mono/500.css"
+import Navbar from "../components/Navbar.astro"
+import Footer from "../components/Footer.astro"
+import CartFab from "../components/cart/CartFab"
+
+interface Props {
+  title?: string
+  description?: string
+  image?: string
+  noFooter?: boolean
+}
+
+const {
+  title = 'هفارستور — أجهزة منزلية موثوقة',
+  description = 'تسوق أحدث الأجهزة المنزلية من هفار. ضمان حقيقي، شحن مجاني، دفع عند الاستلام.',
+  image,
+  noFooter = false,
+} = Astro.props
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site)
 ---
 
 <!doctype html>
@@ -17,9 +36,59 @@ import "@fontsource/jetbrains-mono/500.css"
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#d43533" />
     <meta name="format-detection" content="telephone=no" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- OG -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:type" content="website" />
+    {image && <meta property="og:image" content={image} />}
+
+    <!-- Dark mode: run before render to prevent flash -->
+    <script is:inline>
+      ;(function () {
+        var stored = localStorage.getItem('hvar-theme')
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (stored === 'dark' || (!stored && prefersDark)) {
+          document.documentElement.classList.add('dark')
+        }
+      })()
+    </script>
+
     <slot name="head" />
   </head>
-  <body class="min-h-screen bg-bg text-ink antialiased dark:bg-bg-dark dark:text-ink-dark">
-    <slot />
+
+  <body class="min-h-screen bg-[#fbf7f1] dark:bg-[#12110f] text-[#1c1917] dark:text-[#f5f5f4] antialiased">
+    <Navbar />
+
+    <main>
+      <slot />
+    </main>
+
+    <CartFab client:load />
+
+    {!noFooter && <Footer />}
+
+    <!-- Wilson P7: Scroll reveal observer -->
+    <script>
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add('visible')
+              observer.unobserve(e.target)
+            }
+          })
+        },
+        { threshold: 0.1, rootMargin: '0px 0px -40px 0px' },
+      )
+      document
+        .querySelectorAll('.reveal-section, .reveal-child')
+        .forEach((el) => observer.observe(el))
+    </script>
   </body>
 </html>

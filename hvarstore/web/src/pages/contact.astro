@@ -1,0 +1,122 @@
+---
+import Base from '../layouts/Base.astro'
+---
+
+<Base title="تواصل معنا — هفارستور">
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+    <!-- Breadcrumb -->
+    <nav class="mb-6" aria-label="مسار التنقل">
+      <ol class="flex items-center gap-2 text-xs font-cairo text-[#57534e] dark:text-[#a8a29e]">
+        <li><a href="/" class="hover:text-[#d43533] transition-colors">البيت</a></li>
+        <li class="opacity-40">›</li>
+        <li class="text-[#1c1917] dark:text-[#f5f5f4] font-semibold">تواصل معنا</li>
+      </ol>
+    </nav>
+
+    <h1 class="font-cairo font-black text-2xl text-[#1c1917] dark:text-[#f5f5f4] mb-8">
+      تواصل معنا
+    </h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- WhatsApp -->
+      <a
+        href="https://wa.me/201000000000"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="group flex items-center gap-4 p-6 rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] hover:border-[#25d366] transition-all"
+      >
+        <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-[#25d366]/10 text-[#25d366] group-hover:bg-[#25d366] group-hover:text-white transition-all">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">واتساب</p>
+          <p class="font-cairo text-xs text-[#57534e] dark:text-[#a8a29e] mt-0.5">راسلنا مباشرة — رد سريع</p>
+        </div>
+      </a>
+
+      <!-- Phone -->
+      <a
+        href="tel:+201000000000"
+        class="group flex items-center gap-4 p-6 rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] hover:border-[#d43533] transition-all"
+      >
+        <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-red-50 dark:bg-red-950/20 text-[#d43533] group-hover:bg-[#d43533] group-hover:text-white transition-all">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2-.5c.9.3 1.9.6 2.9.7A2 2 0 0 1 22 16.9Z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">اتصل بنا</p>
+          <p class="font-cairo text-xs text-[#57534e] dark:text-[#a8a29e] mt-0.5">من ٩ صباحاً لـ٩ مساءً</p>
+        </div>
+      </a>
+
+      <!-- Facebook -->
+      <a
+        href="https://facebook.com/hvarstore"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="group flex items-center gap-4 p-6 rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] hover:border-[#1877f2] transition-all"
+      >
+        <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-[#1877f2]/10 text-[#1877f2] group-hover:bg-[#1877f2] group-hover:text-white transition-all">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">فيسبوك</p>
+          <p class="font-cairo text-xs text-[#57534e] dark:text-[#a8a29e] mt-0.5">تابعنا وشوف أحدث العروض</p>
+        </div>
+      </a>
+
+      <!-- Address -->
+      <div class="flex items-center gap-4 p-6 rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825]">
+        <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-red-50 dark:bg-red-950/20 text-[#d43533]">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+        </div>
+        <div>
+          <p class="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">الفرع</p>
+          <p class="font-cairo text-xs text-[#57534e] dark:text-[#a8a29e] mt-0.5">القاهرة، مصر</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FAQ section -->
+    <section class="mt-14">
+      <h2 class="font-cairo font-bold text-lg text-[#1c1917] dark:text-[#f5f5f4] mb-5">
+        أسئلة شائعة
+      </h2>
+      <div class="space-y-3">
+        {([
+          { q: 'ما مدة الضمان؟', a: 'جميع المنتجات بضمان من سنتين لثلاث سنوات حسب المنتج. يبدأ الضمان من تاريخ الاستلام.' },
+          { q: 'هل يمكنني الدفع عند الاستلام؟', a: 'نعم، نوفر خدمة الدفع عند الاستلام (كاش أو فيزا عند التسليم) مع إمكانية الفحص قبل الدفع.' },
+          { q: 'كم يستغرق التوصيل؟', a: 'من ٢ لـ٥ أيام عمل لجميع المحافظات. التوصيل مجاني.' },
+          { q: 'كيف أطلب صيانة؟', a: 'من صفحة "خدمة ما بعد البيع" اختر نوع الخدمة (صيانة / استبدال / مرتجع) وسيتواصل معك الفريق خلال ٢٤ ساعة.' },
+          { q: 'هل يمكنني إرجاع المنتج؟', a: 'نعم، خلال ١٤ يوم من الاستلام. المنتج يجب أن يكون بحالته الأصلية مع العبوة.' },
+        ] as const).map(({ q, a }) => (
+          <details class="group rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] overflow-hidden">
+            <summary class="flex items-center justify-between px-5 py-4 cursor-pointer font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4] select-none hover:bg-stone-50 dark:hover:bg-stone-900/30 transition-colors list-none">
+              <span>{q}</span>
+              <svg class="w-4 h-4 text-stone-400 transition-transform group-open:rotate-180" viewBox="0 0 16 16" fill="none">
+                <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </summary>
+            <div class="px-5 pb-4 pt-1 font-cairo text-sm text-[#57534e] dark:text-[#a8a29e] leading-relaxed">
+              {a}
+            </div>
+          </details>
+        ))}
+      </div>
+    </section>
+
+  </div>
+
+</Base>

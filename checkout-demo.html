@@ -1,0 +1,1584 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>الخروج · هـفار</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ——— TOKENS ——— */
+      :root {
+        --ember: #d43533;
+        --ember-deep: #a81f1d;
+        --ember-glow: #ff6b52;
+        --ember-soft: rgba(212, 53, 51, 0.1);
+        --ember-line: rgba(212, 53, 51, 0.28);
+        --bg: #f7f2ec;
+        --surface: #fffdfa;
+        --ink: #231b18;
+        --ink-2: #5c4f48;
+        --ink-3: #8c7d73;
+        --hair: rgba(35, 27, 24, 0.1);
+        --ok: #1f8a5b;
+        --ok-bg: rgba(31, 138, 91, 0.12);
+        --blue: #2563a8;
+        --blue-bg: rgba(37, 99, 168, 0.12);
+        --radius: 1rem;
+        --curve: cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Cairo", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        line-height: 1.5;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        -webkit-font-smoothing: antialiased;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        opacity: 0.035;
+        mix-blend-mode: multiply;
+      }
+      ::selection {
+        background: var(--ember);
+        color: #fff;
+      }
+
+      /* ——— LAYOUT ——— */
+      .wrap {
+        width: 100%;
+        max-width: 480px;
+        padding: 24px 20px 48px;
+      }
+
+      /* ——— HEADER ——— */
+      .bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 32px;
+      }
+      .bar-mark {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: linear-gradient(150deg, var(--ember), var(--ember-deep));
+        display: grid;
+        place-items: center;
+        position: relative;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+      .bar-mark::after {
+        content: "";
+        position: absolute;
+        width: 60%;
+        height: 60%;
+        border-radius: 50%;
+        background: radial-gradient(circle, var(--ember-glow), transparent 70%);
+        top: -20%;
+        left: -10%;
+        filter: blur(4px);
+        animation: pulse 3s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.5;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.3);
+        }
+      }
+      .bar-mark svg {
+        position: relative;
+        z-index: 2;
+      }
+      .bar h1 {
+        font-size: 1.1rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      .bar h1 small {
+        display: block;
+        font-size: 0.5rem;
+        font-family: "Inter";
+        font-weight: 700;
+        letter-spacing: 0.3em;
+        color: var(--ink-3);
+        margin-top: -2px;
+      }
+      .bar .items {
+        font-family: "Inter";
+        font-size: 0.82rem;
+        color: var(--ink-3);
+        margin-inline-start: auto;
+      }
+
+      /* ——— STEPS ——— */
+      .steps {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        margin-bottom: 36px;
+      }
+      .step {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        position: relative;
+      }
+      .step-num {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 2px solid var(--hair);
+        background: var(--surface);
+        display: grid;
+        place-items: center;
+        font-family: "Inter";
+        font-weight: 800;
+        font-size: 0.85rem;
+        color: var(--ink-3);
+        transition: 0.4s var(--curve);
+        z-index: 2;
+      }
+      .step.done .step-num {
+        background: var(--ember);
+        border-color: var(--ember);
+        color: #fff;
+      }
+      .step.cur .step-num {
+        border-color: var(--ember);
+        color: var(--ember);
+        box-shadow: 0 0 0 5px var(--ember-soft);
+      }
+      .step-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--ink-3);
+        transition: 0.3s;
+      }
+      .step.cur .step-label,
+      .step.done .step-label {
+        color: var(--ink);
+      }
+      .step-line {
+        position: absolute;
+        top: 18px;
+        height: 2px;
+        background: var(--hair);
+        inset-inline-start: 50%;
+        width: 100%;
+        z-index: 1;
+      }
+      .step.done .step-line {
+        background: var(--ember);
+      }
+      .step:last-child .step-line {
+        display: none;
+      }
+
+      /* ——— PANEL ——— */
+      .panel {
+        background: var(--surface);
+        border: 1px solid rgba(35, 27, 24, 0.07);
+        border-radius: 20px;
+        padding: 28px 24px 24px;
+        box-shadow:
+          0 1px 2px rgba(35, 27, 24, 0.04),
+          0 18px 40px -22px rgba(35, 27, 24, 0.28);
+        animation: slideIn 0.45s var(--curve) both;
+      }
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .panel-hidden {
+        display: none !important;
+      }
+      .panel h2 {
+        font-size: 1.15rem;
+        font-weight: 800;
+        margin-bottom: 4px;
+      }
+      .panel .sub {
+        color: var(--ink-2);
+        font-size: 0.92rem;
+        margin-bottom: 22px;
+      }
+
+      /* ——— FIELDS ——— */
+      .field {
+        margin-bottom: 16px;
+      }
+      .field label {
+        display: block;
+        font-weight: 700;
+        font-size: 0.88rem;
+        margin-bottom: 7px;
+      }
+      .field label .req {
+        color: var(--ember);
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: 12px;
+        border: 1px solid var(--hair);
+        background: var(--bg);
+        color: var(--ink);
+        font-family: inherit;
+        font-size: 1rem;
+        transition: 0.2s;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--ember);
+        box-shadow: 0 0 0 4px var(--ember-soft);
+      }
+      select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238c7d73' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: left 14px center;
+        padding-inline: 16px 40px;
+      }
+
+      /* ——— PHONE INPUT ——— */
+      .phone-wrap {
+        display: flex;
+        border: 1px solid var(--hair);
+        border-radius: 12px;
+        overflow: hidden;
+        background: var(--bg);
+        transition: 0.2s;
+      }
+      .phone-wrap:focus-within {
+        border-color: var(--ember);
+        box-shadow: 0 0 0 4px var(--ember-soft);
+      }
+      .phone-pre {
+        padding: 14px 14px;
+        background: var(--bg);
+        font-family: "Inter";
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--ink-3);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        border-inline-end: 1px solid var(--hair);
+        flex-shrink: 0;
+      }
+      .phone-wrap input {
+        border: none;
+        background: none;
+        padding: 14px 12px;
+        font-family: "Inter";
+        font-size: 1.05rem;
+        letter-spacing: 0.04em;
+        color: var(--ink);
+        direction: ltr;
+      }
+      .phone-wrap input:focus {
+        outline: none;
+        box-shadow: none;
+      }
+
+      /* ——— OTP ROW ——— */
+      .otp-row {
+        display: flex;
+        gap: 10px;
+        direction: ltr;
+        justify-content: center;
+        margin: 16px 0 8px;
+      }
+      .otp-row input {
+        width: 52px;
+        height: 58px;
+        text-align: center;
+        font-family: "Inter";
+        font-size: 1.4rem;
+        font-weight: 800;
+        border: 1.5px solid var(--hair);
+        border-radius: 12px;
+        background: var(--bg);
+        color: var(--ink);
+        padding: 0;
+      }
+      .otp-row input:focus {
+        outline: none;
+        border-color: var(--ember);
+        box-shadow: 0 0 0 4px var(--ember-soft);
+      }
+      .otp-hint {
+        text-align: center;
+        color: var(--ink-3);
+        font-size: 0.84rem;
+        margin-top: 14px;
+      }
+      .otp-hint strong {
+        color: var(--ember);
+        font-family: "Inter";
+        cursor: pointer;
+      }
+      .otp-hint strong:hover {
+        text-decoration: underline;
+      }
+
+      /* ——— GEO-LOCATE BUTTON ——— */
+      .geo-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+      .geo-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 14px;
+        border-radius: 12px;
+        border: 1.5px dashed var(--ember-line);
+        background: var(--ember-soft);
+        color: var(--ember);
+        font-family: inherit;
+        font-weight: 700;
+        font-size: 0.92rem;
+        cursor: pointer;
+        transition: 0.25s var(--curve);
+        position: relative;
+        overflow: hidden;
+      }
+      .geo-btn:hover {
+        border-color: var(--ember);
+        background: rgba(212, 53, 51, 0.16);
+      }
+      .geo-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+      .geo-btn .pulse-ring {
+        position: absolute;
+        inset: -4px;
+        border-radius: 14px;
+        border: 2px solid var(--ember);
+        opacity: 0;
+      }
+      .geo-btn.locating .pulse-ring {
+        animation: geoPulse 1.4s ease-out infinite;
+      }
+      @keyframes geoPulse {
+        0% {
+          transform: scale(0.92);
+          opacity: 0.6;
+        }
+        100% {
+          transform: scale(1.06);
+          opacity: 0;
+        }
+      }
+      .geo-btn .spin {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--ember);
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: geoSpin 0.6s linear infinite;
+        display: none;
+      }
+      .geo-btn.locating .spin {
+        display: block;
+      }
+      .geo-btn.locating .loc-text {
+        display: none;
+      }
+      @keyframes geoSpin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .geo-btn svg {
+        flex-shrink: 0;
+      }
+
+      /* ——— GEO SUCCESS BANNER ——— */
+      .geo-success {
+        display: none;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        background: var(--ok-bg);
+        color: var(--ok);
+        font-weight: 700;
+        font-size: 0.88rem;
+        margin-bottom: 16px;
+        animation: slideIn 0.4s var(--curve);
+      }
+      .geo-success.show {
+        display: flex;
+      }
+      .geo-success .pin {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--ok);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        font-size: 1rem;
+        position: relative;
+      }
+      .geo-success .pin::after {
+        content: "";
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        border: 2px solid var(--ok);
+        opacity: 0.3;
+        animation: geoRing 1.6s ease-out infinite;
+      }
+      @keyframes geoRing {
+        0% {
+          transform: scale(0.85);
+          opacity: 0.5;
+        }
+        100% {
+          transform: scale(1.35);
+          opacity: 0;
+        }
+      }
+      .geo-success .pin svg {
+        stroke: #fff;
+      }
+      .geo-success .geo-addr {
+        font-weight: 600;
+        font-size: 0.84rem;
+        color: var(--ink-2);
+      }
+      .geo-success a {
+        font-weight: 800;
+        color: var(--ok);
+        text-decoration: underline;
+        cursor: pointer;
+        font-size: 0.82rem;
+        margin-inline-start: auto;
+      }
+
+      /* ——— SUMMARY ——— */
+      .summary {
+        background: var(--bg);
+        border-radius: 14px;
+        padding: 16px 18px;
+        margin: 22px 0;
+      }
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        font-size: 0.92rem;
+      }
+      .summary-row .v {
+        font-family: "Inter";
+        font-weight: 700;
+      }
+      .summary-row.total {
+        font-size: 1.08rem;
+        font-weight: 800;
+        padding-top: 12px;
+        margin-top: 6px;
+        border-top: 1px dashed var(--hair);
+      }
+      .summary-row.total .v {
+        color: var(--ember);
+        font-size: 1.2rem;
+      }
+
+      /* ——— PAYMENT ——— */
+      .pay-opt {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 18px;
+        border: 1.5px solid var(--hair);
+        border-radius: 14px;
+        cursor: pointer;
+        transition: 0.2s;
+        margin-bottom: 12px;
+        background: var(--bg);
+      }
+      .pay-opt:hover {
+        border-color: var(--ember-line);
+      }
+      .pay-opt.on {
+        border-color: var(--ember);
+        background: var(--ember-soft);
+      }
+      .pay-radio {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid var(--hair);
+        flex-shrink: 0;
+        position: relative;
+        transition: 0.2s;
+      }
+      .pay-opt.on .pay-radio {
+        border-color: var(--ember);
+      }
+      .pay-opt.on .pay-radio::after {
+        content: "";
+        position: absolute;
+        inset: 4px;
+        border-radius: 50%;
+        background: var(--ember);
+        animation: pop 0.25s var(--curve);
+      }
+      @keyframes pop {
+        0% {
+          transform: scale(0);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      .pay-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: var(--surface);
+        display: grid;
+        place-items: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+      }
+      .pay-info .t {
+        font-weight: 800;
+        font-size: 0.96rem;
+      }
+      .pay-info .s {
+        font-size: 0.8rem;
+        color: var(--ink-3);
+      }
+      .pay-tag {
+        margin-inline-start: auto;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: var(--ember);
+        background: var(--ember-soft);
+        padding: 3px 8px;
+        border-radius: 6px;
+        white-space: nowrap;
+      }
+
+      /* ——— BUTTONS ——— */
+      .btn {
+        font-family: inherit;
+        font-weight: 700;
+        font-size: 0.95rem;
+        border: none;
+        cursor: pointer;
+        border-radius: 12px;
+        padding: 15px 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        transition: 0.2s var(--curve);
+      }
+      .btn-block {
+        width: 100%;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, var(--ember), var(--ember-deep));
+        color: #fff;
+      }
+      .btn-primary:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 24px -12px var(--ember);
+      }
+      .btn-primary:active:not(:disabled) {
+        transform: none;
+      }
+      .btn-primary:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+      .btn-ghost {
+        background: var(--bg);
+        color: var(--ink-2);
+        border: 1px solid var(--hair);
+      }
+      .btn-ghost:hover {
+        border-color: var(--ember);
+        color: var(--ember);
+      }
+      .btn-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 24px;
+      }
+      .btn-row .btn-ghost {
+        flex: 0 0 auto;
+        width: auto;
+        padding: 15px 20px;
+      }
+
+      /* ——— TRUST LINE ——— */
+      .trust-line {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 18px;
+        flex-wrap: wrap;
+      }
+      .trust-line span {
+        font-size: 0.76rem;
+        color: var(--ink-3);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .trust-line span::before {
+        content: "✓";
+        color: var(--ok);
+        font-weight: 800;
+        font-size: 0.85rem;
+      }
+
+      /* ——— TOAST ——— */
+      .toast {
+        position: fixed;
+        bottom: 28px;
+        inset-inline-end: 28px;
+        background: var(--ink);
+        color: var(--surface);
+        padding: 14px 20px;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.4);
+        animation: toastIn 0.4s var(--curve);
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      @keyframes toastIn {
+        from {
+          opacity: 0;
+          transform: translateY(14px) scale(0.92);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      /* ——— NOTE ——— */
+      .note {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 12px 16px;
+        border-radius: 12px;
+        font-size: 0.84rem;
+        font-weight: 600;
+        margin-top: 8px;
+      }
+      .note-info {
+        background: var(--blue-bg);
+        color: var(--blue);
+      }
+      .note-ok {
+        background: var(--ok-bg);
+        color: var(--ok);
+      }
+      .note-ember {
+        background: var(--ember-soft);
+        color: var(--ember);
+      }
+
+      /* ——— CONFIRMATION ——— */
+      .confirm {
+        text-align: center;
+        padding: 12px 0;
+      }
+      .confirm .check {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: var(--ok-bg);
+        display: grid;
+        place-items: center;
+        margin: 0 auto 18px;
+        animation: popIn 0.5s var(--curve);
+      }
+      @keyframes popIn {
+        0% {
+          transform: scale(0);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      .confirm .check svg {
+        stroke: var(--ok);
+      }
+      .confirm h2 {
+        font-size: 1.4rem;
+        font-weight: 800;
+        margin-bottom: 6px;
+      }
+      .confirm .order-ref {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--ember-soft);
+        border: 1px dashed var(--ember-line);
+        padding: 10px 18px;
+        border-radius: 12px;
+        margin: 14px 0 22px;
+      }
+      .confirm .order-ref .code {
+        font-family: "Inter";
+        font-weight: 800;
+        font-size: 1.05rem;
+        color: var(--ember);
+        letter-spacing: 0.05em;
+      }
+      .confirm .order-ref .lbl {
+        font-size: 0.82rem;
+        color: var(--ink-2);
+        font-weight: 600;
+      }
+      .confirm-details {
+        text-align: start;
+        background: var(--bg);
+        border-radius: 14px;
+        padding: 18px;
+        margin-top: 16px;
+      }
+      .confirm-details .line {
+        display: flex;
+        justify-content: space-between;
+        padding: 7px 0;
+        font-size: 0.9rem;
+      }
+      .confirm-details .line .v {
+        font-weight: 700;
+      }
+      .confirm-details .line .dim {
+        color: var(--ink-3);
+      }
+
+      /* ——— SKELETON LOADER ——— */
+      .skel {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 6px 0;
+      }
+      .skel-line {
+        height: 14px;
+        border-radius: 7px;
+        background: linear-gradient(
+          90deg,
+          var(--hair) 0%,
+          var(--bg) 50%,
+          var(--hair) 100%
+        );
+        background-size: 200% 100%;
+        animation: skelShimmer 1.4s ease infinite;
+      }
+      @keyframes skelShimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+      .skel-line.w60 {
+        width: 60%;
+      }
+      .skel-line.w40 {
+        width: 40%;
+      }
+      .skel-line.w80 {
+        width: 80%;
+      }
+
+      /* ——— RESPONSIVE ——— */
+      @media (max-width: 400px) {
+        .wrap {
+          padding: 16px 14px 32px;
+        }
+        .panel {
+          padding: 22px 18px;
+        }
+        .otp-row input {
+          width: 46px;
+          height: 52px;
+          font-size: 1.2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <!-- HEADER -->
+      <div class="bar">
+        <div class="bar-mark">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M4 20V4M4 12h11a5 5 0 005-5V4"
+              stroke="#fff"
+              stroke-width="2.4"
+              stroke-linecap="round"
+            />
+            <path
+              d="M20 20V12"
+              stroke="#fff"
+              stroke-width="2.4"
+              stroke-linecap="round"
+            />
+          </svg>
+        </div>
+        <h1>هـفار<small>الخروج</small></h1>
+        <div class="items" id="itemCount">٣ منتجات</div>
+      </div>
+
+      <!-- STEPS -->
+      <div class="steps" id="steps">
+        <div class="step cur" data-step="1">
+          <div class="step-num">١</div>
+          <div class="step-label">رقمك</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step" data-step="2">
+          <div class="step-num">٢</div>
+          <div class="step-label">العنوان</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step" data-step="3">
+          <div class="step-num">٣</div>
+          <div class="step-label">الدفع</div>
+          <div class="step-line"></div>
+        </div>
+      </div>
+
+      <!-- STEP 1: PHONE -->
+      <div class="panel" id="panel-1">
+        <h2>رقمك هو هويتك</h2>
+        <p class="sub">من غير إيميلات ولا تعقيد — رقمك بس.</p>
+        <div class="field">
+          <label>رقم الموبايل <span class="req">*</span></label>
+          <div class="phone-wrap">
+            <span class="phone-pre">🇪🇬 ٢٠+</span>
+            <input
+              type="tel"
+              id="phoneInput"
+              maxlength="11"
+              placeholder="01X XXXXXXX"
+              autocomplete="tel"
+            />
+          </div>
+          <div
+            id="phoneErr"
+            style="
+              color: var(--ember);
+              font-size: 0.82rem;
+              margin-top: 6px;
+              display: none;
+            "
+          >
+            رقم مصري صحيح مطلوب
+          </div>
+        </div>
+        <button
+          class="btn btn-primary btn-block"
+          id="step1Btn"
+          disabled
+          onclick="goStep2()"
+        >
+          التالي ←
+        </button>
+        <div class="trust-line">
+          <span>شحن مجاني</span>
+          <span>ضمان سنة</span>
+          <span>افحص قبل الدفع</span>
+        </div>
+      </div>
+
+      <!-- STEP 1b: OTP -->
+      <div class="panel panel-hidden" id="panel-otp">
+        <h2>تأكيد الرقم</h2>
+        <p class="sub">
+          بعتنا كود لـ
+          <strong id="otpDisplay" style="font-family: &quot;Inter&quot;"
+            >01000000000</strong
+          >
+        </p>
+        <div class="otp-row" id="otpRow">
+          <input type="text" maxlength="1" inputmode="numeric" data-idx="0" />
+          <input type="text" maxlength="1" inputmode="numeric" data-idx="1" />
+          <input type="text" maxlength="1" inputmode="numeric" data-idx="2" />
+          <input type="text" maxlength="1" inputmode="numeric" data-idx="3" />
+        </div>
+        <div class="otp-hint">
+          ما وصلش الكود؟ <strong onclick="resendOtp()">إعادة الإرسال</strong>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="backToStep1()">رجوع</button>
+          <button
+            class="btn btn-primary"
+            id="otpBtn"
+            disabled
+            onclick="goStep3()"
+          >
+            تأكيد
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2: ADDRESS + GEOLINK -->
+      <div class="panel panel-hidden" id="panel-2">
+        <h2>فين نوصّلك؟</h2>
+        <p class="sub">شارك موقعك وهنجيب العنوان تلقائيًا، أو اختار يدويًا.</p>
+
+        <!-- GeoLink button -->
+        <div class="geo-row">
+          <button class="geo-btn" id="geoBtn" onclick="locateMe()">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 10c0 6-9 13-9 13S3 16 3 10a9 9 0 0118 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <span class="loc-text">حدّد موقعي الحالي</span>
+            <span class="spin"></span>
+            <span class="pulse-ring"></span>
+          </button>
+        </div>
+
+        <!-- Geo success banner (hidden until location is detected) -->
+        <div class="geo-success" id="geoSuccess">
+          <div class="pin">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke-width="2.8"
+              stroke-linecap="round"
+            >
+              <path d="M21 10c0 6-9 13-9 13S3 16 3 10a9 9 0 0118 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+          </div>
+          <div>
+            <div>تم تحديد موقعك</div>
+            <div class="geo-addr" id="geoAddr">—</div>
+          </div>
+          <a onclick="clearGeo()">تعديل</a>
+        </div>
+
+        <div class="field">
+          <label>المحافظة <span class="req">*</span></label>
+          <select id="govSelect" onchange="onGovChange()">
+            <option value="">اختار المحافظة</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>المنطقة <span class="req">*</span></label>
+          <select id="distSelect" disabled>
+            <option value="">اختار المنطقة</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>العنوان بالتفصيل <span class="req">*</span></label>
+          <input id="addressInput" placeholder="اسم الشارع، رقم العقار" />
+        </div>
+        <div class="note note-ok">🚚 التوصيل خلال ١-٣ أيام عبر بوسطة</div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="backToOtp()">رجوع</button>
+          <button
+            class="btn btn-primary"
+            id="step2Btn"
+            disabled
+            onclick="goStep4()"
+          >
+            متابعة ←
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 3: PAYMENT -->
+      <div class="panel panel-hidden" id="panel-3">
+        <h2>اختار طريقة الدفع</h2>
+        <p class="sub">اللي يريحك — كل طرق الدفع آمنة.</p>
+
+        <div class="pay-opt on" id="payCod" onclick="selectPay('cod')">
+          <div class="pay-radio"></div>
+          <div class="pay-icon">💵</div>
+          <div class="pay-info">
+            <div class="t">الدفع عند الاستلام</div>
+            <div class="s">ادفع كاش لما تستلم</div>
+          </div>
+          <div class="pay-tag">الأكثر شيوعاً</div>
+        </div>
+        <div class="pay-opt" id="payCard" onclick="selectPay('card')">
+          <div class="pay-radio"></div>
+          <div class="pay-icon">💳</div>
+          <div class="pay-info">
+            <div class="t">بطاقة · محفظة · تقسيط</div>
+            <div class="s">فيزا، ماستركارد، فودافون كاش</div>
+          </div>
+          <div class="pay-tag">عبر Kashier</div>
+        </div>
+
+        <div class="summary">
+          <div class="summary-row">
+            <span>المجموع الفرعي</span
+            ><span class="v" id="subtotal">٤٬٣٣٠ ج.م</span>
+          </div>
+          <div class="summary-row">
+            <span>الشحن</span
+            ><span class="v" style="color: var(--ok)">مجاني</span>
+          </div>
+          <div class="summary-row total">
+            <span>الإجمالي</span><span class="v" id="total">٤٬٣٣٠ ج.م</span>
+          </div>
+        </div>
+
+        <div class="note note-info panel-hidden" id="kashierNote">
+          🔒 التحويل عبر Kashier — بنتحقق من توقيع كل عملية
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="backToAddress()">رجوع</button>
+          <button class="btn btn-primary" onclick="placeOrder()" id="placeBtn">
+            تأكيد الطلب
+          </button>
+        </div>
+      </div>
+
+      <!-- CONFIRMATION -->
+      <div class="panel panel-hidden" id="panel-done">
+        <div class="confirm">
+          <div class="check">
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke-width="2.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h2>تم استلام طلبك 🎉</h2>
+          <p class="sub" style="margin-bottom: 0">
+            هنتأكد منه وهنرسل لك إشعار على واتساب.
+          </p>
+          <div class="order-ref">
+            <span class="lbl">رقم الطلب</span
+            ><span class="code" id="orderRef">HVAR-20260604-0082</span>
+          </div>
+          <div class="confirm-details" id="confirmDetails"></div>
+          <button
+            class="btn btn-primary btn-block"
+            style="margin-top: 20px"
+            onclick="resetDemo()"
+          >
+            طلب جديد ←
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ——— GEO DATA ———
+      const GOVERNORATES = [
+        {
+          id: 1,
+          name: "القاهرة",
+          keywords: ["القاهرة", "cairo"],
+          dists: [
+            "مدينة نصر",
+            "المعادي",
+            "مصر الجديدة",
+            "حلوان",
+            "شبرا",
+            "العباسية",
+            "الزمالك",
+            "جاردن سيتي",
+          ],
+        },
+        {
+          id: 2,
+          name: "الجيزة",
+          keywords: ["الجيزة", "giza", "جيزة"],
+          dists: [
+            "الدقي",
+            "المهندسين",
+            "فيصل",
+            "الهرم",
+            "٦ أكتوبر",
+            "الشيخ زايد",
+            "إمبابة",
+            "العجوزة",
+          ],
+        },
+        {
+          id: 3,
+          name: "الإسكندرية",
+          keywords: ["الإسكندرية", "alexandria", "اسكندرية", "الاسكندرية"],
+          dists: [
+            "سموحة",
+            "سيدي جابر",
+            "المنتزه",
+            "العجمي",
+            "محرم بك",
+            "اللبان",
+            "كليوباترا",
+          ],
+        },
+        {
+          id: 4,
+          name: "القليوبية",
+          keywords: ["القليوبية", "qalyubia", "قليوبية"],
+          dists: ["بنها", "شبرا الخيمة", "القناطر الخيرية", "قليوب"],
+        },
+        {
+          id: 5,
+          name: "الدقهلية",
+          keywords: ["الدقهلية", "dakahlia", "دقهلية"],
+          dists: ["المنصورة", "طلخا", "ميت غمر", "دكرنس"],
+        },
+        {
+          id: 6,
+          name: "الشرقية",
+          keywords: ["الشرقية", "sharqia", "شرقية"],
+          dists: ["الزقازيق", "بلبيس", "العاشر من رمضان", "منيا القمح"],
+        },
+        {
+          id: 7,
+          name: "البحيرة",
+          keywords: ["البحيرة", "beheira"],
+          dists: ["دمنهور", "رشيد", "إدكو", "كوم حمادة"],
+        },
+        {
+          id: 8,
+          name: "المنوفية",
+          keywords: ["المنوفية", "monufia"],
+          dists: ["شبين الكوم", "قويسنا", "منوف", "الباجور"],
+        },
+        {
+          id: 9,
+          name: "الغربية",
+          keywords: ["الغربية", "gharbia"],
+          dists: ["طنطا", "المحلة الكبرى", "سمنود", "السنطة"],
+        },
+        {
+          id: 10,
+          name: "بورسعيد",
+          keywords: ["بورسعيد", "port said"],
+          dists: ["بورسعيد", "بورفؤاد", "الزهور", "الضواحي"],
+        },
+        {
+          id: 11,
+          name: "دمياط",
+          keywords: ["دمياط", "damietta"],
+          dists: ["دمياط", "رأس البر", "فارسكور", "كفر سعد"],
+        },
+        {
+          id: 12,
+          name: "كفر الشيخ",
+          keywords: ["كفر الشيخ", "kafr el-sheikh"],
+          dists: ["كفر الشيخ", "بيلا", "الحامول", "مطوبس"],
+        },
+      ];
+
+      // ——— HELPERS ———
+      const AR = "٠١٢٣٤٥٦٧٨٩";
+      const ar = (s) => String(s).replace(/\d/g, (d) => AR[d]);
+      const arDigits = (n) => ar(n.toLocaleString("en-US"));
+
+      // ——— STATE ———
+      let payMethod = "cod";
+      let phone = "";
+      let geoData = null;
+
+      // ——— PHONE ———
+      const phoneInput = document.getElementById("phoneInput");
+      phoneInput.addEventListener("input", () => {
+        const v = phoneInput.value.replace(/\D/g, "");
+        phoneInput.value = v;
+        const ok = /^01[0125]\d{8}$/.test(v);
+        document.getElementById("step1Btn").disabled = !ok;
+        document.getElementById("phoneErr").style.display =
+          v.length >= 11 && !ok ? "block" : "none";
+      });
+
+      function normalizePhone(raw) {
+        let d = raw.replace(/\D/g, "");
+        if (d.startsWith("20")) d = d.slice(2);
+        if (d.length === 10 && d[0] === "1") d = "0" + d;
+        return /^01[0125]\d{8}$/.test(d) ? d : null;
+      }
+
+      // ——— OTP ———
+      document.querySelectorAll("#otpRow input").forEach((el, i, arr) => {
+        el.addEventListener("input", () => {
+          el.value = el.value.replace(/\D/g, "");
+          if (el.value && i < arr.length - 1) arr[i + 1].focus();
+          verifyOtp();
+        });
+        el.addEventListener("keydown", (e) => {
+          if (e.key === "Backspace" && !el.value && i > 0) arr[i - 1].focus();
+        });
+      });
+
+      function verifyOtp() {
+        const vals = Array.from(document.querySelectorAll("#otpRow input")).map(
+          (i) => i.value,
+        );
+        document.getElementById("otpBtn").disabled = !vals.every((v) => v);
+      }
+
+      function resendOtp() {
+        document
+          .querySelectorAll("#otpRow input")
+          .forEach((i) => (i.value = ""));
+        document.getElementById("otpBtn").disabled = true;
+        document.querySelector("#otpRow input").focus();
+        toast("تم إعادة إرسال الكود ✓");
+      }
+
+      // ——— ADDRESS DROPDOWNS ———
+      (function populate() {
+        const sel = document.getElementById("govSelect");
+        GOVERNORATES.forEach((g) => {
+          sel.innerHTML += `<option value="${g.id}">${g.name}</option>`;
+        });
+      })();
+
+      function onGovChange() {
+        const id = +document.getElementById("govSelect").value;
+        const gov = GOVERNORATES.find((g) => g.id === id);
+        const dist = document.getElementById("distSelect");
+        dist.innerHTML = '<option value="">اختار المنطقة</option>';
+        dist.disabled = !gov;
+        if (gov)
+          gov.dists.forEach((d) => {
+            dist.innerHTML += `<option>${d}</option>`;
+          });
+        checkAddress();
+      }
+
+      document
+        .getElementById("addressInput")
+        .addEventListener("input", checkAddress);
+
+      function checkAddress() {
+        const addr = document.getElementById("addressInput").value.trim();
+        const dist = document.getElementById("distSelect").value;
+        document.getElementById("step2Btn").disabled = !dist || !addr;
+      }
+
+      // ——— GEOLINK INTEGRATION ———
+      function locateMe() {
+        if (!navigator.geolocation) {
+          toast("المتصفح لا يدعم تحديد الموقع");
+          return;
+        }
+
+        const btn = document.getElementById("geoBtn");
+        btn.classList.add("locating");
+        btn.disabled = true;
+
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            reverseGeocode(latitude, longitude);
+          },
+          (error) => {
+            btn.classList.remove("locating");
+            btn.disabled = false;
+            if (error.code === error.PERMISSION_DENIED) {
+              toast("⚠️ لازم تسمح بتحديد الموقع — أو اختار المحافظة يدويًا");
+            } else {
+              toast("⚠️ ما قدرناش نحدد موقعك — جرب يدوي");
+            }
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
+        );
+      }
+
+      // ——— GeoLink Reverse Geocode ———
+      // API whitelists http://localhost:3000 for CORS
+      // Open: http://localhost:3000 (run: bun checkout-server.js)
+      const GEO_KEY = "0ae3efb1-9685-4530-86e2-606dccecec50";
+
+      async function reverseGeocode(lat, lng) {
+        const btn = document.getElementById("geoBtn");
+
+        try {
+          const res = await fetch(
+            `https://geolink-eg.com/api/v2/reverse_geocode?latitude=${lat}&longitude=${lng}&language=ar&country=eg&key=${GEO_KEY}`,
+          );
+          const json = await res.json();
+
+          if (!json.success) throw new Error(json.error || "GeoLink denied");
+
+          const data = json.data;
+          const govName = data.address_parts?.governorate || "";
+          const distName = data.address_parts?.district || "";
+          const shortAddr = data.short_address || data.address || "";
+
+          // Match governorate against our dropdown options
+          const matchedGov = GOVERNORATES.find(
+            (g) =>
+              govName.includes(g.name) ||
+              g.name.includes(govName) ||
+              g.keywords.some((kw) => govName.includes(kw)),
+          );
+
+          if (matchedGov) {
+            document.getElementById("govSelect").value = matchedGov.id;
+            onGovChange();
+
+            // Match district
+            const matchedDist = matchedGov.dists.find(
+              (d) => distName.includes(d) || d.includes(distName),
+            );
+
+            if (matchedDist) {
+              setTimeout(() => {
+                document.getElementById("distSelect").value = matchedDist;
+              }, 50);
+            }
+
+            geoData = { gov: matchedGov, dist: matchedDist || distName };
+            document.getElementById("geoAddr").textContent = shortAddr;
+            document.getElementById("geoSuccess").classList.add("show");
+            toast("📍 تم تحديد موقعك");
+          } else {
+            toast("📍 حددنا موقعك تقريبًا — أكمل اختيار المحافظة");
+          }
+        } catch (err) {
+          console.error("GeoLink error:", err);
+          toast("⚠️ ما قدرناش نحدد العنوان — اختار يدوي");
+        } finally {
+          btn.classList.remove("locating");
+          btn.disabled = false;
+          checkAddress();
+        }
+      }
+
+      function clearGeo() {
+        geoData = null;
+        document.getElementById("geoSuccess").classList.remove("show");
+        document.getElementById("govSelect").value = "";
+        document.getElementById("distSelect").innerHTML =
+          '<option value="">اختار المنطقة</option>';
+        document.getElementById("distSelect").disabled = true;
+        document.getElementById("addressInput").value = "";
+        checkAddress();
+      }
+
+      // ——— PAYMENT ———
+      function selectPay(m) {
+        payMethod = m;
+        document.getElementById("payCod").classList.toggle("on", m === "cod");
+        document.getElementById("payCard").classList.toggle("on", m === "card");
+        document
+          .getElementById("kashierNote")
+          .classList.toggle("panel-hidden", m !== "card");
+      }
+
+      // ——— NAVIGATION ———
+      function setStep(n) {
+        document.querySelectorAll(".step").forEach((s) => {
+          const idx = +s.dataset.step;
+          s.classList.toggle("cur", idx === n);
+          s.classList.toggle("done", idx < n);
+        });
+      }
+
+      function showPanel(id) {
+        document
+          .querySelectorAll(".panel")
+          .forEach((p) => p.classList.add("panel-hidden"));
+        document.getElementById(id).classList.remove("panel-hidden");
+      }
+
+      function goStep2() {
+        const raw = phoneInput.value;
+        const norm = normalizePhone(raw);
+        if (!norm) return;
+        phone = norm;
+        document.getElementById("otpDisplay").textContent = ar(norm);
+        showPanel("panel-otp");
+        setStep(1);
+        document.querySelector("#otpRow input").focus();
+      }
+
+      function backToStep1() {
+        showPanel("panel-1");
+      }
+
+      function goStep3() {
+        showPanel("panel-2");
+        setStep(2);
+        checkAddress();
+      }
+
+      function backToOtp() {
+        showPanel("panel-otp");
+      }
+
+      function goStep4() {
+        showPanel("panel-3");
+        setStep(3);
+        window.scrollTo({
+          top: document.querySelector(".steps").offsetTop,
+          behavior: "smooth",
+        });
+      }
+
+      function backToAddress() {
+        showPanel("panel-2");
+      }
+
+      // ——— ORDER ———
+      function placeOrder() {
+        const btn = document.getElementById("placeBtn");
+        btn.disabled = true;
+        btn.textContent = "جاري تأكيد الطلب…";
+
+        setTimeout(() => {
+          const govId = +document.getElementById("govSelect").value;
+          const gov = GOVERNORATES.find((g) => g.id === govId);
+          const addr = document.getElementById("addressInput").value;
+          const dist = document.getElementById("distSelect").value;
+
+          const today = new Date();
+          const ymd =
+            today.getFullYear() +
+            String(today.getMonth() + 1).padStart(2, "0") +
+            String(today.getDate()).padStart(2, "0");
+          const seq = String(Math.floor(Math.random() * 9000) + 1000);
+          document.getElementById("orderRef").textContent =
+            `HVAR-${ymd}-${seq}`;
+
+          document.getElementById("confirmDetails").innerHTML = `
+      <div class="line"><span class="dim">العنوان</span><span class="v">${gov ? gov.name : ""} · ${dist} · ${addr}</span></div>
+      <div class="line"><span class="dim">الدفع</span><span class="v">${payMethod === "cod" ? "عند الاستلام" : "بطاقة عبر Kashier"}</span></div>
+      <div class="line"><span class="dim">رقم الموبايل</span><span class="v" style="direction:ltr;font-family:'Inter';text-align:start">${ar(phone)}</span></div>
+    `;
+
+          showPanel("panel-done");
+          btn.disabled = false;
+          btn.textContent = "تأكيد الطلب";
+        }, 900);
+      }
+
+      function resetDemo() {
+        showPanel("panel-1");
+        setStep(1);
+        document.querySelectorAll(".step").forEach((s) => {
+          s.classList.remove("done");
+          s.classList.add("cur");
+        });
+        document
+          .querySelectorAll("#otpRow input")
+          .forEach((i) => (i.value = ""));
+        document.getElementById("phoneInput").value = "";
+        document.getElementById("step1Btn").disabled = true;
+        clearGeo();
+      }
+
+      // ——— TOAST ———
+      function toast(msg) {
+        const t = document.createElement("div");
+        t.className = "toast";
+        t.innerHTML = msg;
+        document.body.appendChild(t);
+        setTimeout(() => {
+          t.style.transition = ".3s";
+          t.style.opacity = "0";
+          t.style.transform = "translateY(10px)";
+          setTimeout(() => t.remove(), 300);
+        }, 2800);
+      }
+
+      // ——— INIT ———
+      resetDemo();
+
+      // Expose to global for onclick handlers
+      Object.assign(window, {
+        resetDemo,
+        goStep2,
+        goStep3,
+        goStep4,
+        backToStep1,
+        backToOtp,
+        backToAddress,
+        onGovChange,
+        locateMe,
+        clearGeo,
+        selectPay,
+        placeOrder,
+        resendOtp,
+        toast,
+      });
+    </script>
+  </body>
+</html>

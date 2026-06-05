@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro'
+import AuthForm from '../components/auth/AuthForm'
+---
+
+<Base title="تسجيل الدخول — هفارستور">
+
+  <div class="max-w-md mx-auto px-4 sm:px-6 py-12">
+
+    <div class="text-center mb-8">
+      <a href="/" class="inline-flex items-center gap-0.5 mb-6">
+        <span class="text-[#d43533] font-cairo font-black text-3xl">هفار</span>
+        <span class="text-stone-400 dark:text-stone-500 font-cairo text-sm mt-2">ستور</span>
+      </a>
+      <h1 class="font-cairo font-black text-xl text-[#1c1917] dark:text-[#f5f5f4]">
+        أهلاً بيك
+      </h1>
+      <p class="font-cairo text-sm text-[#57534e] dark:text-[#a8a29e] mt-1">
+        سجل دخول أو أنشئ حساب جديد
+      </p>
+    </div>
+
+    <AuthForm client:load />
+
+  </div>
+
+</Base>

@@ -1,6 +1,7 @@
 import {
 	mysqlTable,
 	serial,
+	bigint,
 	varchar,
 	decimal,
 	text,
@@ -28,7 +29,7 @@ export const customers = mysqlTable(
 // ── Customer addresses ──
 export const customerAddresses = mysqlTable("customer_addresses", {
 	id: serial("id").primaryKey(),
-	customerId: int("customer_id")
+	customerId: bigint("customer_id", { unsigned: true, mode: "number" })
 		.notNull()
 		.references(() => customers.id),
 	governorateId: int("governorate_id").notNull(), // FK to hvar_erp.cities.id
@@ -47,7 +48,7 @@ export const orders = mysqlTable(
 	"orders",
 	{
 		id: serial("id").primaryKey(),
-		customerId: int("customer_id")
+		customerId: bigint("customer_id", { unsigned: true, mode: "number" })
 			.notNull()
 			.references(() => customers.id),
 		contactId: int("contact_id").notNull(), // hvar_erp.contacts.id
@@ -84,7 +85,7 @@ export const orderItems = mysqlTable(
 	"order_items",
 	{
 		id: serial("id").primaryKey(),
-		orderId: int("order_id")
+		orderId: bigint("order_id", { unsigned: true, mode: "number" })
 			.notNull()
 			.references(() => orders.id),
 		productId: int("product_id").notNull(), // hvar_erp.products.id
@@ -103,7 +104,7 @@ export const pendingPayments = mysqlTable(
 	"pending_payments",
 	{
 		id: serial("id").primaryKey(),
-		orderId: int("order_id")
+		orderId: bigint("order_id", { unsigned: true, mode: "number" })
 			.notNull()
 			.references(() => orders.id),
 		kashierOrderId: varchar("kashier_order_id", { length: 50 })

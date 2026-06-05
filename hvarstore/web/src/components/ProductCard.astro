@@ -1,0 +1,148 @@
+---
+import type { ProductCard as ProductCardType } from '../lib/api'
+
+interface Props {
+  product: ProductCardType
+}
+
+const { product } = Astro.props
+const hasDiscount = product.comparePrice !== null && product.comparePrice > product.price
+const discountPct = hasDiscount
+  ? Math.round(((product.comparePrice! - product.price) / product.comparePrice!) * 100)
+  : 0
+const isLowStock = product.stock > 0 && product.stock <= 3
+const outOfStock = product.stock === 0
+---
+
+<article
+  class="card-shine group relative bg-white dark:bg-[#1c1917] rounded-2xl border border-[#e7e0d6] dark:border-[#2c2825] overflow-hidden transition-all"
+  style="transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s cubic-bezier(0.22,1,0.36,1); will-change: transform;"
+  onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 28px rgba(0,0,0,0.08)'"
+  onmouseleave="this.style.transform='translateY(0)';this.style.boxShadow='none'"
+>
+  <!-- Image -->
+  <a href={`/products/${product.slug}`} class="block relative overflow-hidden bg-stone-50 dark:bg-stone-900" style="aspect-ratio:1/1">
+    {product.image ? (
+      <img
+        src={product.image}
+        alt={product.name}
+        width="400"
+        height="400"
+        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <!-- Branded placeholder — no emojis -->
+      <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-50 to-stone-100 dark:from-red-950/20 dark:to-stone-900">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d43533" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.3">
+          <path d="M13 2L4.5 13H11l-1 9L21 11H14l1-9Z"/>
+        </svg>
+      </div>
+    )}
+
+    <!-- Discount badge -->
+    {hasDiscount && (
+      <span class="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-[#d43533] text-white text-[11px] font-bold font-inter leading-tight">
+        -{discountPct}%
+      </span>
+    )}
+
+    <!-- Out of stock overlay -->
+    {outOfStock && (
+      <div class="absolute inset-0 bg-white/70 dark:bg-black/70 flex items-center justify-center">
+        <span class="font-cairo font-bold text-[#57534e] text-sm bg-white dark:bg-[#1c1917] px-3 py-1.5 rounded-lg border border-[#e7e0d6] dark:border-[#2c2825] shadow-sm">
+          نفذت الكمية
+        </span>
+      </div>
+    )}
+  </a>
+
+  <!-- Info -->
+  <div class="p-4">
+    <!-- Category -->
+    {product.categoryName && (
+      <span class="font-cairo text-[10px] font-semibold text-[#a8a29e] uppercase tracking-wide mb-1.5 block">
+        {product.categoryName}
+      </span>
+    )}
+
+    <a href={`/products/${product.slug}`} class="block mb-3">
+      <h3 class="font-cairo font-semibold text-sm text-[#1c1917] dark:text-[#f5f5f4] leading-snug line-clamp-2 hover:text-[#d43533] transition-colors">
+        {product.name}
+      </h3>
+    </a>
+
+    <!-- Price row -->
+    <div class="flex items-baseline gap-2 mb-1.5">
+      <span class="font-inter font-bold text-[#d43533] text-base tabular-nums">
+        {product.price.toLocaleString('ar-EG')} ج.م
+      </span>
+      {hasDiscount && (
+        <span class="font-inter text-[#a8a29e] text-xs line-through tabular-nums">
+          {product.comparePrice!.toLocaleString('ar-EG')}
+        </span>
+      )}
+    </div>
+
+    <!-- Low stock warning — SVG icon, no emoji -->
+    {isLowStock && (
+      <p class="flex items-center gap-1 text-[11px] font-cairo text-amber-600 dark:text-amber-400 mb-2">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.3 3.3L2 20h20L13.7 3.3a2 2 0 0 0-3.4 0Z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        {product.stock} قطع متبقية
+      </p>
+    )}
+
+    <!-- Add to cart button -->
+    <button
+      class:list={[
+        'add-to-cart w-full py-2.5 rounded-xl text-sm font-cairo font-bold transition-all duration-300',
+        outOfStock
+          ? 'bg-stone-100 dark:bg-stone-800 text-[#a8a29e] cursor-not-allowed'
+          : 'bg-[#d43533] hover:bg-[#b91c1c] text-white',
+      ]}
+      disabled={outOfStock}
+      data-product={JSON.stringify({
+        productId: product.id,
+        variationId: product.variationId,
+        slug: product.slug,
+        name: product.name,
+        image: product.image,
+        price: product.price,
+      })}
+    >
+      {outOfStock ? 'نفذت الكمية' : 'أضف للسلة'}
+    </button>
+
+  </div>
+</article>
+
+<script>
+  if (!(window as Window & { __cartBtnsInit?: boolean }).__cartBtnsInit) {
+    ;(window as Window & { __cartBtnsInit?: boolean }).__cartBtnsInit = true
+
+    document.addEventListener('click', async (e) => {
+      const btn = (e.target as Element).closest('.add-to-cart') as HTMLButtonElement | null
+      if (!btn || btn.disabled) return
+
+      const product = JSON.parse(btn.dataset.product ?? '{}')
+      const { addToCart } = await import('../stores/cart')
+      addToCart(product)
+
+      const original = btn.textContent
+      btn.textContent = 'تمت الإضافة'
+      btn.classList.replace('bg-[#d43533]', 'bg-[#22c55e]')
+      btn.classList.remove('hover:bg-[#b91c1c]')
+
+      setTimeout(() => {
+        btn.textContent = original
+        btn.classList.replace('bg-[#22c55e]', 'bg-[#d43533]')
+        btn.classList.add('hover:bg-[#b91c1c]')
+      }, 1500)
+    })
+  }
+</script>

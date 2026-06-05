@@ -1,0 +1,56 @@
+---
+import type { Category } from '../lib/api'
+import ApplianceIcon from './icons/ApplianceIcon.astro'
+
+interface Props {
+  categories: Category[]
+}
+
+const { categories } = Astro.props
+const visible = categories.filter((c) => c.productCount > 0).slice(0, 10)
+---
+
+{visible.length > 0 && (
+  <section class="py-10 reveal-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <h2 class="font-cairo font-bold text-base text-[#57534e] dark:text-[#a8a29e] mb-5 uppercase tracking-wide text-xs">
+        تسوق حسب التصنيف
+      </h2>
+
+      <div class="flex items-stretch gap-3 overflow-x-auto pb-2 snap-x snap-mandatory" style="-ms-overflow-style:none;scrollbar-width:none">
+
+        <!-- All -->
+        <a
+          href="/products"
+          class="flex-shrink-0 snap-start flex flex-col items-center gap-2.5 px-4 py-4 rounded-2xl bg-[#d43533] text-white font-cairo font-bold text-xs transition-all hover:bg-[#b91c1c] hover:shadow-[0_4px_16px_rgba(212,53,51,0.3)]"
+          style="min-width:76px"
+        >
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          <span>الكل</span>
+        </a>
+
+        {visible.map((cat) => (
+          <a
+            href={`/products?category=${cat.id}`}
+            class="flex-shrink-0 snap-start flex flex-col items-center gap-2.5 px-4 py-4 rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] text-[#57534e] dark:text-[#a8a29e] font-cairo font-bold text-xs hover:border-[#d43533] hover:text-[#d43533] dark:hover:border-[#d43533] dark:hover:text-[#d43533] transition-all"
+            style="min-width:76px"
+          >
+            <ApplianceIcon name={cat.name} class="w-6 h-6" />
+            <span class="text-center leading-tight">{cat.name}</span>
+          </a>
+        ))}
+
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  div::-webkit-scrollbar { display: none; }
+</style>

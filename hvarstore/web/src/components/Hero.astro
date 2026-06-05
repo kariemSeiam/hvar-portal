@@ -1,0 +1,193 @@
+---
+// No props — static section with design tokens
+// Design: "المطبخ الدافئ × هفار لوكس" — Warm Kitchen warmth + Hvar Luxe system
+// DESIGN_DIRECTIONS.md: C gives the bones, A gives the soul, B gives the close
+---
+
+<section class="relative overflow-hidden grain mesh-red bg-[#fbf7f1] dark:bg-[#12110f] pt-14 pb-20 sm:pt-20 sm:pb-28">
+
+  <!-- Appliance doodle background (Wilson P1 — Hvar motifs) -->
+  <div class="absolute inset-0 pointer-events-none opacity-[0.04] dark:opacity-[0.06] overflow-hidden select-none" aria-hidden="true">
+    <svg width="100%" height="100%" viewBox="0 0 1200 600" fill="none" preserveAspectRatio="xMidYMid slice">
+      <ellipse cx="100" cy="480" rx="55" ry="22" stroke="#d43533" stroke-width="1.5" fill="none"/>
+      <rect x="70" y="440" width="60" height="40" rx="8" stroke="#d43533" stroke-width="1.5" fill="none"/>
+      <line x1="100" y1="440" x2="100" y2="420" stroke="#d43533" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M1050 100 L1070 200 L1030 200 Z" stroke="#d43533" stroke-width="1.5" fill="none"/>
+      <rect x="1030" y="200" width="40" height="50" rx="4" stroke="#d43533" stroke-width="1.5" fill="none"/>
+      <ellipse cx="600" cy="520" rx="40" ry="45" stroke="#d43533" stroke-width="1" fill="none"/>
+      <line x1="640" y1="500" x2="660" y2="490" stroke="#d43533" stroke-width="1" stroke-linecap="round"/>
+      <rect x="200" y="80" width="70" height="80" rx="10" stroke="#d43533" stroke-width="1" fill="none"/>
+      <ellipse cx="235" cy="80" rx="30" ry="12" stroke="#d43533" stroke-width="1" fill="none"/>
+      <circle cx="950" cy="350" r="35" stroke="#d43533" stroke-width="1" fill="none"/>
+      <line x1="950" y1="315" x2="950" y2="280" stroke="#d43533" stroke-width="1" stroke-linecap="round"/>
+      <line x1="930" y1="385" x2="910" y2="420" stroke="#d43533" stroke-width="1" stroke-linecap="round"/>
+      <line x1="970" y1="385" x2="990" y2="420" stroke="#d43533" stroke-width="1" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-12 gap-8 items-center">
+
+      <!-- Left content (RTL: visual right side = content side) -->
+      <div class="lg:col-span-7 max-w-xl">
+
+        <!-- Premium badge — Direction A warmth cue: brass accent -->
+        <div class="inline-flex items-center gap-2 mb-6">
+          <span class="w-6 h-px bg-[#C8893B]"></span>
+          <span class="text-[#C8893B] text-[10px] font-semibold uppercase tracking-[0.15em] font-inter">أجهزة منزلية موثوقة</span>
+        </div>
+
+        <!-- Headline — Direction A: editorial Arabic warmth, red like a ribbon -->
+        <h1 class="font-cairo font-black text-[2.6rem] sm:text-[3.4rem] lg:text-[3.8rem] leading-[1.12] text-[#1c1917] dark:text-[#f5f5f4] mb-5">
+          <span class="block">في مطبخك</span>
+          <span class="relative inline-block">
+            يستاهل الأحسن
+            <!-- Brass decorative underline — Direction A warmth signature -->
+            <span class="absolute -bottom-2 right-0 left-0 h-[3px] rounded-full"
+                  style="background: linear-gradient(90deg, #C8893B 0%, #daa545 50%, #C8893B 100%); opacity:0.6;"></span>
+            <!-- Red accent dot — Direction C: red used like a ribbon -->
+            <span class="absolute -bottom-[11px] right-0 w-[7px] h-[7px] rounded-full bg-[#d43533]"></span>
+          </span>
+        </h1>
+
+        <!-- Subline — warm trust prose -->
+        <p class="text-[#57534e] dark:text-[#a8a29e] font-cairo text-base sm:text-lg leading-relaxed mb-8 max-w-lg">
+          خلاطات، مكاوي، أجهزة مطبخ — كل اللي تحتاجه لمطبخك
+          <span class="text-[#C8893B] font-semibold">بضمان سنتين</span>
+          وشحن مجاني لباب البيت.
+        </p>
+
+        <!-- CTAs — Direction B: trust architecture, clear primary/secondary -->
+        <div class="flex flex-wrap items-center gap-3">
+          <a
+            href="/products"
+            class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#d43533] hover:bg-[#b91c1c] text-white font-cairo font-bold text-base transition-all hover:shadow-[0_8px_24px_rgba(212,53,51,0.3)] hover:-translate-y-0.5"
+            style="transition: all 0.3s cubic-bezier(0.22,1,0.36,1)"
+          >
+            تسوق الآن
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M4 8h8M8 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <a
+            href="/orders"
+            class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] text-[#1c1917] dark:text-[#f5f5f4] font-cairo font-semibold text-base hover:border-[#d43533] dark:hover:border-[#d43533] transition-all"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            تتبع طلبك
+          </a>
+        </div>
+
+        <!-- Trust line — Direction B: icon-enriched, premium feel -->
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-8 text-xs font-cairo text-[#57534e] dark:text-[#a8a29e]">
+          <span class="inline-flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            ضمان سنتين
+          </span>
+          <span class="inline-flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14"/>
+              <path d="M12 5l7 7-7 7"/>
+            </svg>
+            شحن مجاني
+          </span>
+          <span class="inline-flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            افحص قبل الدفع
+          </span>
+          <span class="inline-flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+            تقسيط بدون فوائد
+          </span>
+        </div>
+
+      </div>
+
+      <!-- Right visual — Direction A: kitchen ritual showcase (RTL layout) -->
+      <div class="hidden lg:block lg:col-span-5 relative">
+        <!-- Featured product highlight card -->
+        <div class="relative rounded-3xl bg-white/70 dark:bg-[#1c1917]/70 backdrop-blur-sm border border-[#e7e0d6]/60 dark:border-[#2c2825]/60 p-6 shadow-[0_8px_32px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
+          <!-- Premium badge -->
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#C8893B]/10 dark:bg-[#C8893B]/15 text-[#C8893B] text-[10px] font-semibold font-inter mb-4">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#C8893B]"></span>
+            الأكثر مبيعاً
+          </div>
+
+          <!-- Appliance showcase grid -->
+          <div class="grid grid-cols-2 gap-3">
+            <!-- Blender -->
+            <div class="rounded-2xl bg-[#fbf7f1] dark:bg-[#12110f] border border-[#e7e0d6]/50 dark:border-[#2c2825]/50 p-3.5 text-center">
+              <svg class="mx-auto mb-2" width="52" height="52" viewBox="0 0 60 60" fill="none">
+                <path d="M25 5 L30 25 L20 25 Z" stroke="#d43533" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+                <rect x="18" y="25" width="24" height="30" rx="3" stroke="#d43533" stroke-width="1.5" fill="none"/>
+                <line x1="30" y1="30" x2="30" y2="40" stroke="#d43533" stroke-width="1" stroke-linecap="round" stroke-dasharray="2 2"/>
+                <circle cx="30" cy="50" r="2" fill="#d43533" opacity="0.3"/>
+              </svg>
+              <p class="font-cairo font-bold text-[11px] text-[#1c1917] dark:text-[#f5f5f4]">خلاط</p>
+              <p class="font-cairo text-[9px] text-[#57534e] dark:text-[#a8a29e]">من ٨٩٩ ج.م</p>
+            </div>
+
+            <!-- Air fryer -->
+            <div class="rounded-2xl bg-[#fbf7f1] dark:bg-[#12110f] border border-[#e7e0d6]/50 dark:border-[#2c2825]/50 p-3.5 text-center">
+              <svg class="mx-auto mb-2" width="52" height="52" viewBox="0 0 60 60" fill="none">
+                <rect x="12" y="18" width="36" height="30" rx="5" stroke="#d43533" stroke-width="1.5" fill="none"/>
+                <ellipse cx="30" cy="18" rx="15" ry="6" stroke="#d43533" stroke-width="1.5" fill="none"/>
+                <line x1="18" y1="40" x2="42" y2="40" stroke="#d43533" stroke-width="0.8" stroke-dasharray="3 3"/>
+              </svg>
+              <p class="font-cairo font-bold text-[11px] text-[#1c1917] dark:text-[#f5f5f4]">قلاية هوائية</p>
+              <p class="font-cairo text-[9px] text-[#57534e] dark:text-[#a8a29e]">من ٢٬٧٩٩ ج.م</p>
+            </div>
+
+            <!-- Kettle -->
+            <div class="rounded-2xl bg-[#fbf7f1] dark:bg-[#12110f] border border-[#e7e0d6]/50 dark:border-[#2c2825]/50 p-3.5 text-center">
+              <svg class="mx-auto mb-2" width="52" height="52" viewBox="0 0 60 60" fill="none">
+                <ellipse cx="30" cy="40" rx="18" ry="16" stroke="#d43533" stroke-width="1.5" fill="none"/>
+                <line x1="48" y1="28" x2="55" y2="22" stroke="#d43533" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M18 28 Q18 18 30 18 Q42 18 42 28" stroke="#d43533" stroke-width="1" fill="none"/>
+                <path d="M26 24 Q30 20 34 24" stroke="#d43533" stroke-width="0.8" fill="none" opacity="0.5"/>
+              </svg>
+              <p class="font-cairo font-bold text-[11px] text-[#1c1917] dark:text-[#f5f5f4]">غلاية</p>
+              <p class="font-cairo text-[9px] text-[#57534e] dark:text-[#a8a29e]">من ٥٩٩ ج.م</p>
+            </div>
+
+            <!-- Iron -->
+            <div class="rounded-2xl bg-[#fbf7f1] dark:bg-[#12110f] border border-[#e7e0d6]/50 dark:border-[#2c2825]/50 p-3.5 text-center">
+              <svg class="mx-auto mb-2" width="52" height="52" viewBox="0 0 60 60" fill="none">
+                <rect x="14" y="28" width="34" height="22" rx="4" stroke="#d43533" stroke-width="1.5" fill="none"/>
+                <ellipse cx="14" cy="40" rx="6" ry="10" stroke="#d43533" stroke-width="1.5" fill="none"/>
+                <line x1="48" y1="34" x2="52" y2="34" stroke="#d43533" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="48" y1="40" x2="52" y2="40" stroke="#d43533" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <p class="font-cairo font-bold text-[11px] text-[#1c1917] dark:text-[#f5f5f4]">مكواة</p>
+              <p class="font-cairo text-[9px] text-[#57534e] dark:text-[#a8a29e]">من ٤٩٩ ج.م</p>
+            </div>
+          </div>
+
+          <!-- CTA whisper -->
+          <div class="mt-4 text-center">
+            <a href="/products" class="inline-flex items-center gap-1 text-xs font-cairo font-semibold text-[#C8893B] hover:text-[#b06f2e] transition-colors">
+              تصفح كل المنتجات
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                <path d="M4 8h8M8 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Floating decorative brass accent dot -->
+        <div class="absolute -top-3 -left-3 w-6 h-6 rounded-full bg-[#C8893B]/20 dark:bg-[#C8893B]/10 blur-sm"></div>
+      </div>
+
+    </div>
+  </div>
+</section>
