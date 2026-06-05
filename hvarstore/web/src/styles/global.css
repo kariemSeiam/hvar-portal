@@ -181,6 +181,12 @@
   100% { transform: translateX(100%); }
 }
 
+/* ── Cart FAB glow ring ── */
+@keyframes fabGlow {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
 /* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
   .reveal-section, .reveal-child {
