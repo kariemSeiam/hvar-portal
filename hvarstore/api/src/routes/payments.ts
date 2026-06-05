@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { createHmac } from "node:crypto";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import type { RowDataPacket } from "mysql2";
 import { loadEnv } from "../env";
 import { getSitePool, query } from "../lib/db";
@@ -106,8 +106,14 @@ route.post("/kashier/initiate", authMiddleware, async (c) => {
 		}),
 	);
 	redirectUrl.searchParams.set(
-		"redirectUrl",
-		`${env.PUBLIC_MEDIA_BASE?.replace("/media", "")}/api/payments/kashier/callback`,
+		"merchantRedirect",
+		`${env.PUBLIC_API_URL}/api/payments/kashier/callback?ref=${kashierOrderId}`,
+	);
+	redirectUrl.searchParams.set(
+		"allowedMethods",
+		parsed.data.paymentMethod === "kashier_installments"
+			? "installments"
+			: "card",
 	);
 	redirectUrl.searchParams.set("display", "ar");
 
@@ -128,24 +134,36 @@ route.post("/kashier/callback", async (c) => {
 		return c.json({ error: "missing signature" }, 400);
 	}
 
-	const sortedPayload = Object.keys(body)
-		.filter((k) => k !== "signature" && k !== "hash")
+	const data = (body?.data ?? body) as Record<string, unknown>;
+	const signatureKeys = Array.isArray(data.signatureKeys)
+		? (data.signatureKeys as string[])
+		: [];
+	if (signatureKeys.length === 0) {
+		return c.json({ error: "missing signatureKeys" }, 400);
+	}
+
+	const payload = [...signatureKeys]
 		.sort()
-		.map(
-			(k) =>
-				`${k}=${typeof body[k] === "object" ? JSON.stringify(body[k]) : body[k]}`,
-		)
+		.map((k) => `${k}=${encodeURIComponent(String(data[k] ?? ""))}`)
 		.join("&");
 
 	const expectedSig = createHmac("sha256", env.KASHIER_SECRET_KEY)
-		.update(sortedPayload)
+		.update(payload)
 		.digest("hex");
 
-	if (signature !== expectedSig) {
+	const sigBuf = Buffer.from(signature, "hex");
+	const expBuf = Buffer.from(expectedSig, "hex");
+	if (
+		sigBuf.length !== expBuf.length ||
+		!timingSafeEqual(sigBuf, expBuf)
+	) {
 		return c.json({ error: "invalid signature" }, 403);
 	}
 
-	const kashierOrderId = body.merchantOrderId ?? body.orderId;
+	const kashierOrderId =
+		c.req.query("ref") ??
+		(data.merchantOrderId as string | undefined) ??
+		(data.orderId as string | undefined);
 	if (!kashierOrderId) {
 		return c.json({ error: "missing orderId" }, 400);
 	}
@@ -201,7 +219,12 @@ route.post("/kashier/callback", async (c) => {
 		fireErpWebhookForPaid(env, pending[0].order_id).catch(() => {});
 	}
 
-	return c.json({ status });
+	const redirectBase = env.PUBLIC_SITE_URL;
+	const confirmPath =
+		status === "confirmed"
+			? `/orders/${pending[0].order_id}?paid=1`
+			: `/orders/${pending[0].order_id}?paid=0`;
+	return c.json({ status, redirectUrl: `${redirectBase}${confirmPath}` });
 });
 
 async function fireErpWebhookForPaid(

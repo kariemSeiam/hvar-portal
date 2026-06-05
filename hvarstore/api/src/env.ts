@@ -27,6 +27,8 @@ export interface Env {
 	ERP_WEBHOOK_URL: string;
 	ERP_WEBHOOK_DELETE_URL: string;
 	PUBLIC_MEDIA_BASE: string;
+	PUBLIC_API_URL: string;
+	PUBLIC_SITE_URL: string;
 	API_PORT: string;
 }
 
@@ -61,6 +63,8 @@ export function loadEnv(): Env {
 		ERP_WEBHOOK_URL: e.ERP_WEBHOOK_URL ?? "",
 		ERP_WEBHOOK_DELETE_URL: e.ERP_WEBHOOK_DELETE_URL ?? "",
 		PUBLIC_MEDIA_BASE: e.PUBLIC_MEDIA_BASE ?? "http://localhost:5000/media",
+		PUBLIC_API_URL: e.PUBLIC_API_URL ?? "http://localhost:5000",
+		PUBLIC_SITE_URL: e.PUBLIC_SITE_URL ?? "http://localhost:4321",
 		API_PORT: e.API_PORT ?? "5000",
 	};
 }
