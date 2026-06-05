@@ -115,10 +115,13 @@ export const pendingPayments = mysqlTable(
 		paymentMethod: varchar("payment_method", { length: 30 }).notNull(), // card | installments
 		redirectUrl: text("redirect_url"),
 		processedAt: timestamp("processed_at"), // set on callback → idempotency guard
+		expiresAt: timestamp("expires_at").notNull(), // 30-min HPP window
+		kashierReference: varchar("kashier_reference", { length: 128 }),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
 	(t) => [
 		index("idx_order").on(t.orderId),
 		index("idx_kashier_order").on(t.kashierOrderId),
+		index("idx_expires").on(t.expiresAt),
 	],
 );

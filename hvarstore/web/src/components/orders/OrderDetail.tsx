@@ -7,6 +7,8 @@ import {
 	ExternalLink,
 	Phone,
 	FileText,
+	CheckCircle2,
+	XCircle,
 } from "lucide-react";
 import { isLoggedIn, getAuthHeaders } from "../../lib/auth";
 
@@ -81,6 +83,7 @@ export default function OrderDetail() {
 	const [error, setError] = useState<string | null>(null);
 	const [cancelling, setCancelling] = useState(false);
 	const [cancelError, setCancelError] = useState<string | null>(null);
+	const [paidFlag, setPaidFlag] = useState<"success" | "failed" | null>(null);
 
 	async function handleCancel() {
 		if (!order || !confirm("هل تريد إلغاء الطلب نهائياً؟")) return;
@@ -110,6 +113,11 @@ export default function OrderDetail() {
 			window.location.href = "/login?redirect=" + window.location.pathname;
 			return;
 		}
+
+		const params = new URLSearchParams(window.location.search);
+		const paid = params.get("paid");
+		if (paid === "1") setPaidFlag("success");
+		else if (paid === "0") setPaidFlag("failed");
 
 		const id = window.location.pathname.split("/").pop();
 		if (!id) return;
@@ -150,6 +158,33 @@ export default function OrderDetail() {
 
 	return (
 		<div className="space-y-6">
+			{paidFlag === "success" && (
+				<div className="flex items-center gap-3 p-4 rounded-2xl bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900/30">
+					<CheckCircle2 size={20} className="text-green-600 shrink-0" />
+					<div className="flex-1">
+						<p className="font-cairo font-bold text-sm text-green-800 dark:text-green-300">
+							تم استلام دفعتك
+						</p>
+						<p className="font-cairo text-xs text-green-700 dark:text-green-400">
+							طلبك قيد التأكيد وسيتم شحنه قريباً
+						</p>
+					</div>
+				</div>
+			)}
+			{paidFlag === "failed" && (
+				<div className="flex items-center gap-3 p-4 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30">
+					<XCircle size={20} className="text-red-600 shrink-0" />
+					<div className="flex-1">
+						<p className="font-cairo font-bold text-sm text-red-800 dark:text-red-300">
+							فشل الدفع
+						</p>
+						<p className="font-cairo text-xs text-red-700 dark:text-red-400">
+							يمكنك المحاولة مرة أخرى أو التواصل مع خدمة العملاء
+						</p>
+					</div>
+				</div>
+			)}
+
 			{/* Header */}
 			<div className="flex items-center justify-between flex-wrap gap-3">
 				<div>

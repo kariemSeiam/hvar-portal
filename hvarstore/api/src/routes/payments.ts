@@ -17,6 +17,7 @@ interface PendingRow extends RowDataPacket {
 	kashier_order_id: string;
 	amount: string;
 	processed_at: string | null;
+	expires_at: string | null;
 }
 
 interface OrderRow extends RowDataPacket {
@@ -57,7 +58,7 @@ route.post("/kashier/initiate", authMiddleware, async (c) => {
 
 	const existing = await query<PendingRow[]>(
 		sitePool,
-		"SELECT id, kashier_order_id FROM pending_payments WHERE order_id = ? AND processed_at IS NULL LIMIT 1",
+		"SELECT id, kashier_order_id, expires_at FROM pending_payments WHERE order_id = ? AND processed_at IS NULL AND expires_at > NOW() LIMIT 1",
 		[order.id],
 	);
 
@@ -67,8 +68,8 @@ route.post("/kashier/initiate", authMiddleware, async (c) => {
 	} else {
 		kashierOrderId = `HVAR-${crypto.randomUUID().replace(/-/g, "").slice(0, 12).toUpperCase()}`;
 		await sitePool.query(
-			`INSERT INTO pending_payments (order_id, kashier_order_id, amount, currency, payment_method, created_at)
-			 VALUES (?, ?, ?, 'EGP', ?, NOW())`,
+			`INSERT INTO pending_payments (order_id, kashier_order_id, amount, currency, payment_method, created_at, expires_at)
+			 VALUES (?, ?, ?, 'EGP', ?, NOW(), DATE_ADD(NOW(), INTERVAL 30 MINUTE))`,
 			[
 				order.id,
 				kashierOrderId,
@@ -153,10 +154,7 @@ route.post("/kashier/callback", async (c) => {
 
 	const sigBuf = Buffer.from(signature, "hex");
 	const expBuf = Buffer.from(expectedSig, "hex");
-	if (
-		sigBuf.length !== expBuf.length ||
-		!timingSafeEqual(sigBuf, expBuf)
-	) {
+	if (sigBuf.length !== expBuf.length || !timingSafeEqual(sigBuf, expBuf)) {
 		return c.json({ error: "invalid signature" }, 403);
 	}
 
@@ -172,7 +170,7 @@ route.post("/kashier/callback", async (c) => {
 
 	const pending = await query<PendingRow[]>(
 		sitePool,
-		"SELECT id, order_id, processed_at FROM pending_payments WHERE kashier_order_id = ? LIMIT 1",
+		"SELECT id, order_id, processed_at, expires_at FROM pending_payments WHERE kashier_order_id = ? LIMIT 1",
 		[kashierOrderId],
 	);
 
@@ -184,6 +182,22 @@ route.post("/kashier/callback", async (c) => {
 		return c.json({ status: "already_processed" });
 	}
 
+	if (
+		pending[0].expires_at &&
+		new Date(pending[0].expires_at).getTime() < Date.now()
+	) {
+		await sitePool.query(
+			"UPDATE pending_payments SET processed_at = NOW() WHERE id = ?",
+			[pending[0].id],
+		);
+		return c.json({ error: "payment_expired" }, 409);
+	}
+
+	const kashierRef =
+		(data.transactionId as string | undefined) ??
+		(data.kashierOrderId as string | undefined) ??
+		null;
+
 	const status = body.paymentStatus === "SUCCESS" ? "confirmed" : "failed";
 
 	const conn = await sitePool.getConnection();
@@ -194,6 +208,13 @@ route.post("/kashier/callback", async (c) => {
 			"UPDATE pending_payments SET processed_at = NOW() WHERE id = ?",
 			[pending[0].id],
 		);
+
+		if (kashierRef) {
+			await conn.query(
+				"UPDATE pending_payments SET kashier_reference = ? WHERE id = ?",
+				[kashierRef, pending[0].id],
+			);
+		}
 
 		if (status === "confirmed") {
 			await conn.query(
