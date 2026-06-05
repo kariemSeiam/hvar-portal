@@ -38,8 +38,8 @@ const visible = categories.filter((c) => c.productCount > 0).slice(0, 10)
         {visible.map((cat) => (
           <a
             href={`/products?category=${cat.id}`}
-            class="flex-shrink-0 snap-start flex flex-col items-center gap-2.5 px-4 py-4 rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] text-[#57534e] dark:text-[#a8a29e] font-cairo font-bold text-xs hover:border-[#d43533] hover:text-[#d43533] dark:hover:border-[#d43533] dark:hover:text-[#d43533] transition-all"
-            style="min-width:76px"
+            class="flex-shrink-0 snap-start flex flex-col items-center gap-2.5 px-4 py-4 rounded-2xl font-cairo font-bold text-xs transition-all hover:border-[--c-brand] hover:text-[--c-brand]"
+            style="min-width:76px;background-color:var(--c-surface);border:1px solid var(--c-border);color:var(--c-ink-muted)"
           >
             <ApplianceIcon name={cat.name} class="w-6 h-6" />
             <span class="text-center leading-tight">{cat.name}</span>

@@ -14,14 +14,10 @@ const isLowStock = product.stock > 0 && product.stock <= 3
 const outOfStock = product.stock === 0
 ---
 
-<article
-  class="card-shine group relative bg-white dark:bg-[#1c1917] rounded-2xl border border-[#e7e0d6] dark:border-[#2c2825] overflow-hidden transition-all"
-  style="transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s cubic-bezier(0.22,1,0.36,1); will-change: transform;"
-  onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 28px rgba(0,0,0,0.08)'"
-  onmouseleave="this.style.transform='translateY(0)';this.style.boxShadow='none'"
->
+<article class="card-shine group relative rounded-2xl overflow-hidden transition-all" style="background-color:var(--c-surface);border:1px solid var(--c-border);box-shadow:var(--c-shadow-card);transition:transform 0.3s cubic-bezier(0.22,1,0.36,1),box-shadow 0.3s cubic-bezier(0.22,1,0.36,1),border-color 0.2s;will-change:transform" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='var(--c-shadow-hover)';this.style.borderColor='var(--c-border-strong)'" onmouseleave="this.style.transform='translateY(0)';this.style.boxShadow='var(--c-shadow-card)';this.style.borderColor='var(--c-border)'">
+
   <!-- Image -->
-  <a href={`/products/${product.slug}`} class="block relative overflow-hidden bg-stone-50 dark:bg-stone-900" style="aspect-ratio:1/1">
+  <a href={`/products/${product.slug}`} class="block relative overflow-hidden" style="aspect-ratio:1/1">
     {product.image ? (
       <img
         src={product.image}
@@ -33,25 +29,32 @@ const outOfStock = product.stock === 0
         decoding="async"
       />
     ) : (
-      <!-- Branded placeholder — no emojis -->
-      <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-50 to-stone-100 dark:from-red-950/20 dark:to-stone-900">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d43533" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.3">
-          <path d="M13 2L4.5 13H11l-1 9L21 11H14l1-9Z"/>
-        </svg>
+      <!-- Branded placeholder -->
+      <div class="product-placeholder w-full h-full flex items-center justify-center">
+        <!-- Subtle appliance doodle rings -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none" aria-hidden="true">
+          <svg width="100%" height="100%" viewBox="0 0 200 200" fill="none" opacity="0.06">
+            <circle cx="100" cy="100" r="70" stroke="var(--c-brand)" stroke-width="1" stroke-dasharray="4 6"/>
+            <circle cx="100" cy="100" r="50" stroke="var(--c-brand)" stroke-width="0.8"/>
+            <circle cx="100" cy="100" r="30" stroke="var(--c-brand)" stroke-width="0.6" stroke-dasharray="2 4"/>
+          </svg>
+        </div>
+        <!-- هـ brand monogram -->
+        <span class="relative z-10 font-cairo font-black select-none" style="font-size:3.5rem;line-height:1;color:var(--c-brand);opacity:0.18">هـ</span>
       </div>
     )}
 
     <!-- Discount badge -->
     {hasDiscount && (
-      <span class="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-[#d43533] text-white text-[11px] font-bold font-inter leading-tight">
+      <span class="absolute top-3 end-3 px-2 py-0.5 rounded-lg font-inter font-bold text-[11px] leading-tight text-white" style="background-color:var(--c-brand)">
         -{discountPct}%
       </span>
     )}
 
     <!-- Out of stock overlay -->
     {outOfStock && (
-      <div class="absolute inset-0 bg-white/70 dark:bg-black/70 flex items-center justify-center">
-        <span class="font-cairo font-bold text-[#57534e] text-sm bg-white dark:bg-[#1c1917] px-3 py-1.5 rounded-lg border border-[#e7e0d6] dark:border-[#2c2825] shadow-sm">
+      <div class="absolute inset-0 flex items-center justify-center" style="background:rgba(var(--c-bg-rgb,251,247,241),0.75)">
+        <span class="font-cairo font-bold text-sm px-3 py-1.5 rounded-xl shadow-sm" style="background-color:var(--c-surface);color:var(--c-ink-muted);border:1px solid var(--c-border)">
           نفذت الكمية
         </span>
       </div>
@@ -62,32 +65,32 @@ const outOfStock = product.stock === 0
   <div class="p-4">
     <!-- Category -->
     {product.categoryName && (
-      <span class="font-cairo text-[10px] font-semibold text-[#a8a29e] uppercase tracking-wide mb-1.5 block">
+      <span class="font-cairo font-semibold text-[10px] uppercase tracking-wide mb-1.5 block" style="color:var(--c-ink-faint)">
         {product.categoryName}
       </span>
     )}
 
     <a href={`/products/${product.slug}`} class="block mb-3">
-      <h3 class="font-cairo font-semibold text-sm text-[#1c1917] dark:text-[#f5f5f4] leading-snug line-clamp-2 hover:text-[#d43533] transition-colors">
+      <h3 class="font-cairo font-semibold text-sm leading-snug line-clamp-2 transition-colors" style="color:var(--c-ink)" onmouseenter="this.style.color='var(--c-brand)'" onmouseleave="this.style.color='var(--c-ink)'">
         {product.name}
       </h3>
     </a>
 
     <!-- Price row -->
     <div class="flex items-baseline gap-2 mb-1.5">
-      <span class="font-inter font-bold text-[#d43533] text-base tabular-nums">
+      <span class="font-inter font-bold text-base tabular-nums" style="color:var(--c-brand)">
         {product.price.toLocaleString('ar-EG')} ج.م
       </span>
       {hasDiscount && (
-        <span class="font-inter text-[#a8a29e] text-xs line-through tabular-nums">
+        <span class="font-inter text-xs line-through tabular-nums" style="color:var(--c-ink-faint)">
           {product.comparePrice!.toLocaleString('ar-EG')}
         </span>
       )}
     </div>
 
-    <!-- Low stock warning — SVG icon, no emoji -->
+    <!-- Low stock -->
     {isLowStock && (
-      <p class="flex items-center gap-1 text-[11px] font-cairo text-amber-600 dark:text-amber-400 mb-2">
+      <p class="flex items-center gap-1 text-[11px] font-cairo mb-2 text-amber-600 dark:text-amber-400">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M10.3 3.3L2 20h20L13.7 3.3a2 2 0 0 0-3.4 0Z"/>
           <line x1="12" y1="9" x2="12" y2="13"/>
@@ -97,14 +100,16 @@ const outOfStock = product.stock === 0
       </p>
     )}
 
-    <!-- Add to cart button -->
+    <!-- Add to cart -->
     <button
       class:list={[
         'add-to-cart w-full py-2.5 rounded-xl text-sm font-cairo font-bold transition-all duration-300',
-        outOfStock
-          ? 'bg-stone-100 dark:bg-stone-800 text-[#a8a29e] cursor-not-allowed'
-          : 'bg-[#d43533] hover:bg-[#b91c1c] text-white',
+        outOfStock ? 'cursor-not-allowed' : '',
       ]}
+      style={outOfStock
+        ? 'background-color:var(--c-border);color:var(--c-ink-muted)'
+        : 'background-color:var(--c-brand);color:#ffffff'
+      }
       disabled={outOfStock}
       data-product={JSON.stringify({
         productId: product.id,
@@ -114,10 +119,11 @@ const outOfStock = product.stock === 0
         image: product.image,
         price: product.price,
       })}
+      onmouseenter={!outOfStock ? "this.style.backgroundColor='var(--c-brand-hover)'" : undefined}
+      onmouseleave={!outOfStock ? "this.style.backgroundColor='var(--c-brand)'" : undefined}
     >
       {outOfStock ? 'نفذت الكمية' : 'أضف للسلة'}
     </button>
-
   </div>
 </article>
 
@@ -134,14 +140,13 @@ const outOfStock = product.stock === 0
       addToCart(product)
 
       const original = btn.textContent
-      btn.textContent = 'تمت الإضافة'
-      btn.classList.replace('bg-[#d43533]', 'bg-[#22c55e]')
-      btn.classList.remove('hover:bg-[#b91c1c]')
+      const originalBg = btn.style.backgroundColor
+      btn.textContent = 'تمت الإضافة ✓'
+      btn.style.backgroundColor = '#16a34a'
 
       setTimeout(() => {
         btn.textContent = original
-        btn.classList.replace('bg-[#22c55e]', 'bg-[#d43533]')
-        btn.classList.add('hover:bg-[#b91c1c]')
+        btn.style.backgroundColor = originalBg
       }, 1500)
     })
   }

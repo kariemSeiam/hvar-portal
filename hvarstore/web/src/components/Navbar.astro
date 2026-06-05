@@ -10,7 +10,7 @@ const links = [
 ]
 ---
 
-<header class="sticky top-0 z-50 bg-white/95 dark:bg-[#1c1917]/95 backdrop-blur-md border-b border-[#e7e0d6] dark:border-[#2c2825]">
+<header class="sticky top-0 z-50 backdrop-blur-md" style="background-color:color-mix(in srgb,var(--c-surface-2) 96%,transparent);border-bottom:1px solid var(--c-border)">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
 
@@ -27,8 +27,8 @@ const links = [
             href={l.href}
             class={`px-3 py-2 rounded-lg text-sm font-semibold font-cairo transition-colors ${
               path === l.href
-                ? 'text-[#d43533] bg-red-50 dark:bg-red-950/30'
-                : 'text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800'
+                ? 'active-link'
+                : 'nav-link'
             }`}
           >
             {l.label}
@@ -41,7 +41,7 @@ const links = [
         <CartBadge client:load />
         <a
           href="/login"
-          class="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-semibold font-cairo text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+          class="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-semibold font-cairo transition-colors nav-link"
         >
           دخول
         </a>
@@ -50,7 +50,7 @@ const links = [
         <!-- Mobile hamburger -->
         <button
           id="nav-toggle"
-          class="md:hidden flex items-center justify-center w-9 h-9 rounded-full text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+          class="md:hidden flex items-center justify-center w-9 h-9 rounded-full transition-colors nav-link"
           aria-label="القائمة"
           aria-expanded="false"
         >
@@ -72,7 +72,8 @@ const links = [
 <!-- Mobile drawer panel (Wilson P5: 3D door-swing RTL) -->
 <div
   id="nav-drawer"
-  class="fixed top-0 right-0 z-50 h-full w-72 bg-white dark:bg-[#1c1917] shadow-2xl"
+  class="fixed top-0 right-0 z-50 h-full w-72 shadow-2xl"
+  style="background-color:var(--c-surface-2)"
   style="transform: perspective(1200px) rotateY(12deg) translateX(100%); transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);"
   aria-hidden="true"
 >
@@ -90,10 +91,11 @@ const links = [
   <div class="relative z-10 p-6 h-full flex flex-col">
     <!-- Header -->
     <div class="flex items-center justify-between mb-8">
-      <a href="/" class="text-[#d43533] font-cairo font-black text-2xl">هفار ستور</a>
+      <a href="/" class="font-cairo font-black text-2xl" style="color:var(--c-brand)">هفار ستور</a>
       <button
         id="nav-close"
-        class="w-8 h-8 flex items-center justify-center rounded-full bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors text-sm"
+        class="w-8 h-8 flex items-center justify-center rounded-full transition-colors text-sm"
+        style="background-color:var(--c-border);color:var(--c-ink-muted)"
         aria-label="إغلاق القائمة"
       >
         ✕
@@ -105,7 +107,7 @@ const links = [
       {links.map((l, i) => (
         <a
           href={l.href}
-          class="drawer-link block px-4 py-3 rounded-xl font-cairo font-semibold text-lg text-stone-800 dark:text-stone-100 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-[#d43533] transition-all"
+          class="drawer-link block px-4 py-3 rounded-xl font-cairo font-semibold text-lg transition-all" style="color:var(--c-ink)"
           style={`transition-delay: ${(i + 1) * 50}ms`}
         >
           {l.label}
@@ -113,7 +115,7 @@ const links = [
       ))}
       <a
         href="/login"
-        class="drawer-link block px-4 py-3 rounded-xl font-cairo font-semibold text-lg text-stone-800 dark:text-stone-100 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-[#d43533] transition-all mt-2 border-t border-stone-100 dark:border-stone-800 pt-4"
+        class="drawer-link block px-4 py-3 rounded-xl font-cairo font-semibold text-lg transition-all mt-2 pt-4" style="color:var(--c-ink);border-top:1px solid var(--c-border)"
         style="transition-delay: 200ms"
       >
         تسجيل الدخول
@@ -122,7 +124,7 @@ const links = [
 
     <!-- Footer trust -->
     <div class="mt-auto pt-6 border-t border-stone-100 dark:border-stone-800">
-      <p class="text-xs text-stone-400 dark:text-stone-600 font-cairo text-center">
+      <p class="text-xs font-cairo text-center" style="color:var(--c-ink-faint)">
         ضمان · شحن مجاني · دفع عند الاستلام
       </p>
     </div>

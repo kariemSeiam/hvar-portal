@@ -1,80 +1,115 @@
 @import "tailwindcss";
 
-/* Dark mode: class-based instead of system preference */
+/* Dark mode: class-based */
 @custom-variant dark (&:is(.dark *));
 
-/* ── Design tokens: هفار الأحمر × هفار الليل ── */
+/* ── Semantic CSS custom properties ─────────────────────────────────────── */
+/* هفار الأحمر — Light */
+:root {
+  --c-bg:           #fbf7f1;
+  --c-surface:      #ffffff;
+  --c-surface-2:    #f5f0e8;
+  --c-ink:          #1c1917;
+  --c-ink-muted:    #57534e;
+  --c-ink-faint:    #8c7d73;
+  --c-border:       #e7e0d6;
+  --c-border-strong:#c8b8a6;
+  --c-brand:        #d43533;
+  --c-brand-hover:  #b91c1c;
+  --c-brand-tint:   #fff0f0;
+  --c-brand-glow:   rgba(212, 53, 51, 0.12);
+  --c-brass:        #c8893b;
+  --c-brass-tint:   #fdf3e7;
+  --c-trust:        #16a34a;
+  --c-trust-dark:   #22c55e;
+  --c-shadow-card:  0 1px 3px rgba(0,0,0,0.06), 0 8px 20px rgba(212,53,51,0.06);
+  --c-shadow-hover: 0 8px 28px rgba(0,0,0,0.10), 0 2px 8px rgba(212,53,51,0.08);
+  color-scheme: light;
+}
+
+/* هفار الليل — Dark */
+.dark {
+  --c-bg:           #131110;
+  --c-surface:      #1f1c18;
+  --c-surface-2:    #27231f;
+  --c-ink:          #f0ebe3;
+  --c-ink-muted:    #a09890;
+  --c-ink-faint:    #706660;
+  --c-border:       #322e28;
+  --c-border-strong:#453e37;
+  --c-brand:        #e85a58;
+  --c-brand-hover:  #d43533;
+  --c-brand-tint:   rgba(232, 90, 88, 0.10);
+  --c-brand-glow:   rgba(232, 90, 88, 0.18);
+  --c-brass:        #d4a050;
+  --c-brass-tint:   rgba(212, 160, 80, 0.12);
+  --c-trust:        #22c55e;
+  --c-trust-dark:   #22c55e;
+  --c-shadow-card:  0 1px 3px rgba(0,0,0,0.35), 0 8px 20px rgba(232,90,88,0.08);
+  --c-shadow-hover: 0 8px 28px rgba(0,0,0,0.45), 0 2px 8px rgba(232,90,88,0.12);
+  color-scheme: dark;
+}
+
+/* ── Tailwind @theme tokens ─────────────────────────────────────────────── */
 @theme {
   /* Brand */
-  --color-hvar-red-50: #fef2f2;
+  --color-hvar-red-50:  #fef2f2;
   --color-hvar-red-100: #fee2e2;
   --color-hvar-red-200: #fecaca;
-  --color-hvar-red-300: #fca5a5;
   --color-hvar-red-400: #f87171;
   --color-hvar-red-500: #ef4444;
   --color-hvar-red-600: #d43533;
   --color-hvar-red-700: #b91c1c;
   --color-hvar-red-800: #991b1b;
   --color-hvar-red-900: #7f1d1d;
-
-  --color-brass-400: #daa545;
-  --color-brass-500: #c8893b;
-  --color-brass-600: #b06f2e;
-
-  --color-trust-green: #22c55e;
-
-  /* Light theme */
-  --color-bg: #fbf7f1;
-  --color-surface: #ffffff;
-  --color-ink: #1c1917;
-  --color-ink-muted: #57534e;
-  --color-border: #e7e0d6;
-
-  /* Dark theme */
-  --color-bg-dark: #12110f;
-  --color-surface-dark: #1c1917;
-  --color-ink-dark: #f5f5f4;
-  --color-ink-muted-dark: #a8a29e;
-  --color-border-dark: #2c2825;
+  --color-brass-400:    #daa545;
+  --color-brass-500:    #c8893b;
+  --color-brass-600:    #b06f2e;
+  --color-trust-green:  #16a34a;
 
   /* Spacing */
   --radius-sm: 0.375rem;
-  --radius-md: 0.75rem;
+  --radius-md: 0.625rem;
   --radius-lg: 1rem;
-  --radius-xl: 1.5rem;
+  --radius-xl: 1.25rem;
 
-  /* Wilson curve */
+  /* Hvar curve */
   --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
-
-  /* Shadows */
-  --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-card-hover: 0 10px 25px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04);
-  --shadow-red: 0 8px 24px rgba(212,53,51,0.12);
 }
 
-/* ── Base layer ── */
+/* ── Base layer ─────────────────────────────────────────────────────────── */
 @layer base {
-  :root { color-scheme: light; }
-  .dark { color-scheme: dark; }
-
   html[dir="rtl"] { text-align: start; }
 
   body {
     font-family: "Cairo", "Inter", system-ui, sans-serif;
-    background-color: var(--color-bg);
-    color: var(--color-ink);
+    background-color: var(--c-bg);
+    color: var(--c-ink);
     -webkit-font-smoothing: antialiased;
-  }
-
-  .dark body {
-    background-color: var(--color-bg-dark);
-    color: var(--color-ink-dark);
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   * { box-sizing: border-box; }
+
+  ::selection {
+    background-color: var(--c-brand-tint);
+    color: var(--c-brand);
+  }
 }
 
-/* ── Wilson P2: Grain texture overlay ── */
+/* ── Typography helpers ─────────────────────────────────────────────────── */
+.font-cairo {
+  font-family: "Cairo", system-ui, sans-serif;
+}
+.font-inter {
+  font-family: "Inter", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.font-mono {
+  font-family: "JetBrains Mono", "Cairo", monospace;
+}
+
+/* ── Wilson P2: Grain texture ───────────────────────────────────────────── */
 .grain {
   position: relative;
 }
@@ -85,20 +120,21 @@
   opacity: 0.04;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   background-repeat: repeat;
+  mix-blend-mode: overlay;
   pointer-events: none;
   z-index: 0;
 }
 .dark .grain::before { opacity: 0.06; }
 
-/* ── Wilson P4: Red mesh hero ── */
+/* ── Wilson P4: Red mesh hero ───────────────────────────────────────────── */
 .mesh-red {
   background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(212,53,51,0.08) 0%, transparent 70%);
 }
 .dark .mesh-red {
-  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(212,53,51,0.12) 0%, transparent 70%);
+  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(232,90,88,0.13) 0%, transparent 70%);
 }
 
-/* ── Wilson P6: Card shine sweep ── */
+/* ── Wilson P6: Card shine sweep ───────────────────────────────────────── */
 .card-shine {
   position: relative;
   overflow: hidden;
@@ -107,7 +143,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.18) 50%, transparent 65%);
+  background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.16) 50%, transparent 65%);
   transform: translateX(-150%);
   transition: transform 0.6s var(--ease-spring);
   pointer-events: none;
@@ -117,7 +153,7 @@
   transform: translateX(150%);
 }
 
-/* ── Wilson P7: Scroll reveals ── */
+/* ── Wilson P7: Scroll reveals ─────────────────────────────────────────── */
 .reveal-section {
   opacity: 0;
   transform: translateY(28px);
@@ -136,35 +172,32 @@
   opacity: 1;
   transform: translateY(0);
 }
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.5s var(--ease-spring), transform 0.5s var(--ease-spring);
+}
+.reveal-scale.visible {
+  opacity: 1;
+  transform: scale(1);
+}
 
-/* ── Wilson P9: Trust line ── */
+/* ── Wilson P9: Trust line ──────────────────────────────────────────────── */
 .trust-line {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   font-size: 0.75rem;
-  color: var(--color-ink-muted);
+  color: var(--c-ink-muted);
   flex-wrap: wrap;
 }
-.dark .trust-line { color: var(--color-ink-muted-dark); }
 .trust-line > span + span::before {
   content: '·';
   margin-inline-end: 0.75rem;
+  opacity: 0.5;
 }
 
-/* ── Typography helpers ── */
-.font-cairo {
-  font-family: "Cairo", system-ui, sans-serif;
-}
-.font-inter {
-  font-family: "Inter", system-ui, sans-serif;
-  font-variant-numeric: tabular-nums;
-}
-.font-mono {
-  font-family: "JetBrains Mono", "Cairo", monospace;
-}
-
-/* ── Shimmer skeleton ── */
+/* ── Shimmer skeleton ───────────────────────────────────────────────────── */
 .shimmer-skel {
   position: relative;
   overflow: hidden;
@@ -173,26 +206,94 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
   transform: translateX(-100%);
-  animation: shimmer 1.4s infinite;
+  animation: shimmer 1.6s infinite;
+}
+.dark .shimmer-skel::after {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
 }
 @keyframes shimmer {
   100% { transform: translateX(100%); }
 }
 
-/* ── Cart FAB glow ring ── */
-@keyframes fabGlow {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); }
+/* ── Product card placeholder ───────────────────────────────────────────── */
+.product-placeholder {
+  background: linear-gradient(135deg, var(--c-brand-tint) 0%, var(--c-bg) 100%);
+  position: relative;
+  overflow: hidden;
+}
+.product-placeholder::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 10px,
+    rgba(212,53,51,0.025) 10px,
+    rgba(212,53,51,0.025) 11px
+  );
 }
 
-/* ── Reduced motion ── */
+/* ── Surface semantic helpers ───────────────────────────────────────────── */
+.bg-surface   { background-color: var(--c-surface); }
+.bg-surface-2 { background-color: var(--c-surface-2); }
+.bg-brand     { background-color: var(--c-brand); }
+.text-ink     { color: var(--c-ink); }
+.text-muted   { color: var(--c-ink-muted); }
+.text-faint   { color: var(--c-ink-faint); }
+.text-brand   { color: var(--c-brand); }
+.text-brass   { color: var(--c-brass); }
+.border-hvar  { border-color: var(--c-border); }
+
+/* ── Card base ──────────────────────────────────────────────────────────── */
+.hvar-card {
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--c-shadow-card);
+  transition: transform 0.3s var(--ease-spring), box-shadow 0.3s var(--ease-spring), border-color 0.2s ease;
+}
+.hvar-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--c-shadow-hover);
+}
+
+/* ── Section divider ────────────────────────────────────────────────────── */
+.hvar-divider {
+  border-color: var(--c-border);
+}
+
+/* ── Nav link states ───────────────────────────────────────────────────── */
+.nav-link {
+  color: var(--c-ink-muted);
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  transition: color 0.15s, background-color 0.15s;
+}
+.nav-link:hover {
+  color: var(--c-ink);
+  background-color: var(--c-border);
+}
+.active-link {
+  color: var(--c-brand);
+  background-color: var(--c-brand-tint);
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+}
+.drawer-link:hover {
+  background-color: var(--c-brand-tint);
+  color: var(--c-brand);
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .reveal-section, .reveal-child {
+  .reveal-section, .reveal-child, .reveal-scale {
     transition: none;
     opacity: 1;
     transform: none;
   }
   .card-shine::after { display: none; }
+  .shimmer-skel::after { animation: none; }
 }

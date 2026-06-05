@@ -6,7 +6,7 @@
 
 <!-- Wilson P6: Grain texture is now inline via style block -->
 
-<section class="relative overflow-hidden bg-[#fbf7f1] dark:bg-[#12110f] pt-14 pb-20 sm:pt-20 sm:pb-28">
+<section class="relative overflow-hidden pt-14 pb-20 sm:pt-20 sm:pb-28" style="background-color:var(--c-bg)">
 
   <!-- Grain texture overlay -->
   <div class="absolute inset-0 pointer-events-none opacity-[0.035] dark:opacity-[0.05] z-0" aria-hidden="true"
@@ -151,10 +151,13 @@
         </div>
 
         <!-- Floating product cards (from vision HTML) -->
-        <div class="absolute top-[6%] -start-[4%] z-10 flex items-center gap-3 bg-white/80 dark:bg-[#1c1917]/80 backdrop-blur-sm border border-[#e7e0d6]/60 dark:border-[#2c2825]/60 rounded-[18px] px-4 py-3 shadow-[0_1px_2px_rgba(35,27,24,0.04),0_18px_40px_-22px_rgba(35,27,24,0.28)] bob-card">
-          <span class="w-[42px] h-[42px] rounded-[11px] bg-red-50 dark:bg-red-950/30 flex items-center justify-center text-xl">🧺</span>
+        <div class="absolute top-[6%] -start-[4%] z-10 flex items-center gap-3 backdrop-blur-sm rounded-[18px] px-4 py-3 bob-card"
+          style="background-color:color-mix(in srgb,var(--c-surface) 85%,transparent);border:1px solid var(--c-border);box-shadow:var(--c-shadow-card)">
+          <div class="w-[42px] h-[42px] rounded-[11px] flex items-center justify-center" style="background-color:var(--c-brand-tint)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--c-brand)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="28" width="34" height="22" rx="4"/><ellipse cx="14" cy="40" rx="6" ry="10"/><line x1="48" y1="34" x2="52" y2="34"/><line x1="48" y1="40" x2="52" y2="40"/></svg>
+          </div>
           <div>
-            <div class="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">مكواة بخار</div>
+            <div class="font-cairo font-bold text-sm" style="color:var(--c-ink)">مكواة بخار</div>
             <div class="font-inter font-bold text-xs text-[#d43533] tabular-nums" dir="ltr">١٬٢٥٠ ج.م</div>
           </div>
         </div>
@@ -167,16 +170,19 @@
           </div>
         </div>
 
-        <div class="absolute -bottom-[2%] start-[18%] z-10 flex items-center gap-3 bg-white/80 dark:bg-[#1c1917]/80 backdrop-blur-sm border border-[#e7e0d6]/60 dark:border-[#2c2825]/60 rounded-[18px] px-4 py-3 shadow-[0_1px_2px_rgba(35,27,24,0.04),0_18px_40px_-22px_rgba(35,27,24,0.28)] bob-card" style="animation-delay: 1.6s;">
-          <span class="w-[42px] h-[42px] rounded-[11px] bg-green-50 dark:bg-green-950/30 flex items-center justify-center text-xl">✓</span>
+        <div class="absolute -bottom-[2%] start-[18%] z-10 flex items-center gap-3 backdrop-blur-sm rounded-[18px] px-4 py-3 bob-card"
+          style="background-color:color-mix(in srgb,var(--c-surface) 85%,transparent);border:1px solid var(--c-border);box-shadow:var(--c-shadow-card);animation-delay:1.6s">
+          <div class="w-[42px] h-[42px] rounded-[11px] flex items-center justify-center" style="background-color:rgba(22,163,74,0.10)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
           <div>
-            <div class="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">تم الشحن</div>
-            <div class="font-inter font-bold text-xs text-[#22c55e]">عبر بوسطة</div>
+            <div class="font-cairo font-bold text-sm" style="color:var(--c-ink)">تم الشحن</div>
+            <div class="font-inter font-bold text-xs" style="color:var(--c-trust)">عبر بوسطة</div>
           </div>
         </div>
 
         <!-- Featured product highlight card (existing, with adjusted z-index) -->
-        <div class="relative rounded-3xl bg-white/70 dark:bg-[#1c1917]/70 backdrop-blur-sm border border-[#e7e0d6]/60 dark:border-[#2c2825]/60 p-6 shadow-[0_8px_32px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2)] z-[2]">
+        <div class="relative rounded-3xl backdrop-blur-sm p-6 z-[2]" style="background-color:color-mix(in srgb,var(--c-surface) 75%,transparent);border:1px solid var(--c-border);box-shadow:var(--c-shadow-card)">
           <!-- Premium badge -->
           <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#C8893B]/10 dark:bg-[#C8893B]/15 text-[#C8893B] text-[10px] font-semibold font-inter mb-4">
             <span class="w-1.5 h-1.5 rounded-full bg-[#C8893B]"></span>
@@ -185,15 +191,15 @@
 
           <!-- Appliance showcase grid -->
           <div class="grid grid-cols-2 gap-3">
-            <div class="rounded-2xl bg-[#fbf7f1] dark:bg-[#12110f] border border-[#e7e0d6]/50 dark:border-[#2c2825]/50 p-3.5 text-center">
+            <div class="rounded-2xl p-3.5 text-center" style="background-color:var(--c-bg);border:1px solid var(--c-border)">
               <svg class="mx-auto mb-2" width="52" height="52" viewBox="0 0 60 60" fill="none">
-                <path d="M25 5 L30 25 L20 25 Z" stroke="#d43533" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
-                <rect x="18" y="25" width="24" height="30" rx="3" stroke="#d43533" stroke-width="1.5" fill="none"/>
-                <line x1="30" y1="30" x2="30" y2="40" stroke="#d43533" stroke-width="1" stroke-linecap="round" stroke-dasharray="2 2"/>
-                <circle cx="30" cy="50" r="2" fill="#d43533" opacity="0.3"/>
+                <path d="M25 5 L30 25 L20 25 Z" stroke="var(--c-brand)" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+                <rect x="18" y="25" width="24" height="30" rx="3" stroke="var(--c-brand)" stroke-width="1.5" fill="none"/>
+                <line x1="30" y1="30" x2="30" y2="40" stroke="var(--c-brand)" stroke-width="1" stroke-linecap="round" stroke-dasharray="2 2"/>
+                <circle cx="30" cy="50" r="2" fill="var(--c-brand)" opacity="0.3"/>
               </svg>
-              <p class="font-cairo font-bold text-[11px] text-[#1c1917] dark:text-[#f5f5f4]">خلاط</p>
-              <p class="font-cairo text-[9px] text-[#57534e] dark:text-[#a8a29e]">من ٨٩٩ ج.م</p>
+              <p class="font-cairo font-bold text-[11px]" style="color:var(--c-ink)">خلاط</p>
+              <p class="font-cairo text-[9px]" style="color:var(--c-ink-muted)">من ٨٩٩ ج.م</p>
             </div>
             <div class="rounded-2xl bg-[#fbf7f1] dark:bg-[#12110f] border border-[#e7e0d6]/50 dark:border-[#2c2825]/50 p-3.5 text-center">
               <svg class="mx-auto mb-2" width="52" height="52" viewBox="0 0 60 60" fill="none">
