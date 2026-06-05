@@ -79,6 +79,31 @@ export default function OrderDetail() {
 	const [order, setOrder] = useState<OrderData | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [cancelling, setCancelling] = useState(false);
+	const [cancelError, setCancelError] = useState<string | null>(null);
+
+	async function handleCancel() {
+		if (!order || !confirm("هل تريد إلغاء الطلب نهائياً؟")) return;
+		setCancelling(true);
+		setCancelError(null);
+		try {
+			const res = await fetch(`${API}/api/orders/${order.id}/cancel`, {
+				method: "POST",
+				headers: getAuthHeaders(),
+			});
+			const data = await res.json();
+			if (!res.ok) throw new Error(data.error ?? "فشل إلغاء الطلب");
+			setOrder((o) =>
+				o
+					? { ...o, status: "cancelled", cancelledAt: new Date().toISOString() }
+					: o,
+			);
+		} catch (err) {
+			setCancelError(err instanceof Error ? err.message : "حدث خطأ");
+		} finally {
+			setCancelling(false);
+		}
+	}
 
 	useEffect(() => {
 		if (!loggedIn) {
@@ -149,6 +174,23 @@ export default function OrderDetail() {
 						})}
 					</p>
 				</div>
+
+				{order.status === "pending" && order.paymentMethod === "cod" && (
+					<button
+						onClick={handleCancel}
+						disabled={cancelling}
+						className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-red-200 dark:border-red-900/40 text-red-600 dark:text-red-400 font-cairo font-bold text-xs hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors disabled:opacity-50"
+					>
+						{cancelling && <Loader2 size={13} className="animate-spin" />}
+						إلغاء الطلب
+					</button>
+				)}
+
+				{cancelError && (
+					<p className="w-full text-xs font-cairo text-red-600 dark:text-red-400 mt-2">
+						{cancelError}
+					</p>
+				)}
 
 				{order.billCode && (
 					<a

@@ -14,7 +14,6 @@ const CreateOrderSchema = z.object({
 				name: z.string(),
 				sku: z.string().optional(),
 				quantity: z.number().int().positive(),
-				unitPrice: z.number().positive(),
 			}),
 		)
 		.min(1, "السلة فارغة"),
@@ -31,6 +30,12 @@ const CreateOrderSchema = z.object({
 interface StockRow extends RowDataPacket {
 	variation_id: number;
 	qty_available: string;
+}
+
+interface VariationPriceRow extends RowDataPacket {
+	id: number;
+	sell_price_inc_tax: string | null;
+	default_sell_price: string | null;
 }
 
 interface OrderRow extends RowDataPacket {
@@ -162,6 +167,40 @@ route.get("/:id", async (c) => {
 	});
 });
 
+route.post("/:id/cancel", async (c) => {
+	const user = c.get("user");
+	const orderId = Number(c.req.param("id"));
+	if (!Number.isFinite(orderId)) return c.json({ error: "bad_request" }, 400);
+
+	const env = loadEnv();
+	const sitePool = getSitePool(env);
+
+	const rows = await query<OrderRow[]>(
+		sitePool,
+		"SELECT id, status, payment_method, erp_webhook_sent FROM orders WHERE id = ? AND contact_id = ? LIMIT 1",
+		[orderId, user.contactId],
+	);
+	if (rows.length === 0) return c.json({ error: "not_found" }, 404);
+
+	const o = rows[0];
+	if (o.status !== "pending") {
+		return c.json({ error: "لا يمكن إلغاء الطلب في هذه المرحلة" }, 409);
+	}
+	if (o.payment_method !== "cod") {
+		return c.json(
+			{ error: "إلغاء الطلبات المدفوعة إلكترونياً يتم عبر خدمة العملاء" },
+			409,
+		);
+	}
+
+	await sitePool.query(
+		"UPDATE orders SET status = 'cancelled', cancelled_at = NOW(), updated_at = NOW() WHERE id = ?",
+		[orderId],
+	);
+
+	return c.json({ status: "cancelled" });
+});
+
 route.post("/", async (c) => {
 	const user = c.get("user");
 	const body = await c.req.json();
@@ -210,7 +249,31 @@ route.post("/", async (c) => {
 		}
 	}
 
-	const subtotal = data.items.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
+	// Fetch authoritative prices from ERP — client-sent prices are not trusted
+	const priceRows = await query<VariationPriceRow[]>(
+		erpPool,
+		`SELECT id, sell_price_inc_tax, default_sell_price FROM variations WHERE id IN (${variationIds.map(() => "?").join(",")}) AND deleted_at IS NULL`,
+		variationIds,
+	);
+	const priceMap = new Map(
+		priceRows.map((r) => [
+			r.id,
+			Number(r.sell_price_inc_tax ?? r.default_sell_price ?? 0),
+		]),
+	);
+	for (const item of data.items) {
+		if (!priceMap.has(item.variationId)) {
+			return c.json(
+				{ error: "product_not_found", variationId: item.variationId },
+				404,
+			);
+		}
+	}
+
+	const subtotal = data.items.reduce(
+		(s, i) => s + (priceMap.get(i.variationId) ?? 0) * i.quantity,
+		0,
+	);
 	const shippingFee = 0;
 	const total = subtotal + shippingFee;
 
@@ -247,7 +310,8 @@ route.post("/", async (c) => {
 		const orderId = (orderResult as { insertId: number }).insertId;
 
 		for (const item of data.items) {
-			const lineSubtotal = item.unitPrice * item.quantity;
+			const unitPrice = priceMap.get(item.variationId) ?? 0;
+			const lineSubtotal = unitPrice * item.quantity;
 			await conn.query(
 				`INSERT INTO order_items
 				 (order_id, product_id, variation_id, name, sku, quantity, unit_price, subtotal)
@@ -259,7 +323,7 @@ route.post("/", async (c) => {
 					item.name,
 					item.sku ?? null,
 					item.quantity,
-					item.unitPrice.toFixed(2),
+					unitPrice.toFixed(2),
 					lineSubtotal.toFixed(2),
 				],
 			);
@@ -268,7 +332,7 @@ route.post("/", async (c) => {
 		await conn.commit();
 
 		if (data.paymentMethod === "cod") {
-			fireErpWebhook(env, orderId, user, data, total).catch(() => {});
+			fireErpWebhook(env, orderId, user, data, priceMap, total).catch(() => {});
 		}
 
 		return c.json({ orderId, total, status: "pending" }, 201);
@@ -285,6 +349,7 @@ async function fireErpWebhook(
 	orderId: number,
 	user: { contactId: number; phone: string; name: string },
 	data: z.infer<typeof CreateOrderSchema>,
+	priceMap: Map<number, number>,
 	total: number,
 ) {
 	if (!env.ERP_WEBHOOK_URL) return;
@@ -313,7 +378,7 @@ async function fireErpWebhook(
 			product_id: i.productId,
 			variation_id: i.variationId,
 			quantity: i.quantity,
-			unit_price: i.unitPrice,
+			unit_price: priceMap.get(i.variationId) ?? 0,
 		})),
 		total,
 		payment_method: data.paymentMethod,
@@ -331,7 +396,7 @@ async function fireErpWebhook(
 			[orderId],
 		);
 	} catch {
-		// webhook failure logged, order still created
+		// webhook failure is non-blocking
 	}
 }
 

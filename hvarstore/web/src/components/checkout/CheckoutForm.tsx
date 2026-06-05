@@ -7,14 +7,10 @@ import {
 	Loader2,
 	ChevronDown,
 	CheckCircle2,
+	LocateFixed,
 } from "lucide-react";
 import { cartItems, cartTotal, cartCount } from "../../stores/cart";
-import {
-	authToken,
-	authUser,
-	isLoggedIn,
-	getAuthHeaders,
-} from "../../lib/auth";
+import { authUser, isLoggedIn, getAuthHeaders } from "../../lib/auth";
 
 interface Gov {
 	id: number;
@@ -28,6 +24,11 @@ interface Dist {
 type PaymentMethod = "cod" | "kashier_card" | "kashier_installments";
 
 const API = import.meta.env?.PUBLIC_API_URL ?? "http://localhost:5000";
+const GEO_KEY = "0ae3efb1-9685-4530-86e2-606dccecec50";
+
+function matchAr(a: string, b: string): boolean {
+	return a.includes(b) || b.includes(a);
+}
 
 export default function CheckoutForm() {
 	const loggedIn = useStore(isLoggedIn);
@@ -52,6 +53,10 @@ export default function CheckoutForm() {
 		orderId: number;
 		total: number;
 	} | null>(null);
+
+	const [geoLoading, setGeoLoading] = useState(false);
+	const [geoHit, setGeoHit] = useState<string | null>(null);
+	const [pendingDistName, setPendingDistName] = useState<string | null>(null);
 
 	useEffect(() => {
 		if (!loggedIn) {
@@ -84,6 +89,52 @@ export default function CheckoutForm() {
 			.then((d) => setDists(d.items))
 			.catch(() => {});
 	}, [govId]);
+
+	// Auto-select district once districts load after GeoLink sets the governorate
+	useEffect(() => {
+		if (!pendingDistName || dists.length === 0) return;
+		const match = dists.find((d) => matchAr(d.nameAr, pendingDistName));
+		if (match) setDistId(match.id);
+		setPendingDistName(null);
+	}, [dists, pendingDistName]);
+
+	async function handleGeoLocate() {
+		if (!navigator.geolocation) return;
+		setGeoLoading(true);
+		setGeoHit(null);
+		navigator.geolocation.getCurrentPosition(
+			async (pos) => {
+				try {
+					const { latitude: lat, longitude: lng } = pos.coords;
+					const res = await fetch(
+						`https://geolink-eg.com/api/v2/reverse_geocode?latitude=${lat}&longitude=${lng}&language=ar&country=eg&key=${GEO_KEY}`,
+					);
+					const json = await res.json();
+					if (!json.success) throw new Error(json.error ?? "GeoLink denied");
+
+					const govName: string = json.data.address_parts?.governorate ?? "";
+					const distName: string = json.data.address_parts?.district ?? "";
+					const shortAddr: string =
+						json.data.short_address ?? json.data.address ?? "";
+
+					const matchedGov = govs.find((g) => matchAr(g.nameAr, govName));
+					if (matchedGov) {
+						setGovId(matchedGov.id);
+						if (distName) setPendingDistName(distName);
+						setGeoHit(shortAddr || govName);
+					} else {
+						setGeoHit(null);
+					}
+				} catch {
+					// silent — user can fill manually
+				} finally {
+					setGeoLoading(false);
+				}
+			},
+			() => setGeoLoading(false),
+			{ enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
+		);
+	}
 
 	if (success) {
 		return (
@@ -145,7 +196,6 @@ export default function CheckoutForm() {
 					variationId: i.variationId,
 					name: i.name,
 					quantity: i.quantity,
-					unitPrice: i.price,
 				})),
 				paymentMethod: payment,
 				governorateId: govId,
@@ -187,14 +237,12 @@ export default function CheckoutForm() {
 				if (!payRes.ok) {
 					throw new Error(payData.error ?? "فشل في بدء الدفع");
 				}
-				// Clear cart before redirect
 				const { cartItems: ci } = await import("../../stores/cart");
 				ci.set([]);
 				window.location.href = payData.redirectUrl;
 				return;
 			}
 
-			// COD — clear cart + show success
 			const { cartItems: ci } = await import("../../stores/cart");
 			ci.set([]);
 			setSuccess({ orderId: data.orderId, total: data.total });
@@ -215,12 +263,43 @@ export default function CheckoutForm() {
 
 			{/* Address section */}
 			<section className="rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] p-5 space-y-4">
-				<div className="flex items-center gap-2 mb-1">
-					<MapPin size={16} className="text-[#d43533]" />
-					<h2 className="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">
-						عنوان التوصيل
-					</h2>
+				<div className="flex items-center justify-between mb-1">
+					<div className="flex items-center gap-2">
+						<MapPin size={16} className="text-[#d43533]" />
+						<h2 className="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">
+							عنوان التوصيل
+						</h2>
+					</div>
+					<button
+						type="button"
+						onClick={handleGeoLocate}
+						disabled={geoLoading}
+						className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-cairo font-semibold border border-[#e7e0d6] dark:border-[#2c2825] text-[#57534e] dark:text-[#a8a29e] hover:border-[#d43533] hover:text-[#d43533] transition-all disabled:opacity-50"
+					>
+						{geoLoading ? (
+							<Loader2 size={12} className="animate-spin" />
+						) : (
+							<LocateFixed size={12} />
+						)}
+						تحديد موقعي
+					</button>
 				</div>
+
+				{geoHit && (
+					<div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900/30">
+						<MapPin size={13} className="text-green-600 shrink-0" />
+						<span className="font-cairo text-xs text-green-700 dark:text-green-400 truncate">
+							{geoHit}
+						</span>
+						<button
+							type="button"
+							onClick={() => setGeoHit(null)}
+							className="mr-auto text-green-600 hover:text-green-800 text-xs font-cairo"
+						>
+							×
+						</button>
+					</div>
+				)}
 
 				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 					{/* Governorate */}

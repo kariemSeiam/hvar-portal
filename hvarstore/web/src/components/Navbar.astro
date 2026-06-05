@@ -1,6 +1,7 @@
 ---
 import CartBadge from './cart/CartBadge'
 import ThemeToggle from './ThemeToggle'
+import NavAuthLink from './NavAuthLink'
 
 const path = Astro.url.pathname
 const links = [
@@ -39,12 +40,7 @@ const links = [
       <!-- Actions -->
       <div class="flex items-center gap-1">
         <CartBadge client:load />
-        <a
-          href="/login"
-          class="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-semibold font-cairo transition-colors nav-link"
-        >
-          دخول
-        </a>
+        <NavAuthLink client:load />
         <ThemeToggle client:load />
 
         <!-- Mobile hamburger -->

@@ -8,6 +8,20 @@ import { signToken, signRefreshToken } from "../lib/auth";
 import { normalizePhone } from "../lib/phone";
 import { authMiddleware } from "../middleware/auth";
 
+// In-memory rate limiter — resets per IP every 60 seconds
+const _rl = new Map<string, { n: number; until: number }>();
+function rateLimit(ip: string, max: number): boolean {
+	const now = Date.now();
+	const e = _rl.get(ip);
+	if (!e || e.until < now) {
+		_rl.set(ip, { n: 1, until: now + 60_000 });
+		return true;
+	}
+	if (e.n >= max) return false;
+	e.n++;
+	return true;
+}
+
 const RegisterSchema = z.object({
 	phone: z.string().min(1, "رقم الموبايل مطلوب"),
 	name: z.string().min(2, "الاسم مطلوب").max(100),
