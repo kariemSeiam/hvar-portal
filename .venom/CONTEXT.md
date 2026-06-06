@@ -1,7 +1,7 @@
 # hvarstore.com — Context
 
-> **Last absorbed:** 2026-06-05 (schema recon against live hvar_erp container; doc/schema reconciled)
-> **Source:** 7 dev spec files + MCRM/wilson-eg/hvar-pos/hvar-catalog project docs + design studies + Wilson pattern catalog + `.venom/recon/hvar_erp.schema.sql` (live mysqldump)
+> **Last absorbed:** 2026-06-06 (all 7 phases complete; code audit against actual source files)
+> **Source:** live source tree (`hvarstore/` monorepo) + git history + 7 dev spec files + design system CSS + schema files
 
 ---
 
@@ -228,53 +228,39 @@ All patterns: `prefers-reduced-motion` respected. All CSS variables — no hardc
 
 ---
 
-## Build Order
+## Build Status — ALL PHASES COMPLETE (as of 2026-06-06)
 
-### ✅ Done (2026-06-04)
-1. **Stack research** — researched 2026 best fit (Hono+Bun+Astro+Tailwind v4)
-2. **Monorepo scaffold** — `hvarstore/` with api/ web/ shared/ migrations/ packages
-3. **DB schema** — Drizzle 5 tables in `migrations/schema/`
-4. **API scaffold** — Hono routes (501 stubs), DB pools, JWT auth, middleware
-5. **Web scaffold** — Astro 5, RTL layout, design tokens, Tailwind v4
-6. **Shared types** — all Zod schemas + TS types
-7. **Docker + deploy config** — Compose, Caddyfile, Dockerfiles
-8. **Git init** — pushed to github.com/kariemSeiam/hvar-portal
+### ✅ Phase 1 — Shell
+- Base layout (Navbar + Footer + RTL), Home (Hero P4+P2+P1 + categories strip + featured products + chef strip + trust block), Products listing, PDP `/products/[slug]`
 
-### ✅ Done (2026-06-05)
-9. **Schema recon** — live mysqldump saved to `.venom/recon/hvar_erp.schema.sql`. Doc/schema reconciled in Gotchas. `service_tickets` confirmed in `mcrm_hvar_hub`.
-10. **Seed script** — `migrations/seed-erp.ts` produces 3 Arabic categories, 8 Hvar kitchen products w/ stock, 5 governorates, 16 districts. Idempotent (wipes `HVR-DEMO-*` SKUs). Run: `bun --cwd migrations run seed`.
-11. **Products API (live)** — `GET /api/products`, `/api/products/:slug`, `/api/products/featured`, `/api/categories`, `/api/locations/{governorates,districts/:govId}` all returning real Arabic data from hvar_erp. Filters: category, q, min_price, max_price, in_stock.
-12. **Env corrected** — `MCRM_DB_*`, `ERP_BUSINESS_ID`, `ERP_LOCATION_ID`, `PUBLIC_MEDIA_BASE` added.
+### ✅ Phase 2 — Cart
+- Nanostores atom (localStorage persistence) + CartFAB (fixed mobile, safe-area-inset aware) + CartView drawer
 
-### 🔜 Phase 1 — Shell (pure read, zero auth, zero cart)
-1. **Base layout** — Navbar + Footer + RTL shell. Every page inherits this. Build once.
-2. **Home page** — Hero (mesh + grain + doodle BG) + categories strip + featured products + chef strip + trust block.
-3. **Products listing** — `/products` — filters (category, price, in-stock) + card grid + pagination.
-4. **Product detail (PDP)** — `/products/[slug]` — gallery + CTA action bar + trust line + description accordion.
+### ✅ Phase 3 — Auth
+- Register + Login (phone+password), phone normalization, JWT httpOnly cookie, `/account` page, protected route middleware
 
-### 🔜 Phase 2 — Cart
-5. **Cart island** — nanostores + localStorage + CartFAB (mobile) + CartDrawer. No auth needed — client state only.
+### ✅ Phase 4 — Checkout + Orders
+- Checkout (geo → dropdowns, COD/Kashier selector, order summary), COD order creation (stock re-check in DB transaction + ERP webhook), Orders list + detail, Bosta tracking link
 
-### 🔜 Phase 3 — Auth
-6. **Register + Login** — phone + password, phone normalization (`shared/phone.ts`), JWT (httpOnly cookie), protected route middleware.
-7. **Account page** — basic profile shell so protected routes are testable end-to-end.
+### ✅ Phase 5 — Payments
+- Kashier HPP flow: `POST /api/payments/kashier/initiate` (pending_payments row → HPP redirect URL), `POST /api/payments/kashier/callback` (HMAC signature validate → idempotent complete)
 
-### 🔜 Phase 4 — Checkout + Orders
-8. **Checkout page** — smart address (geo → reverse geocode → dropdowns, from `checkout-demo.html`) + COD/Kashier selector + order summary.
-9. **COD order creation** — stock re-check inside DB transaction + ERP webhook + confirmation screen.
-10. **Orders list + detail** — status, line items, Bosta tracking link (`bill_code`).
+### ✅ Phase 6 — Service Portal
+- NewTicketForm (type selector صيانة/استبدال/مرتجع + optional linked order), TicketsList, TicketDetail with ServiceStepper for all 3 machines
 
-### 🔜 Phase 5 — Payments
-11. **Kashier flow** — `initiate` (pending_payments row → HPP redirect) + `callback` (HMAC validate → complete order).
+### ✅ Phase 7 — Polish (last commit 730b7a2)
+- Semantic CSS vars (--c-* tokens, no hardcoded colors anywhere)
+- Dark mode: CSS class strategy, ThemeToggle island
+- Wilson patterns: P2 grain, P3 dot grid (catalog), P6 card shine, P7 scroll reveals, P5 3D door-swing RTL nav
+- Structured data (JSON-LD: Organization + WebSite + Product), image lazy-load, OG tags
+- CtaActionBar: variation selector, qty stepper, installment hint (≥1000 EGP), WhatsApp fallbacks
+- StickyMobileCta: bottom sheet on mobile PDP, mirrors CtaActionBar logic
+- CartFAB shows item count badge, no price shown (per design)
 
-### 🔜 Phase 6 — Service Portal
-12. **New ticket form** — type selector (صيانة / استبدال / مرتجع) + optional linked order.
-13. **Tickets list + detail** — ServiceStepper state timeline for all 3 machines (HVM/HVR/HVT).
-
-### 🔜 Phase 7 — Polish
-14. **Wilson patterns** — grain (P2), doodle BGs (P1), card shine (P6), scroll reveals (P7), mobile nav drawer 3D RTL door-swing (P5/P13).
-15. **Dark mode** — CSS class strategy, theme toggle. Tokens already defined.
-16. **SEO + perf** — OG tags, structured data, image lazy-load, font subsetting.
+### 🔄 In-flight (uncommitted working tree)
+- `web/src/components/pdp/CtaActionBar.tsx` — modified (EDGE review fixes)
+- `web/src/components/pdp/StickyMobileCta.tsx` — modified (EDGE review fixes)
+- `scripts/scrape_hvarstore.py` — modified (scraper updates)
 
 ---
 

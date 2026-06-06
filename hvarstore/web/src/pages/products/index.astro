@@ -31,10 +31,10 @@ const categories = categoriesResult.status === 'fulfilled'
 
 const activeCategory = categories.find((c) => c.id === categoryId)
 const pageTitle = activeCategory
-  ? `${activeCategory.name} — هفارستور`
+  ? `${activeCategory.name} | هفار`
   : q
-    ? `نتائج: ${q} — هفارستور`
-    : 'كل المنتجات — هفارستور'
+    ? `نتائج البحث: ${q} | هفار`
+    : 'تسوق أجهزة المطبخ — خلاطات، قلايات، مكاوي | هفار'
 
 function buildUrl(params: Record<string, string | number | undefined | null>) {
   const u = new URL(url)
@@ -50,9 +50,9 @@ function buildUrl(params: Record<string, string | number | undefined | null>) {
 <Base title={pageTitle}>
 
   <!-- Page header -->
-  <div class="bg-white dark:bg-[#1c1917] border-b border-[#e7e0d6] dark:border-[#2c2825] pt-8 pb-6">
+  <div class="pt-8 pb-6" style="background:var(--c-surface);border-bottom:1px solid var(--c-border)">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h1 class="font-cairo font-black text-2xl text-[#1c1917] dark:text-[#f5f5f4] mb-4">
+      <h1 class="font-cairo font-black text-2xl mb-4" style="color:var(--c-ink)">
         {activeCategory ? activeCategory.name : q ? `نتائج: "${q}"` : 'كل المنتجات'}
       </h1>
 

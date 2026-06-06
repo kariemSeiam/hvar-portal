@@ -23,12 +23,15 @@ interface Props {
 }
 
 const {
-  title = 'هفارستور — أجهزة منزلية موثوقة',
-  description = 'تسوق أحدث الأجهزة المنزلية من هفار. ضمان حقيقي، شحن مجاني، دفع عند الاستلام.',
+  title = 'هفار — أجهزة منزلية بضمان حقيقي وشحن مجاني',
+  description = 'تسوق أجهزة المطبخ من هفار: خلاطات، قلايات هوائية، مكاوي، عجانات. ضمان سنتين، شحن مجاني لجميع المحافظات، افحص قبل الدفع.',
   image,
   noFooter = false,
   jsonld = [],
 } = Astro.props
+
+const defaultOgImage = 'https://hvarstore.com/og-image.png'
+const ogImage = image ?? defaultOgImage
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site)
 
@@ -42,25 +45,20 @@ const orgJsonld = ld({
   name: 'هفار',
   alternateName: 'HVAR',
   url: 'https://hvarstore.com',
-  logo: 'https://hvarstore.com/og-image.png',
-  description: 'أجهزة منزلية موثوقة لكل مطبخ مصري',
+  logo: defaultOgImage,
+  description: 'أجهزة منزلية موثوقة لكل مطبخ مصري. ضمان سنتين، شحن مجاني، افحص قبل الدفع.',
   sameAs: [
-    'https://facebook.com/hvar22',
-    'https://instagram.com/hvar222',
-    'https://tiktok.com/@hvarstore1',
+    'https://www.facebook.com/hvar22',
+    'https://www.instagram.com/hvar222',
+    'https://www.tiktok.com/@hvarstore1',
   ],
-  contactPoint: {
-    ['@type']: 'ContactPoint',
-    telephone: '+201000000000',
-    contactType: 'customer service',
-    availableLanguage: ['Arabic', 'English'],
-  },
+  // TODO: replace telephone with real Hvar customer service number
 })
 
 const websiteJsonld = ld({
   ['@type']: 'WebSite',
-  name: 'هفارستور',
-  alternateName: 'HVAR Store',
+  name: 'هفار',
+  alternateName: 'HVAR',
   url: 'https://hvarstore.com',
   inLanguage: 'ar',
   potentialAction: {
@@ -78,6 +76,10 @@ const websiteJsonld = ld({
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#d43533" />
     <meta name="format-detection" content="telephone=no" />
+    <meta name="author" content="هفار — HVAR" />
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -88,7 +90,15 @@ const websiteJsonld = ld({
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:type" content="website" />
-    {image && <meta property="og:image" content={image} />}
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="ar_EG" />
+    <meta property="og:site_name" content="هفار" />
+
+    <!-- Twitter card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
 
     <!-- JSON-LD structured data -->
     <script type="application/ld+json" set:html={orgJsonld}></script>
@@ -97,8 +107,7 @@ const websiteJsonld = ld({
       <script type="application/ld+json" set:html={snippet}></script>
     ))}
 
-    <!-- Preconnect to Google Fonts (served by @fontsource, but adds DNS) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous" />
+    <link rel="preconnect" href="https://hvarstore.com" crossorigin="anonymous" />
 
     <!-- Dark mode: run before render to prevent flash -->
     <script is:inline>

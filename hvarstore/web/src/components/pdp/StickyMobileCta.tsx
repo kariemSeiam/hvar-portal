@@ -71,8 +71,7 @@ export default function StickyMobileCta({ product }: Props) {
 				borderTop: "1px solid var(--c-border)",
 				transform: visible ? "translateY(0)" : "translateY(110%)",
 				transition: "transform 0.35s var(--ease-spring)",
-				paddingBottom:
-					"max(0.75rem, env(safe-area-inset-bottom, 0.75rem))",
+				paddingBottom: "max(0.75rem, env(safe-area-inset-bottom, 0.75rem))",
 				paddingTop: "0.75rem",
 				paddingInline: "1rem",
 				boxShadow: "0 -4px 20px rgba(0,0,0,0.08)",
@@ -95,9 +94,7 @@ export default function StickyMobileCta({ product }: Props) {
 					aria-label="إضافة للسلة"
 					className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-cairo font-bold text-sm text-white transition-all"
 					style={{
-						backgroundColor: added
-							? "var(--c-trust)"
-							: "var(--c-brand)",
+						backgroundColor: added ? "var(--c-trust)" : "var(--c-brand)",
 						transition: "background-color 0.25s var(--ease-spring)",
 					}}
 				>

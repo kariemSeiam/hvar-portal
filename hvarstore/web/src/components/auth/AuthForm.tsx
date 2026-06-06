@@ -137,7 +137,7 @@ export default function AuthForm() {
 				<p className="text-center text-xs font-cairo text-[#a8a29e]">
 					نسيت كلمة المرور؟{" "}
 					<a
-						href="https://wa.me/201000000000?text=نسيت كلمة المرور — رقمي:"
+						href="https://wa.me/201XXXXXXXXX?text=نسيت كلمة المرور — رقمي:"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="text-[#d43533] hover:underline"

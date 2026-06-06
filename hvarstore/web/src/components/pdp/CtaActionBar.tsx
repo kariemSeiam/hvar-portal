@@ -41,8 +41,10 @@ export default function CtaActionBar({ product }: Props) {
 		setTimeout(() => setAdded(false), 2000);
 	}
 
-	const waInquiry = `https://wa.me/201000000000?text=${encodeURIComponent(`مرحبا، أريد الاستفسار عن: ${product.name}`)}`;
-	const waNotify = `https://wa.me/201000000000?text=${encodeURIComponent(`مرحبا، أريد معرفة متى يتوفر: ${product.name}`)}`;
+	// TODO: replace with real Hvar WhatsApp number
+	const WA_NUMBER = '201XXXXXXXXX';
+	const waInquiry = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`مرحبا، أريد الاستفسار عن: ${product.name}`)}`;
+	const waNotify = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`مرحبا، أريد معرفة متى يتوفر: ${product.name}`)}`;
 
 	return (
 		<div
@@ -137,10 +139,7 @@ export default function CtaActionBar({ product }: Props) {
 
 			{/* Installment hint */}
 			{showInstallment && (
-				<p
-					className="text-xs font-cairo"
-					style={{ color: "var(--c-brass)" }}
-				>
+				<p className="text-xs font-cairo" style={{ color: "var(--c-brass)" }}>
 					أقساط تبدأ من{" "}
 					<span className="font-bold">
 						{Math.round(price / 12).toLocaleString("ar-EG")} ج.م/شهر
