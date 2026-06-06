@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro'
 import CtaActionBar from '../../components/pdp/CtaActionBar'
+import StickyMobileCta from '../../components/pdp/StickyMobileCta'
 import ProductCard from '../../components/ProductCard.astro'
 import { api } from '../../lib/api'
 
@@ -15,13 +16,13 @@ try {
   return Astro.redirect('/products')
 }
 
-// Related: same category, excluding current
+/* Related: same category, fetch 8 → filter self → take 4 */
 let related: Awaited<ReturnType<typeof api.products.list>>['items'] = []
 try {
   const r = await api.products.list({
     category: product.categoryId ?? undefined,
     in_stock: undefined,
-    limit: 5,
+    limit: 8,
     offset: 0,
   })
   related = r.items.filter((p) => p.id !== product.id).slice(0, 4)
@@ -34,12 +35,15 @@ const discountPct = hasDiscount
   ? Math.round(((product.comparePrice! - product.price) / product.comparePrice!) * 100)
   : 0
 
-/* ── JSON-LD Product schema ───────────────────────────────────────────── */
+const descriptionFallback = `منتج هفار — جودة مُعتمدة وضمان أصلي. شحن لجميع المحافظات مجاناً.`
+const displayDescription = product.description || descriptionFallback
+
+/* ── JSON-LD ── */
 const productJsonld = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "Product",
   name: product.name,
-  description: product.description ?? `${product.name} من هفار`,
+  description: product.description ?? descriptionFallback,
   sku: product.sku,
   image: product.image ?? undefined,
   category: product.categoryName ?? undefined,
@@ -68,7 +72,9 @@ const breadcrumbJsonld = JSON.stringify({
   itemListElement: [
     { "@type": "ListItem", position: 1, name: "البيت", item: "https://hvarstore.com/" },
     { "@type": "ListItem", position: 2, name: "المنتجات", item: "https://hvarstore.com/products" },
-    ...(product.categoryName ? [{ "@type": "ListItem", position: 3, name: product.categoryName, item: `https://hvarstore.com/products?category=${product.categoryId}` }] : []),
+    ...(product.categoryName && product.categoryId != null
+      ? [{ "@type": "ListItem", position: 3, name: product.categoryName, item: `https://hvarstore.com/products?category=${product.categoryId}` }]
+      : []),
     { "@type": "ListItem", position: 4, name: product.name, item: `https://hvarstore.com/products/${product.slug}` },
   ],
 })
@@ -81,24 +87,24 @@ const breadcrumbJsonld = JSON.stringify({
   jsonld={[productJsonld, breadcrumbJsonld]}
 >
 
-  <!-- Breadcrumb -->
+  <!-- Breadcrumb (RTL-correct separator ‹) -->
   <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-2" aria-label="مسار التنقل">
-    <ol class="flex items-center gap-2 text-xs font-cairo text-[#57534e] dark:text-[#a8a29e]">
-      <li><a href="/" class="hover:text-[#d43533] transition-colors">البيت</a></li>
-      <li class="opacity-40">›</li>
-      <li><a href="/products" class="hover:text-[#d43533] transition-colors">المنتجات</a></li>
-      {product.categoryName && (
+    <ol class="flex items-center flex-wrap gap-1.5 text-xs font-cairo" style="color:var(--c-ink-muted)">
+      <li><a href="/" class="transition-colors hover:text-[var(--c-brand)]">البيت</a></li>
+      <li aria-hidden="true" class="opacity-40 select-none">‹</li>
+      <li><a href="/products" class="transition-colors hover:text-[var(--c-brand)]">المنتجات</a></li>
+      {product.categoryName && product.categoryId != null && (
         <>
-          <li class="opacity-40">›</li>
+          <li aria-hidden="true" class="opacity-40 select-none">‹</li>
           <li>
-            <a href={`/products?category=${product.categoryId}`} class="hover:text-[#d43533] transition-colors">
+            <a href={`/products?category=${product.categoryId}`} class="transition-colors hover:text-[var(--c-brand)]">
               {product.categoryName}
             </a>
           </li>
         </>
       )}
-      <li class="opacity-40">›</li>
-      <li class="text-[#1c1917] dark:text-[#f5f5f4] font-semibold truncate max-w-[180px]">{product.name}</li>
+      <li aria-hidden="true" class="opacity-40 select-none">‹</li>
+      <li class="font-semibold truncate max-w-[180px]" style="color:var(--c-ink)">{product.name}</li>
     </ol>
   </nav>
 
@@ -106,10 +112,15 @@ const breadcrumbJsonld = JSON.stringify({
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
 
-      <!-- Gallery (Wilson P8: breath animation on single image) -->
+      <!-- Gallery (Wilson P8 breath + P2 grain) -->
       <div class="relative">
-        <div class="sticky top-20">
-          <div class="relative aspect-square rounded-2xl overflow-hidden bg-[#fbf7f1] dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825]">
+        <div class="sticky top-[68px]">
+
+          <!-- Image frame with grain overlay (Wilson P2) -->
+          <div
+            class="grain relative aspect-square rounded-2xl overflow-hidden"
+            style="background-color:var(--c-bg);border:1px solid var(--c-border)"
+          >
             {product.image ? (
               <img
                 src={product.image}
@@ -117,83 +128,122 @@ const breadcrumbJsonld = JSON.stringify({
                 class="w-full h-full object-cover pdp-breath"
                 loading="eager"
                 decoding="async"
+                width="800"
+                height="800"
               />
             ) : (
-              <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-50 to-stone-100 dark:from-red-950/20 dark:to-stone-900">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#d43533" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.25">
-                  <path d="M13 2L4.5 13H11l-1 9L21 11H14l1-9Z"/>
-                </svg>
+              <!-- P1 doodle placeholder — Hvar appliance rings -->
+              <div
+                class="w-full h-full flex items-center justify-center"
+                style="background:linear-gradient(135deg,var(--c-brand-tint),var(--c-bg))"
+              >
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none" aria-hidden="true">
+                  <svg width="80%" height="80%" viewBox="0 0 200 200" fill="none" opacity="0.08">
+                    <circle cx="100" cy="100" r="80" stroke="var(--c-brand)" stroke-width="1" stroke-dasharray="6 8"/>
+                    <circle cx="100" cy="100" r="58" stroke="var(--c-brand)" stroke-width="0.8"/>
+                    <circle cx="100" cy="100" r="36" stroke="var(--c-brand)" stroke-width="0.6" stroke-dasharray="3 5"/>
+                    <path d="M80 100h40M100 80v40" stroke="var(--c-brand)" stroke-width="0.8" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <span class="relative z-10 font-cairo font-black select-none" style="font-size:5rem;line-height:1;color:var(--c-brand);opacity:0.14">هـ</span>
               </div>
             )}
 
             <!-- Discount badge -->
             {hasDiscount && (
-              <span class="absolute top-4 right-4 px-3 py-1 rounded-xl bg-[#d43533] text-white text-sm font-bold font-inter shadow-lg">
+              <span
+                class="absolute top-4 end-4 px-3 py-1 rounded-xl text-white text-sm font-bold font-inter shadow-lg"
+                style="background-color:var(--c-brand)"
+              >
                 -{discountPct}%
               </span>
             )}
+
+            <!-- Red ember glow at top (Wilson P4 variant) -->
+            <div
+              class="absolute inset-0 pointer-events-none"
+              aria-hidden="true"
+              style="background:radial-gradient(ellipse 70% 40% at 50% 0%,var(--c-brand-glow) 0%,transparent 70%)"
+            ></div>
           </div>
 
-          <!-- SKU (for reference) -->
-          <p class="mt-3 text-center font-mono text-xs text-stone-400 dark:text-stone-600">
-            {product.sku}
-          </p>
+          <!-- Share + SKU row -->
+          <div class="mt-3 flex items-center justify-between px-1">
+            <p class="font-mono text-xs" style="color:var(--c-ink-faint)">{product.sku}</p>
+            <button
+              id="share-btn"
+              class="flex items-center gap-1.5 text-xs font-cairo transition-colors"
+              style="color:var(--c-ink-muted)"
+              aria-label="مشاركة المنتج"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+              مشاركة
+            </button>
+          </div>
         </div>
       </div>
 
       <!-- Product info -->
       <div class="space-y-6">
 
-        <!-- Category + name -->
-        {product.categoryName && (
+        <!-- Category pill -->
+        {product.categoryName && product.categoryId != null && (
           <a
             href={`/products?category=${product.categoryId}`}
-            class="inline-block text-xs font-cairo font-semibold text-[#d43533] bg-red-50 dark:bg-red-950/20 px-3 py-1 rounded-full hover:bg-red-100 dark:hover:bg-red-950/40 transition-colors"
+            class="inline-block text-xs font-cairo font-semibold px-3 py-1 rounded-full transition-colors"
+            style="color:var(--c-brand);background-color:var(--c-brand-tint)"
           >
             {product.categoryName}
           </a>
         )}
 
-        <h1 class="font-cairo font-black text-2xl sm:text-3xl text-[#1c1917] dark:text-[#f5f5f4] leading-snug">
+        <h1 class="font-cairo font-black text-2xl sm:text-3xl leading-snug" style="color:var(--c-ink)">
           {product.name}
         </h1>
 
-        <!-- CTA action bar (React island: qty + variation + add + WhatsApp) -->
+        <!-- CTA action bar (React island) -->
         <CtaActionBar product={product} client:load />
 
-        <!-- Description accordion -->
-        {product.description && (
-          <details class="group border border-[#e7e0d6] dark:border-[#2c2825] rounded-2xl overflow-hidden">
-            <summary class="flex items-center justify-between px-5 py-4 cursor-pointer font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4] select-none hover:bg-stone-50 dark:hover:bg-stone-900/30 transition-colors list-none">
-              <span>وصف المنتج</span>
-              <svg class="w-4 h-4 text-stone-400 transition-transform group-open:rotate-180" viewBox="0 0 16 16" fill="none">
-                <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </summary>
-            <div class="px-5 pb-5 pt-2 font-cairo text-sm text-[#57534e] dark:text-[#a8a29e] leading-relaxed">
-              {product.description}
-            </div>
-          </details>
-        )}
+        <!-- Description accordion (always visible — fallback if no real desc) -->
+        <details class="group rounded-2xl overflow-hidden" style="border:1px solid var(--c-border)">
+          <summary
+            class="flex items-center justify-between px-5 py-4 cursor-pointer font-cairo font-bold text-sm select-none list-none transition-colors"
+            style="color:var(--c-ink)"
+          >
+            <span>وصف المنتج</span>
+            <svg class="w-4 h-4 transition-transform group-open:rotate-180" viewBox="0 0 16 16" fill="none" style="color:var(--c-ink-faint)">
+              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </summary>
+          <div class="px-5 pb-5 pt-2 font-cairo text-sm leading-relaxed" style="color:var(--c-ink-muted)">
+            {displayDescription}
+          </div>
+        </details>
 
-        <!-- Weight/specs if available -->
+        <!-- Specs accordion (weight from ERP when available) -->
         {product.weight && (
-          <details class="group border border-[#e7e0d6] dark:border-[#2c2825] rounded-2xl overflow-hidden">
-            <summary class="flex items-center justify-between px-5 py-4 cursor-pointer font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4] select-none hover:bg-stone-50 dark:hover:bg-stone-900/30 transition-colors list-none">
+          <details class="group rounded-2xl overflow-hidden" style="border:1px solid var(--c-border)">
+            <summary
+              class="flex items-center justify-between px-5 py-4 cursor-pointer font-cairo font-bold text-sm select-none list-none transition-colors"
+              style="color:var(--c-ink)"
+            >
               <span>المواصفات</span>
-              <svg class="w-4 h-4 text-stone-400 transition-transform group-open:rotate-180" viewBox="0 0 16 16" fill="none">
+              <svg class="w-4 h-4 transition-transform group-open:rotate-180" viewBox="0 0 16 16" fill="none" style="color:var(--c-ink-faint)">
                 <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </summary>
             <div class="px-5 pb-5 pt-2">
               <table class="w-full text-sm font-cairo">
-                <tr class="border-b border-[#e7e0d6] dark:border-[#2c2825]">
-                  <td class="py-2 text-[#57534e] dark:text-[#a8a29e]">الوزن</td>
-                  <td class="py-2 text-[#1c1917] dark:text-[#f5f5f4] font-semibold text-end">{product.weight} كجم</td>
+                <tr style="border-bottom:1px solid var(--c-border)">
+                  <td class="py-2" style="color:var(--c-ink-muted)">الوزن</td>
+                  <td class="py-2 font-semibold text-end" style="color:var(--c-ink)">{product.weight} كجم</td>
                 </tr>
                 <tr>
-                  <td class="py-2 text-[#57534e] dark:text-[#a8a29e]">كود المنتج</td>
-                  <td class="py-2 text-[#1c1917] dark:text-[#f5f5f4] font-mono text-xs text-end">{product.sku}</td>
+                  <td class="py-2" style="color:var(--c-ink-muted)">كود المنتج</td>
+                  <td class="py-2 font-mono text-xs text-end" style="color:var(--c-ink)">{product.sku}</td>
                 </tr>
               </table>
             </div>
@@ -203,10 +253,10 @@ const breadcrumbJsonld = JSON.stringify({
       </div>
     </div>
 
-    <!-- Related products -->
+    <!-- Related products (Wilson P7 reveal) -->
     {related.length > 0 && (
       <section class="mt-16 reveal-section">
-        <h2 class="font-cairo font-bold text-lg text-[#1c1917] dark:text-[#f5f5f4] mb-6">
+        <h2 class="font-cairo font-bold text-lg mb-6" style="color:var(--c-ink)">
           منتجات مشابهة
         </h2>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -221,19 +271,44 @@ const breadcrumbJsonld = JSON.stringify({
 
   </div>
 
+  <!-- Sticky mobile CTA (slides in when inline bar scrolls out of view) -->
+  <StickyMobileCta product={product} client:load />
+
 </Base>
 
 <style>
-  /* Wilson P8: breath animation on product image */
+  /* Wilson P8: 20s breath on gallery image */
   @keyframes pdp-breath {
     0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.018); }
+    50%       { transform: scale(1.018); }
   }
   .pdp-breath {
     animation: pdp-breath 20s ease-in-out infinite;
     transform-origin: center center;
   }
+  /* Share button hover */
+  #share-btn:hover { color: var(--c-brand); }
   @media (prefers-reduced-motion: reduce) {
     .pdp-breath { animation: none; }
   }
 </style>
+
+<script>
+  /* Share button — Web Share API with clipboard fallback */
+  const shareBtn = document.getElementById('share-btn')
+  if (shareBtn) {
+    shareBtn.addEventListener('click', async () => {
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: document.title, url: location.href })
+        } else {
+          await navigator.clipboard.writeText(location.href)
+          shareBtn.textContent = 'تم النسخ ✓'
+          setTimeout(() => (shareBtn.textContent = ''), 1800)
+        }
+      } catch {
+        /* user cancelled share — ignore */
+      }
+    })
+  }
+</script>
