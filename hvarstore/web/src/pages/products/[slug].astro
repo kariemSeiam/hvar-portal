@@ -33,12 +33,52 @@ const hasDiscount = product.comparePrice !== null && product.comparePrice > prod
 const discountPct = hasDiscount
   ? Math.round(((product.comparePrice! - product.price) / product.comparePrice!) * 100)
   : 0
+
+/* ── JSON-LD Product schema ───────────────────────────────────────────── */
+const productJsonld = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Product",
+  name: product.name,
+  description: product.description ?? `${product.name} من هفار`,
+  sku: product.sku,
+  image: product.image ?? undefined,
+  category: product.categoryName ?? undefined,
+  offers: {
+    "@type": "Offer",
+    price: product.price,
+    priceCurrency: "EGP",
+    availability: product.stock > 0
+      ? "https://schema.org/InStock"
+      : "https://schema.org/OutOfStock",
+    url: `https://hvarstore.com/products/${product.slug}`,
+    itemCondition: "https://schema.org/NewCondition",
+    ...(hasDiscount && {
+      priceSpecification: {
+        "@type": "UnitPriceSpecification",
+        price: product.comparePrice,
+        priceCurrency: "EGP",
+      },
+    }),
+  },
+})
+
+const breadcrumbJsonld = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "البيت", item: "https://hvarstore.com/" },
+    { "@type": "ListItem", position: 2, name: "المنتجات", item: "https://hvarstore.com/products" },
+    ...(product.categoryName ? [{ "@type": "ListItem", position: 3, name: product.categoryName, item: `https://hvarstore.com/products?category=${product.categoryId}` }] : []),
+    { "@type": "ListItem", position: 4, name: product.name, item: `https://hvarstore.com/products/${product.slug}` },
+  ],
+})
 ---
 
 <Base
   title={`${product.name} — هفارستور`}
   description={product.description ?? `${product.name} — اشتر الآن من هفارستور`}
   image={product.image ?? undefined}
+  jsonld={[productJsonld, breadcrumbJsonld]}
 >
 
   <!-- Breadcrumb -->

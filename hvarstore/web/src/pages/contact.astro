@@ -1,8 +1,27 @@
 ---
 import Base from '../layouts/Base.astro'
+
+const faqItems = [
+  { q: 'ما مدة الضمان؟', a: 'جميع المنتجات بضمان من سنتين لثلاث سنوات حسب المنتج. يبدأ الضمان من تاريخ الاستلام.' },
+  { q: 'هل يمكنني الدفع عند الاستلام؟', a: 'نعم، نوفر خدمة الدفع عند الاستلام (كاش أو فيزا عند التسليم) مع إمكانية الفحص قبل الدفع.' },
+  { q: 'كم يستغرق التوصيل؟', a: 'من ٢ لـ٥ أيام عمل لجميع المحافظات. التوصيل مجاني.' },
+  { q: 'كيف أطلب صيانة؟', a: 'من صفحة خدمة ما بعد البيع اختر نوع الخدمة (صيانة / استبدال / مرتجع) وسيتواصل معك الفريق خلال ٢٤ ساعة.' },
+  { q: 'هل يمكنني إرجاع المنتج؟', a: 'نعم، خلال ١٤ يوم من الاستلام. المنتج يجب أن يكون بحالته الأصلية مع العبوة.' },
+]
+
+/* JSON-LD FAQ schema */
+const faqJsonld = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqItems.map(({ q, a }) => ({
+    "@type": "Question",
+    name: q,
+    acceptedAnswer: { "@type": "Answer", text: a },
+  })),
+})
 ---
 
-<Base title="تواصل معنا — هفارستور">
+<Base title="تواصل معنا — هفارستور" jsonld={[faqJsonld]}>
 
   <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
@@ -95,13 +114,7 @@ import Base from '../layouts/Base.astro'
         أسئلة شائعة
       </h2>
       <div class="space-y-3">
-        {([
-          { q: 'ما مدة الضمان؟', a: 'جميع المنتجات بضمان من سنتين لثلاث سنوات حسب المنتج. يبدأ الضمان من تاريخ الاستلام.' },
-          { q: 'هل يمكنني الدفع عند الاستلام؟', a: 'نعم، نوفر خدمة الدفع عند الاستلام (كاش أو فيزا عند التسليم) مع إمكانية الفحص قبل الدفع.' },
-          { q: 'كم يستغرق التوصيل؟', a: 'من ٢ لـ٥ أيام عمل لجميع المحافظات. التوصيل مجاني.' },
-          { q: 'كيف أطلب صيانة؟', a: 'من صفحة "خدمة ما بعد البيع" اختر نوع الخدمة (صيانة / استبدال / مرتجع) وسيتواصل معك الفريق خلال ٢٤ ساعة.' },
-          { q: 'هل يمكنني إرجاع المنتج؟', a: 'نعم، خلال ١٤ يوم من الاستلام. المنتج يجب أن يكون بحالته الأصلية مع العبوة.' },
-        ] as const).map(({ q, a }) => (
+        {faqItems.map(({ q, a }) => (
           <details class="group rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] overflow-hidden">
             <summary class="flex items-center justify-between px-5 py-4 cursor-pointer font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4] select-none hover:bg-stone-50 dark:hover:bg-stone-900/30 transition-colors list-none">
               <span>{q}</span>

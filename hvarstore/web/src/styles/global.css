@@ -79,7 +79,28 @@
 
 /* ── Base layer ─────────────────────────────────────────────────────────── */
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
   html[dir="rtl"] { text-align: start; }
+
+  /* Ambient ember glow — fixed radial warmth behind all content */
+  html::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    background:
+      radial-gradient(60vw 50vh at 88% -8%, rgba(212,53,51,0.06) 0%, transparent 60%),
+      radial-gradient(50vw 40vh at 4% 18%, rgba(255,140,90,0.04) 0%, transparent 55%);
+  }
+  html.dark::after {
+    background:
+      radial-gradient(60vw 50vh at 88% -8%, rgba(212,53,51,0.10) 0%, transparent 60%),
+      radial-gradient(50vw 40vh at 4% 18%, rgba(232,90,88,0.06) 0%, transparent 55%);
+  }
 
   body {
     font-family: "Cairo", "Inter", system-ui, sans-serif;
@@ -125,6 +146,29 @@
   z-index: 0;
 }
 .dark .grain::before { opacity: 0.06; }
+
+/* ── Wilson P3: Grid backgrounds ──────────────────────────────────────── */
+.grid-dot {
+  background-image: radial-gradient(circle, var(--c-border) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.grid-dot-sm {
+  background-image: radial-gradient(circle, var(--c-border) 0.8px, transparent 0.8px);
+  background-size: 20px 20px;
+}
+.grid-mesh {
+  background-image:
+    linear-gradient(var(--c-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--c-border) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.grid-hex {
+  background-color: var(--c-bg);
+  background-image:
+    radial-gradient(circle at 25% 25%, var(--c-border) 0.7px, transparent 0.7px),
+    radial-gradient(circle at 75% 75%, var(--c-border) 0.7px, transparent 0.7px);
+  background-size: 28px 28px;
+}
 
 /* ── Wilson P4: Red mesh hero ───────────────────────────────────────────── */
 .mesh-red {
@@ -195,6 +239,17 @@
   content: '·';
   margin-inline-end: 0.75rem;
   opacity: 0.5;
+}
+
+/* ── Image fade-in on load ──────────────────────────────────────────────── */
+@keyframes imgReveal {
+  from { opacity: 0; transform: scale(0.97); filter: blur(10px); }
+}
+img[loading="lazy"] {
+  animation: imgReveal 0.4s cubic-bezier(0.22,1,0.36,1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  img[loading="lazy"] { animation: none; }
 }
 
 /* ── Shimmer skeleton ───────────────────────────────────────────────────── */

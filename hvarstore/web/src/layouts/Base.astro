@@ -18,6 +18,8 @@ interface Props {
   description?: string
   image?: string
   noFooter?: boolean
+  /** JSON-LD structured data snippets (injected before </head>) */
+  jsonld?: string[]
 }
 
 const {
@@ -25,9 +27,48 @@ const {
   description = 'تسوق أحدث الأجهزة المنزلية من هفار. ضمان حقيقي، شحن مجاني، دفع عند الاستلام.',
   image,
   noFooter = false,
+  jsonld = [],
 } = Astro.props
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site)
+
+/* ── Global JSON-LD: Organization + WebSite ─────────────────────────── */
+function ld(obj: Record<string, unknown>) {
+  return JSON.stringify({ "@context": "https://schema.org", ...obj })
+}
+
+const orgJsonld = ld({
+  ['@type']: 'Organization',
+  name: 'هفار',
+  alternateName: 'HVAR',
+  url: 'https://hvarstore.com',
+  logo: 'https://hvarstore.com/og-image.png',
+  description: 'أجهزة منزلية موثوقة لكل مطبخ مصري',
+  sameAs: [
+    'https://facebook.com/hvar22',
+    'https://instagram.com/hvar222',
+    'https://tiktok.com/@hvarstore1',
+  ],
+  contactPoint: {
+    ['@type']: 'ContactPoint',
+    telephone: '+201000000000',
+    contactType: 'customer service',
+    availableLanguage: ['Arabic', 'English'],
+  },
+})
+
+const websiteJsonld = ld({
+  ['@type']: 'WebSite',
+  name: 'هفارستور',
+  alternateName: 'HVAR Store',
+  url: 'https://hvarstore.com',
+  inLanguage: 'ar',
+  potentialAction: {
+    ['@type']: 'SearchAction',
+    target: 'https://hvarstore.com/products?q={search_term_string}',
+    'query-input': 'required name=search_term_string',
+  },
+})
 ---
 
 <!doctype html>
@@ -48,6 +89,16 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site)
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:type" content="website" />
     {image && <meta property="og:image" content={image} />}
+
+    <!-- JSON-LD structured data -->
+    <script type="application/ld+json" set:html={orgJsonld}></script>
+    <script type="application/ld+json" set:html={websiteJsonld}></script>
+    {jsonld.map((snippet) => (
+      <script type="application/ld+json" set:html={snippet}></script>
+    ))}
+
+    <!-- Preconnect to Google Fonts (served by @fontsource, but adds DNS) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous" />
 
     <!-- Dark mode: run before render to prevent flash -->
     <script is:inline>
@@ -88,7 +139,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site)
         { threshold: 0.1, rootMargin: '0px 0px -40px 0px' },
       )
       document
-        .querySelectorAll('.reveal-section, .reveal-child')
+        .querySelectorAll('.reveal-section, .reveal-child, .reveal-scale')
         .forEach((el) => observer.observe(el))
     </script>
   </body>

@@ -1,175 +1,463 @@
 ---
-import CartBadge from './cart/CartBadge'
 import ThemeToggle from './ThemeToggle'
 import NavAuthLink from './NavAuthLink'
 
 const path = Astro.url.pathname
-const links = [
-  { href: '/', label: 'البيت' },
-  { href: '/products', label: 'المنتجات' },
-  { href: '/contact', label: 'تواصل معنا' },
+
+const navLinks = [
+  {
+    href: '/',
+    label: 'البيت',
+    d: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
+  },
+  {
+    href: '/products',
+    label: 'المنتجات',
+    d: 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z',
+  },
+  {
+    href: '/orders',
+    label: 'طلباتي',
+    d: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
+  },
+  {
+    href: '/service/new',
+    label: 'صيانة واستبدال',
+    d: 'M14.5 4.5A4.5 4.5 0 006 8c0 .9.3 1.8.7 2.5L3 14.1A2 2 0 105.9 17l3.6-3.7A4.5 4.5 0 1014.5 4.5z',
+  },
+  {
+    href: '/contact',
+    label: 'تواصل معنا',
+    d: 'M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012 4.2 2 2 0 014 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.4 2L8 9.9a16 16 0 006 6l1.3-1.3a2 2 0 012-.5c.9.3 1.9.6 2.9.7A2 2 0 0122 16.9z',
+  },
 ]
+
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path.startsWith(href)
 ---
 
-<header class="sticky top-0 z-50 backdrop-blur-md" style="background-color:color-mix(in srgb,var(--c-surface-2) 96%,transparent);border-bottom:1px solid var(--c-border)">
+<!-- ─── Header bar ───────────────────────────────────────────────── -->
+<header
+  class="sticky top-0 z-30"
+  style="background-color:color-mix(in srgb,var(--c-surface) 92%,transparent);border-bottom:1px solid var(--c-border);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4)"
+>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-16">
 
-      <!-- Logo -->
-      <a href="/" class="flex items-center gap-0.5 select-none flex-shrink-0">
-        <span class="text-[#d43533] font-cairo font-black text-[1.6rem] leading-none">هفار</span>
-        <span class="text-stone-400 dark:text-stone-500 font-cairo text-[0.8rem] mt-1">ستور</span>
+    <!-- ── Mobile (< md): 3-col grid ────────────────────────────── -->
+    <!-- Col 1 left: Account + Cart  |  Col 2 center: Logo  |  Col 3 right: Hamburger -->
+    <!-- In RTL: physical left = reading end, physical right = reading start -->
+    <!-- Hamburger on the right aligns with the drawer (right-side panel) -->
+    <div class="grid grid-cols-3 md:hidden items-center h-14">
+
+      <!-- Col 1 — end actions (physical left) -->
+      <div class="flex items-center gap-0.5">
+        <a
+          href="/account"
+          class="mob-btn"
+          aria-label="حسابي"
+        >
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Col 2 — logo centered -->
+      <a href="/" class="flex items-center justify-center gap-2 select-none">
+        <div
+          class="brand-mark w-8 h-8 rounded-[9px] relative flex items-center justify-center overflow-hidden flex-shrink-0"
+          style="background:linear-gradient(150deg,var(--c-brand),var(--c-brand-hover));box-shadow:0 3px 10px rgba(212,53,51,0.28)"
+        >
+          <div
+            class="brand-glow absolute rounded-full"
+            aria-hidden="true"
+            style="width:62%;height:62%;background:radial-gradient(circle,rgba(255,107,82,0.85),transparent 70%);top:-22%;left:-10%;filter:blur(3px)"
+          ></div>
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" class="relative z-10">
+            <path d="M3 2v12M13 2v12M3 8h10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="font-cairo font-black text-[1.25rem] leading-none" style="color:var(--c-brand)">هفار</span>
       </a>
 
-      <!-- Desktop nav -->
-      <nav class="hidden md:flex items-center gap-1">
-        {links.map((l) => (
+      <!-- Col 3 — hamburger (physical right = RTL start, matches drawer side) -->
+      <div class="flex justify-end">
+        <button
+          id="nav-toggle"
+          class="mob-btn"
+          aria-label="القائمة"
+          aria-expanded="false"
+        >
+          <div class="flex flex-col gap-[5px] w-[15px]">
+            <span class="ham-line block h-[1.5px] rounded-full bg-current transition-all duration-300"></span>
+            <span class="ham-line-short block h-[1.5px] rounded-full bg-current transition-all duration-300" style="width:75%"></span>
+            <span class="ham-line block h-[1.5px] rounded-full bg-current transition-all duration-300"></span>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Desktop (≥ md): logo · nav · actions ──────────────────── -->
+    <div class="hidden md:flex items-center justify-between h-16 gap-6">
+
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-2.5 select-none flex-shrink-0">
+        <div
+          class="brand-mark w-9 h-9 rounded-[10px] relative flex items-center justify-center overflow-hidden"
+          style="background:linear-gradient(150deg,var(--c-brand),var(--c-brand-hover));box-shadow:0 4px 14px rgba(212,53,51,0.28)"
+        >
+          <div
+            class="brand-glow absolute rounded-full"
+            aria-hidden="true"
+            style="width:62%;height:62%;background:radial-gradient(circle,rgba(255,107,82,0.85),transparent 70%);top:-22%;left:-10%;filter:blur(3px)"
+          ></div>
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" class="relative z-10">
+            <path d="M3 2v12M13 2v12M3 8h10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="flex flex-col leading-none">
+          <span class="font-cairo font-black text-[1.35rem] leading-none" style="color:var(--c-brand)">هفار</span>
+          <span class="font-cairo text-[0.6rem] tracking-wider leading-none mt-0.5" style="color:var(--c-ink-faint)">ستور</span>
+        </div>
+      </a>
+
+      <!-- Nav links (first 3 — desktop only) -->
+      <nav class="flex items-center gap-0.5" aria-label="التنقل الرئيسي">
+        {navLinks.slice(0, 3).map(({ href, label }) => (
           <a
-            href={l.href}
-            class={`px-3 py-2 rounded-lg text-sm font-semibold font-cairo transition-colors ${
-              path === l.href
-                ? 'active-link'
-                : 'nav-link'
-            }`}
+            href={href}
+            class={`desktop-link ${isActive(href) ? 'desktop-link--on' : ''}`}
           >
-            {l.label}
+            {label}
           </a>
         ))}
       </nav>
 
       <!-- Actions -->
-      <div class="flex items-center gap-1">
+      <div class="flex items-center gap-1 flex-shrink-0">
+        <!-- Search → products page -->
+        <a href="/products" class="desk-icon-btn" aria-label="بحث في المنتجات">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+        </a>
+
         <CartBadge client:load />
         <NavAuthLink client:load />
         <ThemeToggle client:load />
 
-        <!-- Mobile hamburger -->
-        <button
-          id="nav-toggle"
-          class="md:hidden flex items-center justify-center w-9 h-9 rounded-full transition-colors nav-link"
-          aria-label="القائمة"
-          aria-expanded="false"
-        >
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <line x1="1" y1="4" x2="17" y2="4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            <line x1="1" y1="9" x2="17" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            <line x1="1" y1="14" x2="17" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Login -->
+        <a href="/login" class="login-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/>
           </svg>
-        </button>
+          دخول
+        </a>
       </div>
-
     </div>
+
   </div>
 </header>
 
-<!-- Mobile drawer overlay -->
-<div id="nav-backdrop" class="fixed inset-0 z-40 bg-black/25 backdrop-blur-sm hidden"></div>
+<!-- ─── Backdrop ─────────────────────────────────────────────────── -->
+<div
+  id="nav-backdrop"
+  class="fixed inset-0 z-40 bg-black/30 backdrop-blur-[2px] opacity-0 pointer-events-none"
+  style="transition:opacity 0.35s ease"
+  aria-hidden="true"
+></div>
 
-<!-- Mobile drawer panel (Wilson P5: 3D door-swing RTL) -->
+<!-- ─── Drawer (slides from right — same side as hamburger) ──────── -->
 <div
   id="nav-drawer"
-  class="fixed top-0 right-0 z-50 h-full w-72 shadow-2xl"
-  style="background-color:var(--c-surface-2)"
-  style="transform: perspective(1200px) rotateY(12deg) translateX(100%); transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);"
+  class="fixed top-0 right-0 z-50 h-full flex flex-col"
+  style="width:min(84vw,320px);background-color:var(--c-surface);box-shadow:-2px 0 60px rgba(0,0,0,0.18);transform:perspective(1200px) rotateY(12deg) translateX(100%);transition:transform 0.4s cubic-bezier(0.22,1,0.36,1)"
   aria-hidden="true"
 >
-  <!-- Doodle overlay (very subtle) -->
-  <div class="absolute inset-0 opacity-[0.03] pointer-events-none overflow-hidden">
-    <svg width="100%" height="100%" viewBox="0 0 288 640" fill="none">
-      <circle cx="240" cy="120" r="60" stroke="#d43533" stroke-width="1"/>
-      <circle cx="240" cy="120" r="40" stroke="#d43533" stroke-width="0.5"/>
-      <circle cx="48" cy="400" r="80" stroke="#d43533" stroke-width="1"/>
-      <circle cx="48" cy="400" r="55" stroke="#d43533" stroke-width="0.5"/>
-      <line x1="144" y1="0" x2="144" y2="640" stroke="#d43533" stroke-width="0.5" stroke-dasharray="4 8"/>
+
+  <!-- Grain -->
+  <div
+    class="absolute inset-0 pointer-events-none select-none"
+    aria-hidden="true"
+    style="background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\");opacity:0.035;mix-blend-mode:overlay"
+  ></div>
+
+  <!-- Decorative doodle rings -->
+  <div class="absolute inset-0 pointer-events-none overflow-hidden select-none" aria-hidden="true" style="opacity:0.045">
+    <svg width="100%" height="100%" viewBox="0 0 320 640" fill="none">
+      <circle cx="266" cy="96"  r="72" stroke="#d43533" stroke-width="1"/>
+      <circle cx="266" cy="96"  r="48" stroke="#d43533" stroke-width="0.6"/>
+      <circle cx="54"  cy="468" r="94" stroke="#d43533" stroke-width="1"/>
+      <circle cx="54"  cy="468" r="60" stroke="#d43533" stroke-width="0.6"/>
+      <line x1="160" y1="0" x2="160" y2="640" stroke="#d43533" stroke-width="0.5" stroke-dasharray="5 10"/>
     </svg>
   </div>
 
-  <div class="relative z-10 p-6 h-full flex flex-col">
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-8">
-      <a href="/" class="font-cairo font-black text-2xl" style="color:var(--c-brand)">هفار ستور</a>
-      <button
-        id="nav-close"
-        class="w-8 h-8 flex items-center justify-center rounded-full transition-colors text-sm"
-        style="background-color:var(--c-border);color:var(--c-ink-muted)"
-        aria-label="إغلاق القائمة"
+  <!-- ── Drawer header ── -->
+  <div
+    class="relative z-10 flex items-center justify-between px-5 py-4"
+    style="border-bottom:1px solid var(--c-border)"
+  >
+    <a href="/" class="flex items-center gap-2 select-none">
+      <div
+        class="w-7 h-7 rounded-[7px] flex items-center justify-center flex-shrink-0"
+        style="background:linear-gradient(150deg,var(--c-brand),var(--c-brand-hover))"
       >
-        ✕
-      </button>
-    </div>
-
-    <!-- Nav links (Wilson P13: staggered) -->
-    <nav class="flex flex-col gap-1" id="drawer-links">
-      {links.map((l, i) => (
-        <a
-          href={l.href}
-          class="drawer-link block px-4 py-3 rounded-xl font-cairo font-semibold text-lg transition-all" style="color:var(--c-ink)"
-          style={`transition-delay: ${(i + 1) * 50}ms`}
-        >
-          {l.label}
-        </a>
-      ))}
-      <a
-        href="/login"
-        class="drawer-link block px-4 py-3 rounded-xl font-cairo font-semibold text-lg transition-all mt-2 pt-4" style="color:var(--c-ink);border-top:1px solid var(--c-border)"
-        style="transition-delay: 200ms"
-      >
-        تسجيل الدخول
-      </a>
-    </nav>
-
-    <!-- Footer trust -->
-    <div class="mt-auto pt-6 border-t border-stone-100 dark:border-stone-800">
-      <p class="text-xs font-cairo text-center" style="color:var(--c-ink-faint)">
-        ضمان · شحن مجاني · دفع عند الاستلام
-      </p>
-    </div>
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+          <path d="M3 2v12M13 2v12M3 8h10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="font-cairo font-black text-lg leading-none" style="color:var(--c-brand)">هفار ستور</span>
+    </a>
+    <button
+      id="nav-close"
+      class="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
+      style="background:var(--c-border);color:var(--c-ink-muted)"
+      aria-label="إغلاق القائمة"
+    >
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M1 1l12 12M13 1L1 13"/>
+      </svg>
+    </button>
   </div>
+
+  <!-- ── Drawer nav ── -->
+  <nav class="relative z-10 flex-1 overflow-y-auto px-3 py-4 space-y-0.5" id="drawer-nav">
+
+    <p class="px-3 pb-2 text-[10px] font-cairo font-bold uppercase tracking-[0.14em]" style="color:var(--c-ink-faint)">
+      القائمة
+    </p>
+
+    {navLinks.map(({ href, label, d }, i) => {
+      const on = isActive(href)
+      return (
+        <a
+          href={href}
+          class={`drawer-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-cairo font-semibold text-[0.93rem] transition-colors`}
+          style={`color:${on ? 'var(--c-brand)' : 'var(--c-ink)'};${on ? 'background-color:var(--c-brand-tint);border-inline-start:2.5px solid var(--c-brand)' : ''};animation-delay:${(i + 1) * 45}ms`}
+        >
+          <!-- Icon slot -->
+          <span
+            class="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-lg transition-colors"
+            style={`background:${on ? 'rgba(212,53,51,0.12)' : 'var(--c-surface-2)'};color:${on ? 'var(--c-brand)' : 'var(--c-ink-faint)'}`}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d={d}/>
+            </svg>
+          </span>
+
+          {label}
+
+          {on && (
+            <span class="ms-auto w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:var(--c-brand)"></span>
+          )}
+        </a>
+      )
+    })}
+
+  </nav>
+
+  <!-- ── Drawer footer ── -->
+  <div
+    class="relative z-10 px-4 pb-6 pt-4 space-y-2.5"
+    style="border-top:1px solid var(--c-border)"
+  >
+    <!-- Login CTA -->
+    <a
+      href="/login"
+      class="drawer-link flex items-center justify-center gap-2 w-full py-2.5 rounded-xl font-cairo font-bold text-sm transition-all"
+      style="background:var(--c-brand);color:#fff"
+    >
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/>
+      </svg>
+      دخول / تسجيل
+    </a>
+
+    <!-- WhatsApp -->
+    <a
+      href="https://wa.me/201000000000"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl font-cairo font-semibold text-sm transition-all"
+      style="background:rgba(37,211,102,0.10);color:#128c55;border:1px solid rgba(37,211,102,0.18)"
+    >
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+      واتساب
+    </a>
+
+    <!-- Trust -->
+    <p class="text-center font-cairo text-[11px]" style="color:var(--c-ink-faint)">
+      ضمان · شحن مجاني · دفع عند الاستلام
+    </p>
+  </div>
+
 </div>
 
 <script>
-  const toggle = document.getElementById('nav-toggle')
-  const closeBtn = document.getElementById('nav-close')
-  const drawer = document.getElementById('nav-drawer')
-  const backdrop = document.getElementById('nav-backdrop')
-  const links = document.querySelectorAll('.drawer-link')
+  const toggle   = document.getElementById('nav-toggle')!
+  const closeBtn = document.getElementById('nav-close')!
+  const drawer   = document.getElementById('nav-drawer')!
+  const backdrop = document.getElementById('nav-backdrop')!
+  const links    = document.querySelectorAll<HTMLElement>('.drawer-link')
 
-  function openDrawer() {
-    drawer!.style.transform = 'perspective(1200px) rotateY(0deg) translateX(0)'
-    drawer!.setAttribute('aria-hidden', 'false')
-    backdrop!.classList.remove('hidden')
-    toggle!.setAttribute('aria-expanded', 'true')
-    document.body.style.overflow = 'hidden'
-    links.forEach((l) => {
-      ;(l as HTMLElement).style.opacity = '1'
-      ;(l as HTMLElement).style.transform = 'translateX(0)'
-    })
-  }
-
-  function closeDrawer() {
-    drawer!.style.transform = 'perspective(1200px) rotateY(12deg) translateX(100%)'
-    drawer!.setAttribute('aria-hidden', 'true')
-    backdrop!.classList.add('hidden')
-    toggle!.setAttribute('aria-expanded', 'false')
-    document.body.style.overflow = ''
-    links.forEach((l) => {
-      ;(l as HTMLElement).style.opacity = '0'
-      ;(l as HTMLElement).style.transform = 'translateX(16px)'
-    })
-  }
-
-  // Initial hidden state for stagger
+  /* initial stagger state */
   links.forEach((l) => {
-    ;(l as HTMLElement).style.opacity = '0'
-    ;(l as HTMLElement).style.transform = 'translateX(16px)'
-    ;(l as HTMLElement).style.transition = 'opacity 0.3s cubic-bezier(0.22,1,0.36,1), transform 0.3s cubic-bezier(0.22,1,0.36,1), background-color 0.2s'
+    l.style.opacity   = '0'
+    l.style.transform = 'translateX(12px)'
+    l.style.transition =
+      `opacity 0.3s cubic-bezier(0.22,1,0.36,1) var(--dl,0ms),
+       transform 0.3s cubic-bezier(0.22,1,0.36,1) var(--dl,0ms),
+       background-color 0.2s, color 0.15s`
   })
 
-  toggle?.addEventListener('click', openDrawer)
-  closeBtn?.addEventListener('click', closeDrawer)
-  backdrop?.addEventListener('click', closeDrawer)
+  function open() {
+    drawer.style.transform = 'perspective(1200px) rotateY(0deg) translateX(0)'
+    drawer.setAttribute('aria-hidden', 'false')
+    backdrop.style.opacity       = '1'
+    backdrop.style.pointerEvents = 'auto'
+    toggle.setAttribute('aria-expanded', 'true')
+    document.body.style.overflow = 'hidden'
+    links.forEach((l, i) => {
+      setTimeout(() => {
+        l.style.opacity   = '1'
+        l.style.transform = 'translateX(0)'
+      }, 50 + i * 38)
+    })
+  }
 
-  document.querySelectorAll('#nav-drawer a').forEach((a) =>
-    a.addEventListener('click', closeDrawer),
-  )
+  function close() {
+    drawer.style.transform = 'perspective(1200px) rotateY(12deg) translateX(100%)'
+    drawer.setAttribute('aria-hidden', 'true')
+    backdrop.style.opacity       = '0'
+    backdrop.style.pointerEvents = 'none'
+    toggle.setAttribute('aria-expanded', 'false')
+    document.body.style.overflow = ''
+    links.forEach((l) => {
+      l.style.opacity   = '0'
+      l.style.transform = 'translateX(12px)'
+    })
+  }
+
+  toggle.addEventListener('click', open)
+  closeBtn.addEventListener('click', close)
+  backdrop.addEventListener('click', close)
+  document.querySelectorAll('#nav-drawer a').forEach((a) => a.addEventListener('click', close))
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close() })
 </script>
+
+<style>
+  /* ── Ember brand mark pulse ── */
+  .brand-glow {
+    animation: emberPulse 3.4s ease-in-out infinite;
+  }
+  @keyframes emberPulse {
+    0%, 100% { opacity: 0.5;  transform: scale(1);    }
+    50%      { opacity: 0.95; transform: scale(1.28); }
+  }
+
+  /* ── Mobile icon buttons (circle, no border) ── */
+  .mob-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: var(--c-ink-muted);
+    transition: background-color 0.2s, color 0.2s;
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
+  .mob-btn:hover {
+    background-color: var(--c-brand-tint);
+    color: var(--c-brand);
+  }
+
+  /* ── Desktop icon buttons (small square) ── */
+  .desk-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--c-border);
+    background-color: transparent;
+    color: var(--c-ink-muted);
+    transition: border-color 0.2s, color 0.2s, transform 0.2s;
+    cursor: pointer;
+  }
+  .desk-icon-btn:hover {
+    border-color: var(--c-brand);
+    color: var(--c-brand);
+    transform: translateY(-1px);
+  }
+
+  /* ── Desktop nav links ── */
+  .desktop-link {
+    padding: 0.35rem 0.85rem;
+    border-radius: 0.5rem;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--c-ink-muted);
+    transition: color 0.15s, background-color 0.15s;
+    white-space: nowrap;
+    position: relative;
+  }
+  .desktop-link:hover {
+    color: var(--c-ink);
+    background-color: var(--c-border);
+  }
+  .desktop-link--on {
+    color: var(--c-brand);
+    background-color: var(--c-brand-tint);
+  }
+  .desktop-link--on::after {
+    content: '';
+    position: absolute;
+    bottom: 3px;
+    inset-inline: 0.85rem;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--c-brand);
+    opacity: 0.5;
+  }
+
+  /* ── Desktop login button ── */
+  .login-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 0.625rem;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+    font-size: 0.875rem;
+    border: 1.5px solid var(--c-brand);
+    color: var(--c-brand);
+    transition: background-color 0.2s, color 0.2s;
+    white-space: nowrap;
+  }
+  .login-btn:hover {
+    background-color: var(--c-brand);
+    color: #fff;
+  }
+
+  /* ── Drawer link hover ── */
+  .drawer-link:hover {
+    background-color: var(--c-brand-tint);
+    color: var(--c-brand);
+  }
+
+  /* ── Reduced motion ── */
+  @media (prefers-reduced-motion: reduce) {
+    .brand-glow { animation: none; opacity: 0.7; }
+    .drawer-link { transition: color 0.15s, background-color 0.15s !important; }
+  }
+</style>
