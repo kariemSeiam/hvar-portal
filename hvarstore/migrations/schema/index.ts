@@ -9,7 +9,11 @@ import {
 	int,
 	boolean,
 	index,
+	mysqlEnum,
+	json,
+	datetime,
 } from "drizzle-orm/mysql-core";
+import { sql } from "drizzle-orm";
 
 // ── Customers (auth layer, not hvar_erp.contacts) ──
 export const customers = mysqlTable(
@@ -97,6 +101,29 @@ export const orderItems = mysqlTable(
 		subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
 	},
 	(t) => [index("idx_order").on(t.orderId)],
+);
+
+// ── Webhook outbox (durable retry queue for ERP push) ──
+export const webhookOutbox = mysqlTable(
+	"webhook_outbox",
+	{
+		id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),
+		eventType: mysqlEnum("event_type", ["order_created", "payment_confirmed"]).notNull(),
+		orderId: bigint("order_id", { mode: "number" }).notNull(),
+		payload: json("payload").notNull(),
+		targetUrl: varchar("target_url", { length: 500 }).notNull(),
+		attempts: int("attempts").notNull().default(0),
+		maxAttempts: int("max_attempts").notNull().default(8),
+		nextAttemptAt: datetime("next_attempt_at").notNull(),
+		lastError: text("last_error"),
+		deliveredAt: datetime("delivered_at"),
+		deadAt: datetime("dead_at"),
+		createdAt: datetime("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+	},
+	(t) => [
+		index("outbox_due_idx").on(t.deliveredAt, t.deadAt, t.nextAttemptAt),
+		index("outbox_order_idx").on(t.orderId),
+	],
 );
 
 // ── Pending payments (durable bridge: create before Kashier redirect, complete in callback) ──

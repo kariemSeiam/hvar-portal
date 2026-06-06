@@ -30,6 +30,7 @@ export interface Env {
 	PUBLIC_API_URL: string;
 	PUBLIC_SITE_URL: string;
 	API_PORT: string;
+	ADMIN_PHONES: string;
 }
 
 export function loadEnv(): Env {
@@ -66,5 +67,6 @@ export function loadEnv(): Env {
 		PUBLIC_API_URL: e.PUBLIC_API_URL ?? "http://localhost:5000",
 		PUBLIC_SITE_URL: e.PUBLIC_SITE_URL ?? "http://localhost:4321",
 		API_PORT: e.API_PORT ?? "5000",
+		ADMIN_PHONES: e.ADMIN_PHONES ?? "",
 	};
 }

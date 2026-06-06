@@ -4,6 +4,7 @@ import type { RowDataPacket } from "mysql2";
 import { loadEnv } from "../env";
 import { getErpPool, getSitePool, query } from "../lib/db";
 import { normalizePhone } from "../lib/phone";
+import { enqueueWebhook } from "../lib/webhook-outbox";
 
 const CreateOrderSchema = z.object({
 	items: z
@@ -329,11 +330,39 @@ route.post("/", async (c) => {
 			);
 		}
 
-		await conn.commit();
-
 		if (data.paymentMethod === "cod") {
-			fireErpWebhook(env, orderId, user, data, priceMap, total).catch(() => {});
+			const govs = await query<GovRow[]>(
+				getErpPool(env),
+				"SELECT nameAr FROM cities WHERE id = ? LIMIT 1",
+				[data.governorateId],
+			);
+			const dists = await query<DistRow[]>(
+				getErpPool(env),
+				"SELECT district_name_ar FROM districts WHERE id = ? LIMIT 1",
+				[data.districtId],
+			);
+			const payload = {
+				order_id: orderId,
+				contact_id: user.contactId,
+				shipping_address: {
+					state: govs[0]?.nameAr ?? "",
+					city: dists[0]?.district_name_ar ?? "",
+					address_line_1: `${data.building}, ${data.street}`,
+					zip_code: "",
+				},
+				order_details: data.items.map((i) => ({
+					product_id: i.productId,
+					variation_id: i.variationId,
+					quantity: i.quantity,
+					unit_price: priceMap.get(i.variationId) ?? 0,
+				})),
+				total,
+				payment_method: data.paymentMethod,
+			};
+			await enqueueWebhook({ env, eventType: "order_created", orderId, payload, conn });
 		}
+
+		await conn.commit();
 
 		return c.json({ orderId, total, status: "pending" }, 201);
 	} catch (err) {
@@ -343,61 +372,5 @@ route.post("/", async (c) => {
 		conn.release();
 	}
 });
-
-async function fireErpWebhook(
-	env: ReturnType<typeof loadEnv>,
-	orderId: number,
-	user: { contactId: number; phone: string; name: string },
-	data: z.infer<typeof CreateOrderSchema>,
-	priceMap: Map<number, number>,
-	total: number,
-) {
-	if (!env.ERP_WEBHOOK_URL) return;
-
-	const govs = await query<GovRow[]>(
-		getErpPool(env),
-		"SELECT nameAr FROM cities WHERE id = ? LIMIT 1",
-		[data.governorateId],
-	);
-	const dists = await query<DistRow[]>(
-		getErpPool(env),
-		"SELECT district_name_ar FROM districts WHERE id = ? LIMIT 1",
-		[data.districtId],
-	);
-
-	const payload = {
-		order_id: orderId,
-		contact_id: user.contactId,
-		shipping_address: {
-			state: govs[0]?.nameAr ?? "",
-			city: dists[0]?.district_name_ar ?? "",
-			address_line_1: `${data.building}, ${data.street}`,
-			zip_code: "",
-		},
-		order_details: data.items.map((i) => ({
-			product_id: i.productId,
-			variation_id: i.variationId,
-			quantity: i.quantity,
-			unit_price: priceMap.get(i.variationId) ?? 0,
-		})),
-		total,
-		payment_method: data.paymentMethod,
-	};
-
-	try {
-		await fetch(env.ERP_WEBHOOK_URL, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(payload),
-		});
-
-		await getSitePool(env).query(
-			"UPDATE orders SET erp_webhook_sent = 1 WHERE id = ?",
-			[orderId],
-		);
-	} catch {
-		// webhook failure is non-blocking
-	}
-}
 
 export default route;

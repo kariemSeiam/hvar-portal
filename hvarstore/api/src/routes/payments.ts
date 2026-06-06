@@ -5,6 +5,7 @@ import type { RowDataPacket } from "mysql2";
 import { loadEnv } from "../env";
 import { getSitePool, query } from "../lib/db";
 import { authMiddleware } from "../middleware/auth";
+import { enqueueWebhook } from "../lib/webhook-outbox";
 
 const InitiateSchema = z.object({
 	orderId: z.number().int().positive(),
@@ -240,6 +241,44 @@ route.post("/kashier/callback", async (c) => {
 				"UPDATE orders SET status = 'confirmed', updated_at = NOW() WHERE id = ?",
 				[pending.order_id],
 			);
+
+			const [orderRows] = await conn.query<RowDataPacket[]>(
+				"SELECT * FROM orders WHERE id = ? LIMIT 1",
+				[pending.order_id],
+			);
+			const [itemRows] = await conn.query<RowDataPacket[]>(
+				"SELECT * FROM order_items WHERE order_id = ?",
+				[pending.order_id],
+			);
+
+			if (orderRows.length > 0) {
+				const o = orderRows[0];
+				const erpPayload = {
+					order_id: o.id,
+					contact_id: o.contact_id,
+					shipping_address: {
+						state: "",
+						city: "",
+						address_line_1: `${o.building as string}, ${o.street as string}`,
+						zip_code: "",
+					},
+					order_details: itemRows.map((i) => ({
+						product_id: i.product_id,
+						variation_id: i.variation_id,
+						quantity: i.quantity,
+						unit_price: Number(i.unit_price),
+					})),
+					total: Number(o.total),
+					payment_method: o.payment_method,
+				};
+				await enqueueWebhook({
+					env,
+					eventType: "payment_confirmed",
+					orderId: pending.order_id,
+					payload: erpPayload,
+					conn,
+				});
+			}
 		} else {
 			await conn.query(
 				"UPDATE orders SET status = 'payment_failed', updated_at = NOW() WHERE id = ?",
@@ -255,10 +294,6 @@ route.post("/kashier/callback", async (c) => {
 		conn.release();
 	}
 
-	if (status === "confirmed") {
-		fireErpWebhookForPaid(env, pending.order_id).catch(() => {});
-	}
-
 	const redirectBase = env.PUBLIC_SITE_URL;
 	const confirmPath =
 		status === "confirmed"
@@ -266,61 +301,5 @@ route.post("/kashier/callback", async (c) => {
 			: `/orders/${pending.order_id}?paid=0`;
 	return c.json({ status, redirectUrl: `${redirectBase}${confirmPath}` });
 });
-
-async function fireErpWebhookForPaid(
-	env: ReturnType<typeof loadEnv>,
-	orderId: number,
-) {
-	if (!env.ERP_WEBHOOK_URL) return;
-
-	const sitePool = getSitePool(env);
-	const orders = await query<RowDataPacket[]>(
-		sitePool,
-		"SELECT * FROM orders WHERE id = ? LIMIT 1",
-		[orderId],
-	);
-	if (orders.length === 0) return;
-
-	const items = await query<RowDataPacket[]>(
-		sitePool,
-		"SELECT * FROM order_items WHERE order_id = ?",
-		[orderId],
-	);
-
-	const o = orders[0];
-	const payload = {
-		order_id: o.id,
-		contact_id: o.contact_id,
-		shipping_address: {
-			state: "",
-			city: "",
-			address_line_1: `${o.building}, ${o.street}`,
-			zip_code: "",
-		},
-		order_details: items.map((i: RowDataPacket) => ({
-			product_id: i.product_id,
-			variation_id: i.variation_id,
-			quantity: i.quantity,
-			unit_price: Number(i.unit_price),
-		})),
-		total: Number(o.total),
-		payment_method: o.payment_method,
-	};
-
-	try {
-		await fetch(env.ERP_WEBHOOK_URL, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(payload),
-		});
-
-		await sitePool.query(
-			"UPDATE orders SET erp_webhook_sent = 1 WHERE id = ?",
-			[orderId],
-		);
-	} catch {
-		// webhook failure is non-blocking
-	}
-}
 
 export default route;

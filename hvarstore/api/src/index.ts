@@ -9,6 +9,8 @@ import authRoutes from "./routes/auth";
 import orders from "./routes/orders";
 import payments from "./routes/payments";
 import tickets from "./routes/tickets";
+import { startOutboxWorker } from "./lib/webhook-outbox";
+import admin from "./routes/admin";
 
 const app = new Hono();
 const env = loadEnv();
@@ -42,6 +44,12 @@ app.route("/api/tickets", tickets);
 
 // Payments: initiate requires auth, callback is public
 app.route("/api/payments", payments);
+
+startOutboxWorker(env);
+
+// Admin routes (requires auth + phone allowlist — see ADMIN_PHONES env var)
+app.use("/api/admin/*", authMiddleware);
+app.route("/api/admin", admin);
 
 // Health check
 app.get("/api/health", (c) =>
