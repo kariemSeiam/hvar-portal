@@ -90,7 +90,7 @@ route.post("/kashier/initiate", authMiddleware, async (c) => {
 	const baseUrl =
 		mode === "live"
 			? "https://checkout.kashier.io"
-			: "https://checkout.kashier.io";
+			: "https://test-checkout.kashier.io";
 
 	const redirectUrl = new URL(baseUrl);
 	redirectUrl.searchParams.set("merchantId", mid);
@@ -135,6 +135,14 @@ route.post("/kashier/callback", async (c) => {
 		return c.json({ error: "missing signature" }, 400);
 	}
 
+	const REQUIRED_SIG_KEYS = [
+		"paymentStatus",
+		"merchantOrderId",
+		"transactionId",
+		"amount",
+		"currency",
+	] as const;
+
 	const data = (body?.data ?? body) as Record<string, unknown>;
 	const signatureKeys = Array.isArray(data.signatureKeys)
 		? (data.signatureKeys as string[])
@@ -143,9 +151,15 @@ route.post("/kashier/callback", async (c) => {
 		return c.json({ error: "missing signatureKeys" }, 400);
 	}
 
-	const payload = [...signatureKeys]
-		.sort()
-		.map((k) => `${k}=${encodeURIComponent(String(data[k] ?? ""))}`)
+	const missingKey = REQUIRED_SIG_KEYS.find(
+		(k) => !signatureKeys.includes(k) || !(k in data),
+	);
+	if (missingKey) {
+		return c.json({ error: "unauthorized" }, 401);
+	}
+
+	const payload = signatureKeys
+		.map((k) => `${k}=${String(data[k] ?? "")}`)
 		.join("&");
 
 	const expectedSig = createHmac("sha256", env.KASHIER_SECRET_KEY)
@@ -168,63 +182,68 @@ route.post("/kashier/callback", async (c) => {
 
 	const sitePool = getSitePool(env);
 
-	const pending = await query<PendingRow[]>(
-		sitePool,
-		"SELECT id, order_id, processed_at, expires_at FROM pending_payments WHERE kashier_order_id = ? LIMIT 1",
-		[kashierOrderId],
-	);
-
-	if (pending.length === 0) {
-		return c.json({ error: "unknown order" }, 404);
-	}
-
-	if (pending[0].processed_at) {
-		return c.json({ status: "already_processed" });
-	}
-
-	if (
-		pending[0].expires_at &&
-		new Date(pending[0].expires_at).getTime() < Date.now()
-	) {
-		await sitePool.query(
-			"UPDATE pending_payments SET processed_at = NOW() WHERE id = ?",
-			[pending[0].id],
-		);
-		return c.json({ error: "payment_expired" }, 409);
-	}
-
 	const kashierRef =
 		(data.transactionId as string | undefined) ??
 		(data.kashierOrderId as string | undefined) ??
 		null;
 
-	const status = body.paymentStatus === "SUCCESS" ? "confirmed" : "failed";
+	const status = data.paymentStatus === "SUCCESS" ? "confirmed" : "failed";
 
+	let pending!: PendingRow;
 	const conn = await sitePool.getConnection();
 	try {
 		await conn.beginTransaction();
 
+		const [pendingRows] = await conn.query<PendingRow[]>(
+			"SELECT id, order_id, processed_at, expires_at FROM pending_payments WHERE kashier_order_id = ? LIMIT 1 FOR UPDATE",
+			[kashierOrderId],
+		);
+
+		if (pendingRows.length === 0) {
+			await conn.rollback();
+			return c.json({ error: "unknown order" }, 404);
+		}
+
+		pending = pendingRows[0];
+
+		if (pending.processed_at) {
+			await conn.rollback();
+			return c.json({ status: "already_processed" });
+		}
+
+		if (
+			pending.expires_at &&
+			new Date(pending.expires_at).getTime() < Date.now()
+		) {
+			await conn.query(
+				"UPDATE pending_payments SET processed_at = NOW() WHERE id = ?",
+				[pending.id],
+			);
+			await conn.commit();
+			return c.json({ error: "payment_expired" }, 409);
+		}
+
 		await conn.query(
 			"UPDATE pending_payments SET processed_at = NOW() WHERE id = ?",
-			[pending[0].id],
+			[pending.id],
 		);
 
 		if (kashierRef) {
 			await conn.query(
 				"UPDATE pending_payments SET kashier_reference = ? WHERE id = ?",
-				[kashierRef, pending[0].id],
+				[kashierRef, pending.id],
 			);
 		}
 
 		if (status === "confirmed") {
 			await conn.query(
 				"UPDATE orders SET status = 'confirmed', updated_at = NOW() WHERE id = ?",
-				[pending[0].order_id],
+				[pending.order_id],
 			);
 		} else {
 			await conn.query(
 				"UPDATE orders SET status = 'payment_failed', updated_at = NOW() WHERE id = ?",
-				[pending[0].order_id],
+				[pending.order_id],
 			);
 		}
 
@@ -237,14 +256,14 @@ route.post("/kashier/callback", async (c) => {
 	}
 
 	if (status === "confirmed") {
-		fireErpWebhookForPaid(env, pending[0].order_id).catch(() => {});
+		fireErpWebhookForPaid(env, pending.order_id).catch(() => {});
 	}
 
 	const redirectBase = env.PUBLIC_SITE_URL;
 	const confirmPath =
 		status === "confirmed"
-			? `/orders/${pending[0].order_id}?paid=1`
-			: `/orders/${pending[0].order_id}?paid=0`;
+			? `/orders/${pending.order_id}?paid=1`
+			: `/orders/${pending.order_id}?paid=0`;
 	return c.json({ status, redirectUrl: `${redirectBase}${confirmPath}` });
 });
 
