@@ -17,6 +17,10 @@ route.use("/*", async (c, next) => {
 	await next();
 });
 
+interface OutboxDetailRow extends OutboxRow {
+	payload: string;
+}
+
 interface OutboxRow extends RowDataPacket {
 	id: number;
 	event_type: string;
@@ -35,29 +39,88 @@ interface CountRow extends RowDataPacket {
 	total: number;
 }
 
-const OUTBOX_QUERIES: Record<
-	string,
-	{ rows: string; count: string }
-> = {
+const OUTBOX_QUERIES: Record<string, { rows: string; count: string }> = {
 	dead: {
 		rows: `SELECT id, event_type, order_id, target_url, attempts, max_attempts,
 		              next_attempt_at, last_error, delivered_at, dead_at, created_at
 		       FROM webhook_outbox WHERE dead_at IS NOT NULL ORDER BY id DESC LIMIT ? OFFSET ?`,
-		count: "SELECT COUNT(*) AS total FROM webhook_outbox WHERE dead_at IS NOT NULL",
+		count:
+			"SELECT COUNT(*) AS total FROM webhook_outbox WHERE dead_at IS NOT NULL",
 	},
 	delivered: {
 		rows: `SELECT id, event_type, order_id, target_url, attempts, max_attempts,
 		              next_attempt_at, last_error, delivered_at, dead_at, created_at
 		       FROM webhook_outbox WHERE delivered_at IS NOT NULL ORDER BY id DESC LIMIT ? OFFSET ?`,
-		count: "SELECT COUNT(*) AS total FROM webhook_outbox WHERE delivered_at IS NOT NULL",
+		count:
+			"SELECT COUNT(*) AS total FROM webhook_outbox WHERE delivered_at IS NOT NULL",
 	},
 	pending: {
 		rows: `SELECT id, event_type, order_id, target_url, attempts, max_attempts,
 		              next_attempt_at, last_error, delivered_at, dead_at, created_at
 		       FROM webhook_outbox WHERE delivered_at IS NULL AND dead_at IS NULL ORDER BY id DESC LIMIT ? OFFSET ?`,
-		count: "SELECT COUNT(*) AS total FROM webhook_outbox WHERE delivered_at IS NULL AND dead_at IS NULL",
+		count:
+			"SELECT COUNT(*) AS total FROM webhook_outbox WHERE delivered_at IS NULL AND dead_at IS NULL",
 	},
 };
+
+route.get("/outbox/:id", async (c) => {
+	const env = loadEnv();
+	const id = Number(c.req.param("id"));
+	const pool = getSitePool(env);
+
+	const rows = await query<OutboxDetailRow[]>(
+		pool,
+		`SELECT id, event_type, order_id, payload, target_url, attempts, max_attempts,
+		        next_attempt_at, last_error, delivered_at, dead_at, created_at
+		 FROM webhook_outbox WHERE id = ?`,
+		[id],
+	);
+
+	if (!rows.length) return c.json({ error: "not found" }, 404);
+	return c.json(rows[0]);
+});
+
+route.post("/outbox/:id/requeue", async (c) => {
+	const env = loadEnv();
+	const id = Number(c.req.param("id"));
+	const pool = getSitePool(env);
+
+	const rows = await query<OutboxRow[]>(
+		pool,
+		`SELECT id, event_type, order_id, target_url, attempts, max_attempts,
+		        next_attempt_at, last_error, delivered_at, dead_at, created_at
+		 FROM webhook_outbox WHERE id = ?`,
+		[id],
+	);
+
+	if (!rows.length) return c.json({ error: "not found" }, 404);
+	const row = rows[0];
+	if (row.delivered_at !== null)
+		return c.json({ error: "already delivered — cannot requeue" }, 400);
+
+	await query(
+		pool,
+		`UPDATE webhook_outbox SET attempts=0, last_error=NULL, dead_at=NULL, next_attempt_at=NOW() WHERE id=?`,
+		[id],
+	);
+
+	return c.json({ id, status: "requeued", row });
+});
+
+route.post("/outbox/requeue-dead", async (c) => {
+	const env = loadEnv();
+	const pool = getSitePool(env);
+
+	const result = await query<{ affectedRows: number } & RowDataPacket[]>(
+		pool,
+		`UPDATE webhook_outbox SET attempts=0, last_error=NULL, dead_at=NULL, next_attempt_at=NOW()
+		 WHERE dead_at IS NOT NULL AND delivered_at IS NULL`,
+	);
+
+	// mysql2 returns OkPacket; cast through unknown for type safety
+	const affected = (result as unknown as { affectedRows: number }).affectedRows ?? 0;
+	return c.json({ requeued: affected });
+});
 
 route.get("/outbox", async (c) => {
 	const env = loadEnv();
