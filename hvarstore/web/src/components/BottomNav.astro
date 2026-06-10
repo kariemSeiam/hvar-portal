@@ -1,0 +1,156 @@
+---
+/**
+ * Bottom navigation — mobile only (md:hidden). The thumb zone owns the
+ * primary journeys: home, catalog, cart (drawer), wishlist, account.
+ * Hidden on the PDP, where StickyMobileCta owns the bottom edge.
+ */
+const path = Astro.url.pathname
+
+const items = [
+  {
+    href: '/',
+    label: 'البيت',
+    match: (p: string) => p === '/',
+    d: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
+  },
+  {
+    href: '/products',
+    label: 'المنتجات',
+    match: (p: string) => p.startsWith('/products'),
+    d: 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z',
+  },
+  // cart slot rendered separately (button, not link)
+  {
+    href: '/wishlist',
+    label: 'المفضلة',
+    match: (p: string) => p.startsWith('/wishlist'),
+    d: 'M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z',
+  },
+  {
+    href: '/account',
+    label: 'حسابي',
+    match: (p: string) => p.startsWith('/account') || p.startsWith('/orders') || p.startsWith('/login'),
+    d: 'M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M16 7a4 4 0 11-8 0 4 4 0 018 0z',
+  },
+]
+
+const [home, products, wishlist, account] = items
+const renderOrder = [home, products] // cart goes between products and wishlist
+---
+
+<nav class="bnav md:hidden" aria-label="التنقل الرئيسي">
+  {renderOrder.map(({ href, label, match, d }) => (
+    <a href={href} class:list={['bnav-item', match(path) && 'bnav-item--on']} aria-current={match(path) ? 'page' : undefined}>
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d={d} />
+      </svg>
+      <span class="bnav-label font-cairo">{label}</span>
+    </a>
+  ))}
+
+  <!-- Cart — opens the drawer, carries the live count -->
+  <button type="button" id="bnav-cart" class="bnav-item" aria-label="السلة">
+    <span class="relative">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0" />
+      </svg>
+      <span id="bnav-cart-count" class="bnav-count font-inter" hidden>0</span>
+    </span>
+    <span class="bnav-label font-cairo">السلة</span>
+  </button>
+
+  {[wishlist, account].map(({ href, label, match, d }) => (
+    <a href={href} class:list={['bnav-item', match(path) && 'bnav-item--on']} aria-current={match(path) ? 'page' : undefined}>
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d={d} />
+      </svg>
+      <span class="bnav-label font-cairo">{label}</span>
+    </a>
+  ))}
+</nav>
+
+<style>
+  .bnav {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 55;
+    display: flex;
+    align-items: stretch;
+    background: color-mix(in srgb, var(--c-surface) 92%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--c-border);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.06);
+  }
+  .bnav-item {
+    position: relative;
+    flex: 1;
+    min-height: 56px; /* > 44px touch target */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    color: var(--c-ink-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.2s ease;
+  }
+  .bnav-label {
+    font-size: 0.625rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .bnav-item--on {
+    color: var(--c-brand);
+  }
+  /* active indicator — small ember dash on top edge */
+  .bnav-item--on::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    inset-inline-start: 50%;
+    transform: translateX(50%);
+    width: 1.5rem;
+    height: 3px;
+    border-radius: 0 0 3px 3px;
+    background: var(--c-brand);
+  }
+  .bnav-count {
+    position: absolute;
+    top: -5px;
+    inset-inline-end: -9px;
+    min-width: 16px;
+    height: 16px;
+    padding-inline: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: var(--c-brand);
+    color: #fff;
+    font-size: 9.5px;
+    font-weight: 700;
+    line-height: 1;
+  }
+</style>
+
+<script>
+  import { cartCount } from '../stores/cart'
+  import { cartDrawerOpen } from '../stores/cartDrawer'
+
+  const btn = document.getElementById('bnav-cart')
+  const badge = document.getElementById('bnav-cart-count')
+
+  btn?.addEventListener('click', () => cartDrawerOpen.set(true))
+
+  cartCount.subscribe((n) => {
+    if (!badge) return
+    badge.hidden = n === 0
+    badge.textContent = n > 99 ? '99+' : String(n)
+  })
+</script>

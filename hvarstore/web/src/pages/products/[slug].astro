@@ -116,6 +116,7 @@ const breadcrumbJsonld = JSON.stringify({
   title={`${product.name} — سعر ومواصفات | هفار`}
   description={product.description ?? `${product.name} — بضمان سنتين وشحن مجاني. تسوق من هفار، اختيارك الأول في المطبخ.`}
   image={product.image ?? undefined}
+  noBottomNav
   jsonld={[productJsonld, breadcrumbJsonld]}
 >
 

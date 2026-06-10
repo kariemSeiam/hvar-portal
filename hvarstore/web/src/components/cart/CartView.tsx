@@ -332,7 +332,7 @@ export default function CartView() {
 											>
 												<button
 													onClick={() => updateQuantity(item.variationId, item.quantity - 1)}
-													className="w-9 h-9 flex items-center justify-center transition-colors"
+													className="w-11 h-11 flex items-center justify-center transition-colors"
 													style={{ color: "var(--c-ink-muted)" }}
 													onMouseEnter={(e) => (e.currentTarget.style.background = "var(--c-surface-2)")}
 													onMouseLeave={(e) => (e.currentTarget.style.background = "")}
@@ -350,7 +350,7 @@ export default function CartView() {
 												</span>
 												<button
 													onClick={() => updateQuantity(item.variationId, item.quantity + 1)}
-													className="w-9 h-9 flex items-center justify-center transition-colors"
+													className="w-11 h-11 flex items-center justify-center transition-colors"
 													style={{ color: "var(--c-ink-muted)" }}
 													onMouseEnter={(e) => (e.currentTarget.style.background = "var(--c-surface-2)")}
 													onMouseLeave={(e) => (e.currentTarget.style.background = "")}

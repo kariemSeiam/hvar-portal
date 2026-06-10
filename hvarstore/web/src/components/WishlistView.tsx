@@ -129,7 +129,7 @@ export default function WishlistView() {
 							type="button"
 							onClick={() => toggleWishlist(p.id)}
 							aria-label={`إزالة ${p.name} من المفضلة`}
-							className="absolute top-2.5 end-2.5 flex items-center justify-center w-9 h-9 rounded-full transition-colors"
+							className="absolute top-2 end-2 flex items-center justify-center w-11 h-11 rounded-full transition-colors"
 							style={{
 								backgroundColor: "color-mix(in srgb, var(--c-surface) 85%, transparent)",
 								border: "1px solid var(--c-border)",
@@ -176,7 +176,7 @@ export default function WishlistView() {
 											setTimeout(() => setAddedId(null), 1400);
 										}}
 										aria-label={addedId === p.id ? "تمت الإضافة" : `أضيفي ${p.name} للسلة`}
-										className="flex items-center justify-center w-9 h-9 rounded-full text-white transition-transform active:scale-90"
+										className="flex items-center justify-center w-11 h-11 rounded-full text-white transition-transform active:scale-90"
 										style={{ backgroundColor: addedId === p.id ? "var(--c-trust)" : "var(--c-brand)" }}
 									>
 										{addedId === p.id ? (

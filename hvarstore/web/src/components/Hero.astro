@@ -7,7 +7,7 @@ import Doodles from './Doodles.astro'
 
 <!-- Wilson P6: Grain texture is now inline via style block -->
 
-<section class="relative overflow-hidden pt-16 pb-24 sm:pt-24 sm:pb-32 min-h-[calc(100svh-4rem)] flex flex-col justify-center" style="background-color:var(--c-bg)">
+<section class="relative overflow-hidden pt-12 pb-14 sm:pt-24 sm:pb-32 md:min-h-[calc(100svh-4rem)] flex flex-col justify-center" style="background-color:var(--c-bg)">
 
   <!-- Grain texture overlay -->
   <div class="absolute inset-0 pointer-events-none opacity-[0.035] dark:opacity-[0.05] z-0" aria-hidden="true"
@@ -94,8 +94,8 @@ import Doodles from './Doodles.astro'
           </div>
         </div>
 
-        <!-- Trust line -->
-        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-6 text-xs font-cairo reveal-fade" style="color:var(--c-ink-muted);transition-delay: 0.4s;">
+        <!-- Trust line — single swipeable line on mobile, wraps on larger screens -->
+        <div class="hero-trust flex sm:flex-wrap items-center gap-x-5 gap-y-2 mt-6 text-xs font-cairo reveal-fade" style="color:var(--c-ink-muted);transition-delay: 0.4s;">
           <span class="inline-flex items-center gap-1.5">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -210,6 +210,20 @@ import Doodles from './Doodles.astro'
   @keyframes morphOrb {
     0%, 100% { border-radius: 36% 64% 58% 42% / 52% 44% 56% 48%; }
     50% { border-radius: 58% 42% 38% 62% / 46% 58% 42% 54%; }
+  }
+
+  /* Trust line: one swipeable line on mobile */
+  @media (max-width: 639px) {
+    .hero-trust {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      margin-inline: -1rem;
+      padding-inline: 1rem;
+    }
+    .hero-trust::-webkit-scrollbar { display: none; }
+    .hero-trust > span { white-space: nowrap; flex-shrink: 0; }
   }
 
   /* Fade-in reveals */

@@ -49,7 +49,7 @@ const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.va
         )}
       </div>
 
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div class="feat-row">
         {featured.length === 0 ? (
           /* Skeleton shimmer while loading */
           Array.from({ length: 4 }).map(() => (
@@ -73,6 +73,40 @@ const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.va
 
     </div>
   </section>
+
+  <style>
+    /* Featured: thumb-driven horizontal snap carousel on mobile (with edge
+       peek), grid on larger screens */
+    @media (max-width: 639px) {
+      .feat-row {
+        display: flex;
+        gap: 0.875rem;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        margin-inline: -1rem;
+        padding-inline: 1rem;
+        padding-bottom: 0.5rem;
+      }
+      .feat-row::-webkit-scrollbar { display: none; }
+      .feat-row > * {
+        min-width: min(62vw, 240px);
+        flex-shrink: 0;
+        scroll-snap-align: start;
+      }
+    }
+    @media (min-width: 640px) {
+      .feat-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+      }
+    }
+    @media (min-width: 1024px) {
+      .feat-row { grid-template-columns: repeat(4, 1fr); }
+    }
+  </style>
 
   <ChefStrip />
 

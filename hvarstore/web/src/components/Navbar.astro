@@ -131,7 +131,7 @@ const isActive = (href: string) =>
 
       <!-- Nav links (first 3 — desktop only) -->
       <nav class="flex items-center gap-0.5" aria-label="التنقل الرئيسي">
-        {navLinks.slice(0, 3).map(({ href, label }) => (
+        {navLinks.filter(({ href }) => href !== '/wishlist').map(({ href, label }) => (
           <a
             href={href}
             class={`desktop-link ${isActive(href) ? 'desktop-link--on' : ''}`}
@@ -157,9 +157,9 @@ const isActive = (href: string) =>
           </svg>
         </a>
 
-        <CartBadge client:load />
-        <NavAuthLink client:load />
-        <ThemeToggle client:load />
+        <CartBadge client:idle />
+        <NavAuthLink client:idle />
+        <ThemeToggle client:idle />
 
         <!-- Login -->
         <a href="/login" class="login-btn">

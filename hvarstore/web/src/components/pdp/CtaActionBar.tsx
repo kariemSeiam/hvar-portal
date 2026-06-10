@@ -88,13 +88,16 @@ export default function CtaActionBar({ product }: Props) {
 											disabled={isUnavail}
 											title={v.name}
 											aria-label={v.name}
-											className="relative w-9 h-9 rounded-full transition-all"
+											className="relative w-11 h-11 rounded-full transition-all"
 											style={{
+												/* 44px touch target; the visible swatch stays a 36px circle */
 												backgroundColor: hex,
+												padding: 4,
+												backgroundClip: "content-box",
 												outline: isSelected
 													? "3px solid var(--c-brand)"
 													: "2px solid var(--c-border)",
-												outlineOffset: isSelected ? "2px" : "0px",
+												outlineOffset: isSelected ? "0px" : "-2px",
 												opacity: isUnavail ? 0.35 : 1,
 												cursor: isUnavail ? "not-allowed" : "pointer",
 											}}
