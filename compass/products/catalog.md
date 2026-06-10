@@ -151,7 +151,7 @@ All Hvar blenders are **8000 وات**. This is the key differentiator the brand 
 
 **7*1 means 7 accessories in one** — blender + food grinder + citrus juicer + grater + vegetable slicer + whisk + ice crusher. The "كبة" attachment is included.
 
-**⚠️ خلاط 7*1 (5069) has 152 on hand but 178 reserved — it's in deficit.** Do not show "in stock" without live check.
+**Caution — خلاط 7*1 (5069) has 152 on hand but 178 reserved — it's in deficit.** Do not show "in stock" without live check.
 
 The `1000 وات — 6001` product referenced in older compass files does not exist in the MCRM API. It was placeholder data. Delete any references.
 
@@ -498,3 +498,101 @@ API: `GET /api/products?featured=true&limit=8`
 | Product images hosting | ERP / hvarstore.com/public/uploads | URLs come from ERP `products.image` |
 | Spare parts ordering | Service flow | Match part → parent product → open service ticket |
 | Promotions / campaigns | ERP | Badges array comes from ERP response |
+
+---
+
+## Bloggers / Creator Reviews — A First-Class PDP Surface
+
+This is not a blog. It is social proof bolted directly onto the product, and it is the catalog's contribution to Hvar's single strongest growth engine: chef and creator endorsement. The brand already lives on "بشهادة كل شيفات مصر" — the catalog must make that claim visible, per-product, on the PDP itself.
+
+Every product that has chef/creator coverage (and most hero SKUs do — see the per-product **Chef endorsements** lines above) gets a **Creator Reviews** block on its PDP. Treat it as a core PDP module, not an afterthought tab.
+
+### The creator-review card
+
+Each card binds one piece of creator content to one specific product. The binding is to the SKU, not to a category — a review of كبة النينجا 5029 must not surface on the كبة البلدوزر 5070 PDP.
+
+| Field | Source | Notes |
+|-------|--------|-------|
+| Creator name | manual / mCRM | Arabic exactly as the creator brands themselves, e.g. `شيف نهى الفيشاوي`, `ساره صقر`, `شيف ميادة محمد` |
+| Platform | derived from URL | `youtube` \| `instagram` \| `tiktok` |
+| Embed URL | manual | Canonical post/video URL — feeds oEmbed |
+| Linked SKU | required | The exact product SKU this review is attached to |
+| Thumbnail | oEmbed response / cached | Stored locally as fallback (see below) |
+| Quote / nickname | optional | e.g. النينجا nickname was coined by شيف نهى الفيشاوي — surface that origin story on the card |
+
+### Embed via oEmbed
+
+Render the embed through each platform's oEmbed endpoint (YouTube, Instagram). Do not hand-roll iframe markup per platform — resolve the URL to its oEmbed payload, cache the payload, and render from cache. Lazy-load the iframe; a wall of live social embeds will wreck PDP performance on the 3G-ish mobile connections most Egyptian buyers are on.
+
+### Embed-fallback pattern (resilience — not optional)
+
+Social embeds rot. Links break, posts get deleted, creators go private, oEmbed endpoints rate-limit. A broken iframe on a hero PDP is worse than no review at all — it reads as neglect on exactly the surface that is supposed to build trust.
+
+Rule: **never render a broken iframe.** The card degrades gracefully in this order:
+
+1. **Healthy:** live oEmbed iframe (lazy-loaded).
+2. **Embed fails / rate-limited / blocked:** render the cached **thumbnail + creator name + external link** ("شوف الريفيو على {platform}") that opens the original post in a new tab. Still useful, still trust-building, never broken.
+3. **Link confirmed dead:** hide the card from the PDP and flag it for content review. Do not show a dead thumbnail.
+
+| State | What renders | Trigger |
+|-------|--------------|---------|
+| `live` | oEmbed iframe | oEmbed resolves, link healthy |
+| `fallback` | Thumbnail + external link | Embed error, but URL still resolves (2xx/3xx) |
+| `dead` | Nothing (hidden, flagged) | Link-health check returns 4xx/5xx/gone |
+
+### Nightly link-health check
+
+A scheduled job walks every creator-review URL and HEAD/GET-checks it:
+- 2xx/3xx → keep `live` (or `fallback` if the embed specifically is failing).
+- 4xx/5xx/timeout → mark `dead`, hide the card, raise a content-review flag so a human can re-source or re-link.
+- Log transitions so a creator quietly deleting a viral video (e.g. the 26.5K-view كبة النينجا TikTok) is caught the next morning, not by an angry customer.
+
+This is the same defensive posture the rest of the catalog takes toward stock ("never hardcode stock, always read from API") — applied to social proof.
+
+---
+
+## Support & Maintenance Hub — A First-Class Catalog Section
+
+The catalog's job does not end at "add to cart." Hvar sells motors, blades, gaskets, and jugs that wear out, and the brand's whole promise (نحاس، تروس معدن، ضمان سنتين، قطع غيار متاحة) is a *durability* promise. The catalog must make durability legible after purchase, not just before it. The Support & Maintenance Hub is that surface, exposed per product line.
+
+It is the customer-facing bridge into the service portal / mCRM — it does not own the data, it routes into it. See `portal/service-portal.md` for the request form and tracking page, and `products/mcrm.md` for the ticket state machine on the other side.
+
+### Per product line, the hub surfaces:
+
+| Element | Content | Routes to |
+|---------|---------|-----------|
+| **Spare parts** | The parts for this product family, looked up via the **Spare Parts Taxonomy** prefix map above (e.g. `70xx` → 5070 family, `57xx` → 5057 hand blender). Display-only — parts are `type=part` and **never sold standalone in the store.** | Service flow: match part → parent SKU → open ticket |
+| **Warranty info** | Per-SKU warranty terms, stated in the customer's language. Surface the two-tier warranty explicitly (see below) — it is a selling point that lives past the sale. | — |
+| **Service request entry** | "اطلب صيانة" entry point per product line, pre-filling the product/SKU context. | `portal/service-portal.md` form → mCRM ticket |
+
+### Hard rules
+
+- **Parts stay invisible as products.** The hub may *name* a part so a customer can say "أنا محتاج السلاح بتاع الـ5070," but the only action is "open a service request," never "buy this part." This is the same `type=part` firewall stated at the top of this file — the hub does not punch a hole in it.
+- **Route, don't replicate.** Ticket status, repair stage, and workshop queue live in mCRM. The hub links into the tracking page; it does not maintain its own copy of ticket state.
+- **Pre-fill context.** When a customer enters a service request from a product's hub, carry the SKU + parent-family mapping into the ticket so support is not asking "أي موديل؟" from scratch.
+
+---
+
+## Quality & Warranty Facts to Surface (where true)
+
+Display these on the PDP **only for SKUs where they actually hold** — do not blanket-apply. They are differentiators precisely because they are specific.
+
+### Materials origin — "خامات تركي، تقفيل مصري"
+
+Where true for a product line, surface the build-quality signal:
+
+- **100% Turkish materials / components** (`خامات تركي 100%`) — positions Hvar above generic local assembly on raw-material quality.
+- **Egyptian final assembly** (`تقفيل مصري`) — local accountability, local warranty servicing, and supports the "أقوى ... في مصر" brand frame. Pair the two: imported quality, finished and stood-behind locally.
+
+Render as a quality line in the spec area or as a trust pill near the warranty, not buried in the collapsible secondary specs. This is an above-the-fold signal where it applies.
+
+### Two-tier warranty — make the 20-year jug explicit
+
+Several SKUs carry **two distinct warranties**, and collapsing them into one number throws away a real differentiator. The break-proof acrylic jug (الدورق الأكريليك ضد الكسر) on the relevant كبة lines carries a **20-year warranty** — separate from, and far longer than, the standard appliance warranty.
+
+| Warranty | Covers | Typical term |
+|----------|--------|--------------|
+| **Appliance warranty** | Motor + body + electronics | 24 months (12 on some lines — read per SKU) |
+| **Jug / dorق warranty** | Break-proof acrylic jug only | **20 years** |
+
+Display rule: show **both** on PDPs where the 20-year jug applies — do not let the standard "ضمان سنتين" line swallow the 20-year claim. Format the jug warranty as `ضمان الدورق 20 سنة` distinct from the appliance `ضمان {N}` line. The 20-year jug is a headline-grade differentiator; treat it like one.

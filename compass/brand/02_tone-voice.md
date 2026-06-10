@@ -204,6 +204,31 @@ These are disqualifying phrases. If any of these appear in any piece of Hvar cop
 
 ---
 
+## Competitor & Discount Register (adopted 2026-06-10)
+
+Two tone rules drawn from studying a peer brand, adopted as Hvar guidance. They sit alongside the never-say list and override anything that contradicts them.
+
+### No competitor mentions
+
+Hvar never names a competitor to position against it. Not "أرخص ٣٥٪ من سامسونج" / "35% cheaper than Samsung", not "better than Sokany", not a comparison table with rival logos. Naming a competitor borrows their salience and reduces Hvar to a relative quantity. Say the absolute instead:
+
+| Wrong (competitor-anchored) | Right (self-anchored) |
+|------------------------------|------------------------|
+| "أرخص ٣٥٪ من سامسونج" | "أفضل قيمة في فئته" |
+| "35% cheaper than Samsung" | "best value in its class" |
+
+This is a positioning rule, not just a phrasing rule: Hvar competes on what it is, never against what someone else is.
+
+### The anti-discount register
+
+Hvar sells **value without cheapness**. It never competes on being the cheapest — being cheapest is Sokany's position (see `00_brand-nucleus.md`), and the moment Hvar claims "cheapest" it forfeits the premium feel that is its only real gap. The register, in one phrase:
+
+**"مش الأرخص... الأفضل ليك"** — *"not the cheapest... the best for you."*
+
+Lead with worth — materials, warranty, the specific thing the product does well — and let price be fair rather than lowest. Discount language ("سارع", "عرض لفترة محدودة") is already on the never-say list; this rule is the positive counterpart: what to say instead of competing down.
+
+---
+
 ## Numbers and Pricing
 
 **Egyptian numerals vs. Western numerals:** Use Eastern Arabic numerals (١٢٣٤٥) in all Arabic-context UI: product prices, quantities, warranty years, order numbers shown in Arabic context. Use Western Arabic numerals (12345) in English-context UI, technical codes, and when Eastern numerals would break layout alignment. The rule is consistency within a context, not mixing within a single element.

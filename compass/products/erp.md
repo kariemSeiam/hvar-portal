@@ -660,3 +660,82 @@ Ultimate POS is third-party software that can upgrade without warning. After any
 | `image` | `products` | Product images |
 
 Write a schema health-check script that verifies these columns exist with the expected data types before declaring any ERP upgrade successful.
+
+The real structure-only DDL of `hvar_erp` (80 tables, actual columns and indexes) lives at `compass/products/hvar_erp.schema.sql`. That file is the ground truth this document is the narrative of — diff against it after any Ultimate POS upgrade, and build the health-check from it.
+
+---
+
+## Legacy Integration Reality — How It Actually Worked (absorbed 2026-06-10)
+
+> Everything above is the correct forward model. This section preserves how the inherited system actually moves data, because that legacy still runs in production and its columns and quirks will surface during migration and when reading historical rows. Source: absorbed POS/ERP project docs.
+
+### The Two Systems and Their Stacks
+
+- **ERP** — Ultimate POS, Laravel 10, **Laravel Passport** (not Sanctum), `nwidart/laravel-modules`. Owns `hvar_erp`.
+- **Legacy storefront** — Active eCommerce CMS, Laravel 8 / PHP ^7.1.3, Sanctum (API) + Spatie (admin), Flutter mobile API v2. Only **5 migration files** — the schema came from the installer, not migrations.
+
+### Product Discovery — the Legacy Pull API (contrast with our direct-SQL reads)
+
+The ERP's Website Module historically *pulled* the catalog from the storefront through an **auth-less** integration controller (no Sanctum guard):
+
+```
+GET  /api/v2/erp_integration/all-categories
+GET  /api/v2/erp_integration/all-attributes      (includes attribute_values)
+GET  /api/v2/erp_integration/all-brands
+GET  /api/v2/erp_integration/all-products         (category / brand / stocks / thumbnail)
+GET  /api/v2/erp_integration/all-orders           (last hour only)
+GET  /api/v2/erp_integration/products-stocks
+POST /api/v2/erp_integration/update-product-stock
+```
+
+**`/all-orders` mutates on read:** in the same call it hard-deletes `order_details` rows pointing at deleted products, then deletes the order (and combined_order) if no details remain. A discovery endpoint with destructive side effects — never model new reads on it. Our new model reads `hvar_erp` directly via parameterized SQL (top of this file); the pull API is legacy context only.
+
+Product CRUD propagated storefront → ERP via `ProductController` methods keyed on `id_from_pos`: `product_store_from_pos`, `update_from_pos`, `update_status_from_pos`, `delete_from_pos`.
+
+### Order → Draft → Final — the Draft Is Editable
+
+Compass treats MCRM confirmation as a binary approve. In the ERP the draft is **editable before confirmation**: an operator opens it in `SellController` (drafts list), can change items and quantities, set shipping + location, confirm payment, then status → `final` → `ProductUtil::decreaseProductQuantity()` deducts `variation_location_details` → `SellCreatedOrModified` fires accounting + invoice. The draft is assigned an `invoice_no` ("draft number") at creation.
+
+**Landmine:** `2SellController.php` is a 2,297-line copy of `SellController` (the class is *still named* `SellController`) — a backup / A-B fork. Anyone diffing sell behavior must know both files exist.
+
+### Recording Payment Invoices — the ERP Write Shapes
+
+For POS-terminal sales (status `final`, written atomically). The storefront never writes these, but these are the column sets the ERP uses and they define what "paid" means on a transaction:
+
+```
+transactions:
+  business_id, location_id, type='sell', status='final',
+  contact_id (or walk-in), invoice_no='POS-{YYYYMMDD}-{seq}',
+  final_total, tax_amount (0 for most Hvar SKUs), discount_amount,
+  shipping_charges, payment_status ('paid' card / 'due' COD),
+  website_order_id=NULL (in-store), created_by=cashier
+
+transaction_sell_lines:
+  transaction_id, product_id, variation_id (NULL if single),
+  quantity, unit_price, item_tax, unit_price_inc_tax,
+  line_total = quantity × unit_price_inc_tax
+
+transaction_payments:
+  transaction_id, amount, method ('cash' | 'card' | 'cheque'),
+  paid_on=NOW(), payment_for='product'  (NOT 'purchase' — that is supplier payments),
+  created_by
+```
+
+**The payment-status enum is `paid` / `due` — not `unpaid`.** A storefront order that reports unpaid lands as `payment_status='due'`. A `transaction_payments` row is created **only when paid**. This reconciles the `unpaid` vs `due` wording that appears elsewhere — the ERP-write enum wins.
+
+### Stock Sync Was Bidirectional (legacy)
+
+Two crons kept stock in sync, mapped by `ERP.website_product_id ⇄ POS.id_from_pos` and `ERP Variation.website_variation_id ⇄ POS ProductStock`:
+
+- `pos:stock` (ERP → storefront): reads `website_api_settings`, batches products in groups of 10, dispatches `ProcessPosStock` jobs pushing `{product_id, qty, price}` (`qty_available`, `sell_price_inc_tax`).
+- `stock:cron` (storefront → ERP): pushes for products with `id_from_pos` to the hardcoded host `https://pos.elamriaa.com/api/products/update_stock_from_active`.
+
+The legacy docs' own recommendation: make it **one-way ERP → storefront** to kill drift. That is exactly the model compass mandates (the ERP is the authority).
+
+### Bulk Status Backdoor
+
+`UpdateShippingStatusController@upload` accepts `.xlsx / .xls / .csv` via `ShippingImport` to bulk-update `transactions.shipping_status` outside Bosta. Operational reality to know when reconciling delivery state.
+
+### Webhook Verb Family
+
+Beyond `webHooksyncOrdersGet/Update/Delete`, the integration exposes `syncCategoriesGet`, `syncProductsGet`, `syncAttributesGet` — the same webhook channel carries catalog sync, not only orders.

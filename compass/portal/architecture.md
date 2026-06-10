@@ -612,6 +612,118 @@ Default page sizes by context:
 
 ---
 
+## Delivery State Codes (`transactions`)
+
+The customer order-tracking page reads a **numeric delivery state** off `transactions` and must translate it to Arabic. This is the **delivery/shipment** state map — physically distinct from the service-ticket state machines (HVM/HVR/HVT) in `products/mcrm.md` and `portal/ux-patterns.md`. Do not conflate the two: a ticket's `PENDING` and a delivery's `10` mean different things and live on different tables.
+
+| Code | Arabic (customer-facing) | Meaning |
+|------|--------------------------|---------|
+| `10` | طلب استلام | Pickup requested — shipment registered, awaiting collection |
+| `24` | في المستودع | In warehouse / hub |
+| `30` | قيد النقل | In transit |
+| `45` | تم التوصيل | Delivered |
+| `46` | مرتجع | Returned to sender |
+| `47` | استثناء | Exception (delivery problem — failed attempt, address issue) |
+| `48` | ملغي | Cancelled |
+| `100` | مفقود | Lost |
+| `101` | تالف | Damaged |
+
+**Rules:**
+- `45` is the only success terminal. `46`, `48`, `100`, `101` are failure/loss terminals — surface a WhatsApp contact CTA on any of them, never a dead end.
+- `47` (استثناء) is **transient**, not terminal — it means an attempt failed and the shipment is still in the network. Show a reassurance note, not an alarm.
+- Any code not in this map → fall back to the neutral "جاري تجهيز طلبك" state. Never render a raw integer to the customer.
+- This map drives the badge on `/orders` and the status line on `/orders/:id`. It is read-only — the portal never writes these codes (ERP/Bosta own them).
+
+---
+
+## Business-Value Customer Tiers (COD amount)
+
+Segmentation tier derived from a customer's COD (cash-on-delivery) value in EGP. Staff/segmentation-facing (MCRM, internal dashboards) — **never surfaced to the customer**. Negative values represent net refunds owed.
+
+| Tier | Range (EGP) | Arabic label |
+|------|-------------|--------------|
+| `PREMIUM_HIGH` | `>= 5000` | عميل مميز |
+| `HIGH_VALUE` | `1500 – 5000` | قيمة عالية |
+| `STANDARD` | `500 – 1500` | عادي |
+| `LOW_VALUE` | `1 – 500` | قيمة منخفضة |
+| `ZERO_COD` | `0` | بدون تحصيل |
+| `SMALL_REFUND` | `-500 – 0` | استرداد صغير |
+| `LARGE_REFUND` | `< -500` | استرداد كبير |
+
+**Confirm before relying on the premium threshold:** the legacy/old-system docs **disagree** on the `PREMIUM_HIGH` cutoff — one source says `>= 5000`, another says `>= 10000`. The table above uses `5000` as documented in the harvested source, but treat it as unverified. Confirm the live business rule before wiring this into any tier badge, pricing logic, or staff segmentation. Boundary handling (inclusive vs exclusive at `500`, `1500`, `5000`) must also be pinned down before use.
+
+---
+
+## Client Data Layer — the `useApi` Hook Family
+
+Proven on the same Flask + React stack (carried over from a sibling project). **This is the recommended standard client data primitive** for hvarstore.com — do not hand-roll `fetch` + `useState` + `useEffect` per component.
+
+| Hook | What it adds | Primary use |
+|------|-------------|-------------|
+| `useApi` | In-memory cache with **TTL**, automatic **retry + exponential backoff**, **AbortController** cancellation on unmount/refetch | Catalog, categories, account, order/ticket detail reads |
+| `useOptimisticApi` | Optimistic local mutation with **rollback on failure** | Cart quantity steppers, add-to-cart badge, address edits |
+| `usePollingApi` | Interval-driven refetch with backoff, stops on terminal condition | **Order-tracking: poll `GET /api/orders/:id` until `bill_code` is populated**, then stop |
+| `useInfiniteApi` | Cursor/offset accumulation against the pagination envelope | Long order history, MCRM-style lists |
+
+**Why this matters here:**
+- `usePollingApi` directly serves the documented order-tracking need — the confirmation page sits in a `جاري تجهيز طلبك` state and polls until `transactions.bill_code` flips from `NULL` to a Bosta code, then renders the tracking link and **halts polling**. No manual `setInterval` plumbing, no leaked timers.
+- TTL caching aligns with the Scale Reality rules: 5-minute TTL on the small catalog is exactly what `useApi` provides; **stock (`variation_location_details`) must opt out of caching** (`ttl: 0`) — it is always live.
+- AbortController cancellation prevents the classic race where a customer taps between products and a stale response overwrites the current one.
+- `useOptimisticApi` is the implementation vehicle for the Optimistic Updates pattern in `ux-patterns.md` (cart badge increments before the server confirms, rolls back on failure).
+
+---
+
+## Provider Ordering Rationale
+
+The provider hierarchy is not arbitrary — order encodes a render-timing contract.
+
+```jsx
+<ThemeProvider>          {/* OUTERMOST — sets dir + dark class before first paint */}
+  <CountsProvider>       {/* high — sidebar/badge counts, ~5-min refresh */}
+    <AuthProvider>
+      <CartProvider>
+        <Router> ... </Router>
+      </CartProvider>
+    </AuthProvider>
+  </CountsProvider>
+</ThemeProvider>
+```
+
+- **`ThemeProvider` must be OUTERMOST.** It sets `dir` and the `dark` class on `<html>` **before first render**. If it sat lower, the page would paint once in the wrong theme/direction and then snap — a visible **theme/RTL flash** (FOUC). This is the runtime counterpart to the design-system rule that the `.dark` class is initialized in a `<script>` before render: the provider must own that state from the very top of the tree.
+- A **counts/badge provider sits high** (just under theme), feeding sidebar badge counts (pending orders, open tickets) with a **~5-minute refresh**. High placement lets any nav/header element read counts without prop-drilling; the slow refresh interval keeps it off the hot path (these counts are ambient, not transactional).
+- `AuthProvider` → `CartProvider` order is unchanged from the base hierarchy: cart may need auth context (saved addresses, customer link) but auth never needs cart.
+
+---
+
+## Current Live Stack vs Target (Ground Truth)
+
+What is **live on hvarstore.com today** diverges from the **new build's locked target**. Record both so nobody mistakes the current storefront's choices for the compass-approved system.
+
+| Concern | Current live (today) | New build — target (LOCKED) |
+|---------|----------------------|-----------------------------|
+| Storefront platform | **Dukan (دكان)** white-label eCommerce platform | Flask + React SPA (this project) |
+| Fonts | IBM Plex Sans Arabic + Montserrat Arabic + Amiri | **Cairo + Inter + JetBrains Mono** (design-system locked trio) |
+| Analytics | **TikTok Pixel** + **Microsoft Clarity** | TBD per new build — do not assume the live tags carry over |
+
+**Reading this table:** the current live storefront is the **Dukan** white-label platform — that is the active eCommerce site being replaced, not a Hvar-built stack. Its font and analytics choices are **current-live facts, not direction.** The locked type system for the new build remains Cairo + Inter + JetBrains Mono (see `design-system.md`); do not let the live IBM Plex / Montserrat / Amiri stack leak into the new build. TikTok Pixel + Clarity are noted because any analytics decision for the new portal should be a deliberate choice, not a copy-paste of what Dukan happens to load.
+
+### ERP Webhook Channel — Full Verb Set
+
+The ERP integration channel (`POST /websiteintegration/...`) carries **more than orders.** Beyond the order verbs already documented (`webHooksyncOrdersGet`, `...Update`, `...Delete`), the channel also syncs catalog data:
+
+| Verb | Carries |
+|------|---------|
+| `syncOrdersGet` | Order placement → ERP draft transaction |
+| `syncOrdersUpdate` | Order modification |
+| `syncOrdersDelete` | Order cancellation → remove draft transaction |
+| `syncCategoriesGet` | Category tree |
+| `syncProductsGet` | Product catalog |
+| `syncAttributesGet` | Product attributes / variation specs |
+
+The catalog verbs (`syncCategoriesGet`, `syncProductsGet`, `syncAttributesGet`) explain how the portal's catalog stays aligned with ERP without a second write path — they are ERP-driven syncs over the same channel. The portal still reads catalog directly from `hvar_erp` (see the two-database pattern); these verbs are the push side of that same data, not a separate source of truth.
+
+---
+
 ## Documents in This Dev Guide
 
 | File | What It Covers |
