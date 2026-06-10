@@ -1,0 +1,2471 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hvar Store — Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,400&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   HVAR STORE — DESIGN SYSTEM v1.0
+   hvarstore.com — Customer Portal
+   Cairo (Arabic UI) + Inter (numerals/prices) · RTL-first · Mobile-first
+   Brand anchor: #d43533 (Hvar deep red)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SECTION 1 — DESIGN TOKENS (CSS custom properties)
+   Copy this :root block into your project's globals.css / tokens.css
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* ── BRAND RAMP ─────────────────────────────────────────── */
+  --hv-50:  #fdf2f2;
+  --hv-100: #fce0df;
+  --hv-200: #fac4c3;
+  --hv-300: #f49d9b;
+  --hv-400: #ec6a68;
+  --hv-500: #d43533;   /* ← BRAND ANCHOR — never change */
+  --hv-600: #b82d2b;
+  --hv-700: #9a2220;
+  --hv-800: #7f1d1b;
+  --hv-900: #681a18;
+  --hv-950: #3d0c0b;
+
+  /* ── SEMANTIC ALIASES (light theme) ────────────────────── */
+  --brand:         var(--hv-500);
+  --brand-hover:   var(--hv-600);
+  --brand-active:  var(--hv-700);
+  --brand-soft:    var(--hv-50);
+  --brand-muted:   var(--hv-100);
+  --brand-border:  var(--hv-200);
+  --brand-text:    var(--hv-700);
+
+  /* ── SURFACE (light) ────────────────────────────────────── */
+  --bg:          #f8f5f2;   /* warm paper — not cold grey */
+  --bg-base:     #ffffff;
+  --bg-subtle:   #f2eeea;
+  --bg-inset:    #ede8e3;
+  --bg-overlay:  rgba(30, 20, 18, 0.44);
+
+  /* ── INK (light) ────────────────────────────────────────── */
+  --ink:         #1e1410;   /* warm charcoal, not pure black */
+  --ink-secondary: #5a4a43;
+  --ink-tertiary:  #8c7b73;
+  --ink-disabled:  #bfb0a8;
+  --ink-on-brand:  #ffffff;
+
+  /* ── BORDERS (light) ────────────────────────────────────── */
+  --border:        rgba(30, 20, 18, 0.10);
+  --border-medium: rgba(30, 20, 18, 0.16);
+  --border-strong: rgba(30, 20, 18, 0.26);
+
+  /* ── SEMANTIC COLORS ────────────────────────────────────── */
+  --success:        #1a7a4a;
+  --success-bg:     #edfaf2;
+  --success-border: #b6edcc;
+  --warning:        #a05a10;
+  --warning-bg:     #fff7ec;
+  --warning-border: #f7d9aa;
+  --danger:         #c0302e;
+  --danger-bg:      #fff1f0;
+  --danger-border:  #f8bfbe;
+  --info:           #1d5fa8;
+  --info-bg:        #eff5ff;
+  --info-border:    #bdd5fa;
+
+  /* ── STATUS (service tickets) ───────────────────────────── */
+  --st-pending:    #6b5c52;  --st-pending-bg:   #f5f0ed;
+  --st-active:     #1d5fa8;  --st-active-bg:    #eff5ff;
+  --st-progress:   #a05a10;  --st-progress-bg:  #fff7ec;
+  --st-done:       #1a7a4a;  --st-done-bg:      #edfaf2;
+  --st-closed:     #4a3e38;  --st-closed-bg:    #ede8e3;
+
+  /* ── SHADOWS ────────────────────────────────────────────── */
+  --shadow-xs:  0 1px 2px rgba(30,20,18,.06);
+  --shadow-sm:  0 1px 3px rgba(30,20,18,.08), 0 1px 2px rgba(30,20,18,.06);
+  --shadow-md:  0 4px 12px rgba(30,20,18,.10), 0 2px 4px rgba(30,20,18,.06);
+  --shadow-lg:  0 12px 32px rgba(30,20,18,.14), 0 4px 8px rgba(30,20,18,.06);
+  --shadow-xl:  0 24px 56px rgba(30,20,18,.18), 0 8px 16px rgba(30,20,18,.08);
+  --shadow-brand: 0 8px 24px -6px rgba(212,53,51,.40);
+  --shadow-brand-lg: 0 16px 40px -8px rgba(212,53,51,.48);
+
+  /* ── RADIUS ─────────────────────────────────────────────── */
+  --radius-xs:  4px;
+  --radius-sm:  8px;
+  --radius-md:  12px;
+  --radius-lg:  16px;
+  --radius-xl:  22px;
+  --radius-2xl: 30px;
+  --radius-full: 9999px;
+
+  /* ── SPACING (8px base) ─────────────────────────────────── */
+  --sp-1:  4px;   --sp-2:  8px;   --sp-3:  12px;  --sp-4:  16px;
+  --sp-5:  20px;  --sp-6:  24px;  --sp-8:  32px;  --sp-10: 40px;
+  --sp-12: 48px;  --sp-16: 64px;  --sp-20: 80px;  --sp-24: 96px;
+
+  /* ── TYPOGRAPHY — fluid with clamp() ───────────────────── */
+  /* Cairo for Arabic UI; Inter for numbers/prices */
+  --font-arabic:  'Cairo', 'Segoe UI', system-ui, sans-serif;
+  --font-numeric: 'Inter', ui-sans-serif, sans-serif;
+  --font-mono:    'Inter', ui-monospace, 'Cascadia Code', monospace;
+
+  --text-xs:   clamp(0.70rem, 0.68rem + 0.10vw, 0.78rem);
+  --text-sm:   clamp(0.82rem, 0.80rem + 0.12vw, 0.92rem);
+  --text-base: clamp(0.95rem, 0.92rem + 0.16vw, 1.05rem);
+  --text-md:   clamp(1.05rem, 1.00rem + 0.26vw, 1.18rem);
+  --text-lg:   clamp(1.18rem, 1.10rem + 0.40vw, 1.36rem);
+  --text-xl:   clamp(1.36rem, 1.24rem + 0.60vw, 1.60rem);
+  --text-2xl:  clamp(1.60rem, 1.42rem + 0.90vw, 2.00rem);
+  --text-3xl:  clamp(2.00rem, 1.70rem + 1.50vw, 2.60rem);
+  --text-4xl:  clamp(2.60rem, 2.10rem + 2.50vw, 3.60rem);
+
+  --leading-tight:  1.18;
+  --leading-snug:   1.36;
+  --leading-base:   1.60;
+  --leading-loose:  1.82;
+
+  --weight-light:    300;
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --weight-extrabold:800;
+  --weight-black:    900;
+
+  /* ── TRANSITIONS ────────────────────────────────────────── */
+  --ease-out:    cubic-bezier(0.22, 0.68, 0.24, 1.00);
+  --ease-spring: cubic-bezier(0.22, 1.40, 0.36, 1.00);
+  --ease-in-out: cubic-bezier(0.42, 0.00, 0.58, 1.00);
+  --dur-fast:    120ms;
+  --dur-base:    200ms;
+  --dur-slow:    340ms;
+
+  /* ── Z-INDEX SCALE ──────────────────────────────────────── */
+  --z-base:    0;
+  --z-raised:  10;
+  --z-dropdown:200;
+  --z-sticky:  300;
+  --z-overlay: 400;
+  --z-modal:   500;
+  --z-toast:   600;
+}
+
+/* ─── DARK THEME OVERRIDES ──────────────────────────────── */
+[data-theme="dark"] {
+  --bg:          #100d0b;
+  --bg-base:     #1a1310;
+  --bg-subtle:   #221a16;
+  --bg-inset:    #2b2018;
+  --bg-overlay:  rgba(0, 0, 0, 0.60);
+
+  --ink:           #f0e8e4;
+  --ink-secondary: #c9b8b0;
+  --ink-tertiary:  #8a7870;
+  --ink-disabled:  #4a3c36;
+  --ink-on-brand:  #ffffff;
+
+  --border:        rgba(240,232,228,.09);
+  --border-medium: rgba(240,232,228,.14);
+  --border-strong: rgba(240,232,228,.22);
+
+  --brand-soft:   rgba(212,53,51,.14);
+  --brand-muted:  rgba(212,53,51,.20);
+  --brand-border: rgba(212,53,51,.32);
+  --brand-text:   var(--hv-300);
+
+  --success:        #3cca80; --success-bg:     rgba(60,202,128,.12); --success-border: rgba(60,202,128,.28);
+  --warning:        #e6a84d; --warning-bg:     rgba(230,168,77,.12); --warning-border: rgba(230,168,77,.28);
+  --danger:         #f0756a; --danger-bg:      rgba(240,117,106,.12);--danger-border:  rgba(240,117,106,.28);
+  --info:           #5aa3e6; --info-bg:        rgba(90,163,230,.12); --info-border:    rgba(90,163,230,.28);
+
+  --st-pending-bg:  rgba(200,188,180,.10);
+  --st-active-bg:   rgba(90,163,230,.12);
+  --st-progress-bg: rgba(230,168,77,.12);
+  --st-done-bg:     rgba(60,202,128,.12);
+  --st-closed-bg:   rgba(240,232,228,.08);
+  --st-pending:  #c8bcb4; --st-active:  #5aa3e6; --st-progress: #e6a84d;
+  --st-done:     #3cca80; --st-closed:  #8a7870;
+
+  --shadow-xs: 0 1px 2px rgba(0,0,0,.30);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.38), 0 1px 2px rgba(0,0,0,.22);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.44), 0 2px 4px rgba(0,0,0,.22);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,.56), 0 4px 8px rgba(0,0,0,.24);
+  --shadow-xl: 0 24px 56px rgba(0,0,0,.68), 0 8px 16px rgba(0,0,0,.28);
+  --shadow-brand: 0 8px 24px -4px rgba(212,53,51,.50);
+  --shadow-brand-lg: 0 16px 48px -6px rgba(212,53,51,.58);
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SECTION 2 — RESET & BASE
+   ───────────────────────────────────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  color-scheme: light dark;
+}
+
+body {
+  font-family: var(--font-arabic);
+  font-size: var(--text-base);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-base);
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background var(--dur-slow) var(--ease-in-out),
+              color var(--dur-base) var(--ease-in-out);
+}
+
+/* tabular-nums for all price/number elements */
+.tnum, [data-tnum], .price, .badge-count, .order-id {
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* RTL logical properties baseline */
+:root { direction: rtl; }
+
+/* links */
+a { color: var(--brand); text-decoration: none; }
+a:hover { color: var(--brand-hover); }
+a:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; border-radius: var(--radius-xs); }
+
+/* selection */
+::selection { background: var(--hv-200); color: var(--hv-900); }
+[data-theme="dark"] ::selection { background: var(--hv-800); color: var(--hv-100); }
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* images */
+img, video { max-width: 100%; display: block; }
+
+/* focus ring utility */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+  border-radius: var(--radius-xs);
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SECTION 3 — LAYOUT PRIMITIVES
+   ───────────────────────────────────────────────────────────────────────── */
+
+.container {
+  width: 100%;
+  max-width: 1240px;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 40px);
+}
+
+.container-sm { max-width: 680px;  margin-inline: auto; padding-inline: clamp(16px,4vw,40px); }
+.container-md { max-width: 900px;  margin-inline: auto; padding-inline: clamp(16px,4vw,40px); }
+.container-xl { max-width: 1440px; margin-inline: auto; padding-inline: clamp(16px,4vw,40px); }
+
+/* Stack — vertical rhythm */
+.stack { display: flex; flex-direction: column; }
+.stack-2  { gap: var(--sp-2); }
+.stack-3  { gap: var(--sp-3); }
+.stack-4  { gap: var(--sp-4); }
+.stack-6  { gap: var(--sp-6); }
+.stack-8  { gap: var(--sp-8); }
+
+/* Cluster — horizontal wrapping */
+.cluster { display: flex; flex-wrap: wrap; align-items: center; }
+.cluster-2  { gap: var(--sp-2); }
+.cluster-3  { gap: var(--sp-3); }
+.cluster-4  { gap: var(--sp-4); }
+
+/* Grid — responsive product grids */
+.grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: var(--sp-4);
+}
+
+.grid-2  { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-4); }
+.grid-3  { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); }
+.grid-4  { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-4); }
+
+@media (max-width: 900px)  { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px)  { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 440px)  { .grid-2 { grid-template-columns: 1fr; } }
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: var(--border);
+  border: none;
+  margin-block: var(--sp-6);
+}
+
+/* Section spacing */
+.section   { padding-block: clamp(40px, 6vw, 80px); }
+.section-sm { padding-block: clamp(24px, 4vw, 48px); }
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SECTION 4 — TYPOGRAPHY SCALE
+   ───────────────────────────────────────────────────────────────────────── */
+
+.display-1 { font-size: var(--text-4xl); font-weight: var(--weight-black);  line-height: var(--leading-tight); letter-spacing: -0.03em; }
+.display-2 { font-size: var(--text-3xl); font-weight: var(--weight-extrabold); line-height: var(--leading-tight); letter-spacing: -0.025em; }
+.h1        { font-size: var(--text-2xl); font-weight: var(--weight-extrabold); line-height: var(--leading-snug);  letter-spacing: -0.02em; }
+.h2        { font-size: var(--text-xl);  font-weight: var(--weight-bold);      line-height: var(--leading-snug);  letter-spacing: -0.015em; }
+.h3        { font-size: var(--text-lg);  font-weight: var(--weight-bold);      line-height: var(--leading-snug); }
+.h4        { font-size: var(--text-md);  font-weight: var(--weight-semibold);  line-height: var(--leading-base); }
+.h5        { font-size: var(--text-base);font-weight: var(--weight-semibold);  line-height: var(--leading-base); }
+
+.body-lg  { font-size: var(--text-md);   line-height: var(--leading-loose); }
+.body     { font-size: var(--text-base); line-height: var(--leading-base);  }
+.body-sm  { font-size: var(--text-sm);   line-height: var(--leading-base);  }
+.caption  { font-size: var(--text-xs);   line-height: var(--leading-base);  }
+
+.label    { font-size: var(--text-xs);   font-weight: var(--weight-bold);   letter-spacing: 0.12em; text-transform: uppercase; }
+.eyebrow  { font-size: var(--text-xs);   font-weight: var(--weight-extrabold); letter-spacing: 0.20em; text-transform: uppercase; color: var(--brand); }
+
+/* Text color utilities */
+.text-primary   { color: var(--ink); }
+.text-secondary { color: var(--ink-secondary); }
+.text-tertiary  { color: var(--ink-tertiary); }
+.text-disabled  { color: var(--ink-disabled); }
+.text-brand     { color: var(--brand); }
+.text-success   { color: var(--success); }
+.text-warning   { color: var(--warning); }
+.text-danger    { color: var(--danger); }
+.text-info      { color: var(--info); }
+
+/* Price typography */
+.price-lg { font-family: var(--font-numeric); font-size: var(--text-2xl); font-weight: 800; color: var(--ink); }
+.price-md { font-family: var(--font-numeric); font-size: var(--text-xl);  font-weight: 800; color: var(--ink); }
+.price-sm { font-family: var(--font-numeric); font-size: var(--text-md);  font-weight: 700; color: var(--ink); }
+.price-strike { font-family: var(--font-numeric); font-size: var(--text-sm); color: var(--ink-tertiary); text-decoration: line-through; }
+.price-unit { font-size: 0.72em; font-weight: 600; color: var(--ink-secondary); margin-inline-start: 3px; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SECTION 5 — BUTTONS
+   ───────────────────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  font-family: var(--font-arabic);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-md);
+  transition:
+    background var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    transform var(--dur-fast) var(--ease-spring),
+    opacity var(--dur-base) var(--ease-out);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ripple on click */
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,.18);
+  opacity: 0;
+  border-radius: inherit;
+  transition: opacity var(--dur-fast);
+}
+.btn:active::after { opacity: 1; }
+.btn:active { transform: scale(0.975); }
+.btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+
+/* sizes */
+.btn-xs  { height: 32px; padding-inline: 12px; font-size: var(--text-xs); border-radius: var(--radius-sm); }
+.btn-sm  { height: 38px; padding-inline: 16px; font-size: var(--text-sm); }
+.btn-md  { height: 46px; padding-inline: 22px; font-size: var(--text-base); }
+.btn-lg  { height: 54px; padding-inline: 28px; font-size: var(--text-md); border-radius: var(--radius-lg); }
+.btn-xl  { height: 62px; padding-inline: 36px; font-size: var(--text-lg); border-radius: var(--radius-xl); }
+.btn-full { width: 100%; }
+
+/* ── primary ── */
+.btn-primary {
+  background: var(--hv-500);
+  color: #fff;
+  box-shadow: var(--shadow-brand);
+}
+.btn-primary:hover {
+  background: var(--hv-600);
+  box-shadow: var(--shadow-brand-lg);
+  transform: translateY(-1px);
+}
+.btn-primary:active { background: var(--hv-700); transform: scale(0.975) translateY(0); }
+
+/* ── secondary ── */
+.btn-secondary {
+  background: var(--bg-base);
+  color: var(--ink);
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-xs);
+}
+.btn-secondary:hover { border-color: var(--border-strong); background: var(--bg-subtle); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.btn-secondary:active { transform: scale(0.975); }
+
+/* ── ghost ── */
+.btn-ghost {
+  background: transparent;
+  color: var(--ink-secondary);
+  border-color: transparent;
+}
+.btn-ghost:hover { background: var(--bg-subtle); color: var(--ink); }
+
+/* ── brand-ghost ── */
+.btn-brand-ghost {
+  background: var(--brand-soft);
+  color: var(--brand);
+  border-color: var(--brand-border);
+}
+.btn-brand-ghost:hover { background: var(--brand-muted); border-color: var(--hv-300); }
+
+/* ── danger ── */
+.btn-danger { background: var(--danger); color: #fff; box-shadow: 0 6px 18px -4px rgba(192,48,46,.40); }
+.btn-danger:hover { background: #a62826; transform: translateY(-1px); }
+
+/* ── WhatsApp ── */
+.btn-whatsapp { background: #25d366; color: #fff; box-shadow: 0 6px 20px -4px rgba(37,211,102,.46); }
+.btn-whatsapp:hover { background: #1da851; transform: translateY(-1px); }
+
+/* ── icon button ── */
+.btn-icon {
+  width: 42px; height: 42px;
+  padding: 0;
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+  color: var(--ink-secondary);
+  border: 1.5px solid var(--border);
+  box-shadow: var(--shadow-xs);
+}
+.btn-icon:hover { background: var(--bg-subtle); color: var(--brand); border-color: var(--brand-border); transform: translateY(-1px); }
+.btn-icon.btn-icon-sm  { width: 34px; height: 34px; border-radius: var(--radius-sm); }
+.btn-icon.btn-icon-lg  { width: 52px; height: 52px; border-radius: var(--radius-lg); }
+.btn-icon.active { background: var(--brand-soft); color: var(--brand); border-color: var(--brand-border); }
+
+/* ── loading state ── */
+.btn.loading { pointer-events: none; opacity: 0.75; }
+.btn.loading .btn-text { opacity: 0; }
+.btn.loading::before {
+  content: '';
+  position: absolute;
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,.30);
+  border-top-color: rgba(255,255,255,.90);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.btn-secondary.loading::before, .btn-ghost.loading::before {
+  border-color: var(--border-medium);
+  border-top-color: var(--brand);
+}
+
+/* ── disabled ── */
+.btn:disabled, .btn[aria-disabled="true"] {
+  opacity: 0.44;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SECTION 6 — BADGES & PILLS
+   ───────────────────────────────────────────────────────────────────────── */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-arabic);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.badge-xs  { font-size: var(--text-xs);  padding: 3px 8px; }
+.badge-sm  { font-size: var(--text-xs);  padding: 5px 10px; }
+.badge-md  { font-size: var(--text-sm);  padding: 6px 13px; }
+.badge-lg  { font-size: var(--text-base);padding: 8px 16px; }
+
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.badge-dot-pulse {
+  width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0;
+  position: relative;
+}
+.badge-dot-pulse::after {
+  content: ''; position: absolute; inset: -3px;
+  border-radius: 50%; border: 2px solid currentColor;
+  opacity: 0; animation: dot-pulse 1.8s ease-out infinite;
+}
+@keyframes dot-pulse { 0%{transform:scale(.6);opacity:.8} 100%{transform:scale(1.8);opacity:0} }
+
+/* semantic variants */
+.badge-brand   { background: var(--brand-muted);    color: var(--brand-text); }
+.badge-success { background: var(--success-bg);     color: var(--success); border: 1px solid var(--success-border); }
+.badge-warning { background: var(--warning-bg);     color: var(--warning); border: 1px solid var(--warning-border); }
+.badge-danger  { background: var(--danger-bg);      color: var(--danger);  border: 1px solid var(--danger-border); }
+.badge-info    { background: var(--info-bg);        color: var(--info);    border: 1px solid var(--info-border); }
+.badge-neutral { background: var(--bg-inset);       color: var(--ink-secondary); border: 1px solid var(--border); }
+
+/* discount badge — solid brand */
+.badge-discount {
+  background: var(--hv-500);
+  color: #fff;
+  font-family: var(--font-numeric);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+}
+
+/* service status badges */
+.badge-st-pending  { background: var(--st-pending-bg);  color: var(--st-pending);  }
+.badge-st-active   { background: var(--st-active-bg);   color: var(--st-active);   }
+.badge-st-progress { background: var(--st-progress-bg); color: var(--st-progress); }
+.badge-st-done     { background: var(--st-done-bg);     color: var(--st-done);     }
+.badge-st-closed   { background: var(--st-closed-bg);   color: var(--st-closed);   }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SECTION 7 — FORMS
+   ───────────────────────────────────────────────────────────────────────── */
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+
+.field-label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.field-required { color: var(--brand); font-size: var(--text-xs); }
+.field-hint  { font-size: var(--text-xs); color: var(--ink-tertiary); margin-top: 2px; }
+.field-error { font-size: var(--text-xs); color: var(--danger); margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+.field-success-msg { font-size: var(--text-xs); color: var(--success); margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+
+/* base input */
+.input {
+  width: 100%;
+  height: 48px;
+  padding-inline: var(--sp-4);
+  font-family: var(--font-arabic);
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  color: var(--ink);
+  background: var(--bg-base);
+  border: 1.5px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition:
+    border-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    background var(--dur-base) var(--ease-out);
+  -webkit-appearance: none;
+  appearance: none;
+}
+.input::placeholder { color: var(--ink-disabled); }
+.input:hover:not(:disabled):not(:focus) { border-color: var(--border-strong); }
+.input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 4px var(--brand-muted);
+  background: var(--bg-base);
+}
+.input.input-error { border-color: var(--danger); }
+.input.input-error:focus { box-shadow: 0 0 0 4px var(--danger-bg); }
+.input.input-success { border-color: var(--success); }
+.input.input-success:focus { box-shadow: 0 0 0 4px var(--success-bg); }
+.input:disabled { background: var(--bg-inset); color: var(--ink-disabled); cursor: not-allowed; opacity: 0.7; }
+.input-sm { height: 38px; font-size: var(--text-sm); padding-inline: 12px; border-radius: var(--radius-sm); }
+.input-lg { height: 56px; font-size: var(--text-md); padding-inline: 20px; border-radius: var(--radius-lg); }
+
+/* textarea */
+textarea.input {
+  height: auto;
+  min-height: 110px;
+  padding-block: 14px;
+  resize: vertical;
+  line-height: var(--leading-base);
+}
+
+/* select */
+select.input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238c7b73' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 14px center; /* RTL: arrow on left */
+  padding-inline-start: 40px;
+  cursor: pointer;
+}
+
+/* phone input — Egyptian mobile */
+.phone-field {
+  display: flex;
+  align-items: stretch;
+  border: 1.5px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-base);
+  transition: border-color var(--dur-base), box-shadow var(--dur-base);
+}
+.phone-field:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 4px var(--brand-muted);
+}
+.phone-field.input-error { border-color: var(--danger); }
+.phone-field.input-error:focus-within { box-shadow: 0 0 0 4px var(--danger-bg); }
+.phone-prefix {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  background: var(--bg-subtle);
+  border-inline-start: 1.5px solid var(--border-medium);
+  font-family: var(--font-numeric);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--ink-secondary);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.phone-prefix img { width: 20px; height: 15px; border-radius: 2px; object-fit: cover; }
+.phone-number-input {
+  flex: 1;
+  height: 48px;
+  border: none;
+  background: transparent;
+  padding-inline: 14px;
+  font-family: var(--font-numeric);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  outline: none;
+  direction: ltr;
+  text-align: right; /* numbers right-aligned in RTL page */
+}
+.phone-number-input::placeholder { color: var(--ink-disabled); font-weight: var(--weight-regular); letter-spacing: 0; }
+
+/* OTP input row */
+.otp-group {
+  display: flex;
+  gap: var(--sp-3);
+  direction: ltr;
+  justify-content: center;
+}
+.otp-input {
+  width: 60px; height: 68px;
+  text-align: center;
+  font-family: var(--font-numeric);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-extrabold);
+  color: var(--ink);
+  background: var(--bg-base);
+  border: 2px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  outline: none;
+  transition: border-color var(--dur-base), box-shadow var(--dur-base), transform var(--dur-fast) var(--ease-spring);
+  caret-color: var(--brand);
+}
+.otp-input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-muted); transform: scale(1.04); }
+.otp-input.otp-filled { border-color: var(--success); background: var(--success-bg); }
+
+/* address selects — dependent pair */
+.address-pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+@media (max-width: 480px) { .address-pair { grid-template-columns: 1fr; } }
+
+/* input with icon */
+.input-group { position: relative; }
+.input-group .input-icon {
+  position: absolute;
+  top: 50%; transform: translateY(-50%);
+  color: var(--ink-tertiary);
+  pointer-events: none;
+  transition: color var(--dur-base);
+}
+.input-group .input-icon-end   { inset-inline-end: 14px; }
+.input-group .input-icon-start { inset-inline-start: 14px; }
+.input-group .input-icon-end ~ .input  { padding-inline-end: 44px; }
+.input-group .input-icon-start ~ .input { padding-inline-start: 44px; }
+.input-group:focus-within .input-icon  { color: var(--brand); }
+
+/* checkbox */
+.checkbox-wrap { display: flex; align-items: flex-start; gap: var(--sp-3); cursor: pointer; }
+.checkbox-input { position: absolute; opacity: 0; width: 0; height: 0; }
+.checkbox-box {
+  width: 20px; height: 20px; flex-shrink: 0;
+  border: 2px solid var(--border-medium);
+  border-radius: var(--radius-xs);
+  background: var(--bg-base);
+  display: grid; place-items: center;
+  transition: all var(--dur-base) var(--ease-out);
+  margin-top: 1px;
+}
+.checkbox-input:checked + .checkbox-box {
+  background: var(--brand); border-color: var(--brand);
+}
+.checkbox-input:checked + .checkbox-box::after {
+  content: '';
+  width: 11px; height: 7px;
+  border-inline-start: 2.5px solid #fff;
+  border-bottom: 2.5px solid #fff;
+  transform: rotate(-45deg) translateY(-1px);
+}
+.checkbox-input:focus-visible + .checkbox-box { box-shadow: 0 0 0 4px var(--brand-muted); }
+.checkbox-label { font-size: var(--text-base); color: var(--ink); }
+
+/* radio */
+.radio-wrap { display: flex; align-items: center; gap: var(--sp-3); cursor: pointer; }
+.radio-input { position: absolute; opacity: 0; width: 0; height: 0; }
+.radio-circle {
+  width: 22px; height: 22px; flex-shrink: 0;
+  border: 2px solid var(--border-medium);
+  border-radius: 50%;
+  background: var(--bg-base);
+  display: grid; place-items: center;
+  transition: all var(--dur-base) var(--ease-out);
+}
+.radio-input:checked + .radio-circle { border-color: var(--brand); }
+.radio-input:checked + .radio-circle::after {
+  content: ''; width: 10px; height: 10px;
+  border-radius: 50%; background: var(--brand);
+}
+.radio-input:focus-visible + .radio-circle { box-shadow: 0 0 0 4px var(--brand-muted); }
+
+/* payment method option — large radio card */
+.pay-option {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-4) var(--sp-5);
+  background: var(--bg-base);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: border-color var(--dur-base), background var(--dur-base), box-shadow var(--dur-base);
+}
+.pay-option:hover { border-color: var(--brand-border); }
+.pay-option.selected { border-color: var(--brand); background: var(--brand-soft); box-shadow: 0 0 0 1px var(--brand); }
+.pay-option .pay-icon {
+  width: 48px; height: 48px; border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  display: grid; place-items: center;
+  flex-shrink: 0;
+  font-size: 1.6rem;
+}
+.pay-option .pay-info { flex: 1; }
+.pay-option .pay-title { font-weight: var(--weight-bold); font-size: var(--text-base); }
+.pay-option .pay-desc  { font-size: var(--text-sm); color: var(--ink-secondary); margin-top: 2px; }
+.pay-option .pay-tag   {
+  font-size: var(--text-xs); font-weight: var(--weight-bold);
+  color: var(--brand); background: var(--brand-soft);
+  padding: 4px 9px; border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SECTION 8 — CARDS
+   ───────────────────────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+}
+.card-body { padding: var(--sp-5) var(--sp-6); }
+.card-header { padding: var(--sp-4) var(--sp-6); border-bottom: 1px solid var(--border); }
+.card-footer { padding: var(--sp-4) var(--sp-6); border-top: 1px solid var(--border); background: var(--bg-subtle); }
+
+/* ── product card ── */
+.product-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+  display: flex;
+  flex-direction: column;
+}
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--hv-200);
+}
+[data-theme="dark"] .product-card:hover { border-color: var(--hv-800); }
+
+.product-card-image {
+  aspect-ratio: 1;
+  background: var(--bg-subtle);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.product-card-image img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  padding: var(--sp-4);
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+.product-card:hover .product-card-image img { transform: scale(1.06); }
+
+.product-card-badges {
+  position: absolute;
+  top: var(--sp-3);
+  inset-inline-start: var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  align-items: flex-start;
+}
+.product-card-wishlist {
+  position: absolute;
+  top: var(--sp-3);
+  inset-inline-end: var(--sp-3);
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bg-base) 86%, transparent);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(6px);
+  display: grid; place-items: center;
+  color: var(--ink-tertiary);
+  transition: color var(--dur-base), background var(--dur-base);
+  cursor: pointer;
+}
+.product-card-wishlist:hover { color: var(--brand); background: var(--brand-soft); }
+.product-card-wishlist.active { color: var(--brand); }
+
+.product-card-body { padding: var(--sp-4); flex: 1; display: flex; flex-direction: column; gap: var(--sp-2); }
+.product-card-cat  { font-size: var(--text-xs); font-weight: var(--weight-semibold); color: var(--ink-tertiary); text-transform: uppercase; letter-spacing: 0.08em; }
+.product-card-name { font-size: var(--text-base); font-weight: var(--weight-bold); color: var(--ink); line-height: var(--leading-snug); flex: 1; }
+.product-card-price { display: flex; align-items: baseline; gap: var(--sp-2); margin-top: auto; }
+.product-card-low-stock {
+  display: flex; align-items: center; gap: 5px;
+  font-size: var(--text-xs); font-weight: var(--weight-bold); color: var(--warning);
+}
+.product-card-add {
+  width: 100%; margin-top: var(--sp-3);
+  height: 42px;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  font-family: var(--font-arabic); font-weight: var(--weight-bold); font-size: var(--text-sm);
+  background: var(--bg-subtle);
+  color: var(--ink);
+  border: 1.5px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--dur-base) var(--ease-out);
+}
+.product-card-add:hover { background: var(--brand); color: #fff; border-color: var(--brand); box-shadow: var(--shadow-brand); }
+.product-card-add.added { background: var(--success); color: #fff; border-color: var(--success); }
+
+/* skeleton card */
+.skeleton-card { background: var(--bg-base); border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; }
+.skeleton { background: var(--bg-inset); border-radius: var(--radius-sm); position: relative; overflow: hidden; }
+.skeleton::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--bg-base) 60%, transparent) 40%,
+    color-mix(in srgb, var(--bg-base) 60%, transparent) 60%,
+    transparent 100%
+  );
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+[dir="rtl"] .skeleton::after { animation: shimmer-rtl 1.6s ease-in-out infinite; }
+@keyframes shimmer { from{transform:translateX(-100%)} to{transform:translateX(100%)} }
+@keyframes shimmer-rtl { from{transform:translateX(100%)} to{transform:translateX(-100%)} }
+
+/* ── cart drawer ── */
+.cart-drawer {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: min(440px, 94vw);
+  background: var(--bg-base);
+  border-inline-start: 1px solid var(--border);
+  box-shadow: var(--shadow-xl);
+  z-index: var(--z-modal);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-100%); /* RTL: slides from right, so -100% closes */
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+[dir="rtl"] .cart-drawer { transform: translateX(100%); }
+.cart-drawer.open { transform: translateX(0); }
+.cart-drawer-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--sp-5) var(--sp-6);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.cart-drawer-body { flex: 1; overflow-y: auto; padding: var(--sp-4) var(--sp-6); }
+.cart-drawer-foot {
+  padding: var(--sp-5) var(--sp-6);
+  border-top: 1px solid var(--border);
+  background: var(--bg-subtle);
+  flex-shrink: 0;
+}
+
+.cart-item {
+  display: flex;
+  gap: var(--sp-4);
+  padding-block: var(--sp-4);
+  border-bottom: 1px solid var(--border);
+}
+.cart-item:last-child { border-bottom: none; }
+.cart-item-img {
+  width: 72px; height: 72px; flex-shrink: 0;
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  overflow: hidden;
+  display: grid; place-items: center;
+}
+.cart-item-img img { width: 100%; height: 100%; object-fit: contain; padding: 6px; }
+.cart-item-info  { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.cart-item-name  { font-size: var(--text-sm); font-weight: var(--weight-bold); color: var(--ink); line-height: var(--leading-snug); }
+.cart-item-var   { font-size: var(--text-xs); color: var(--ink-tertiary); }
+.cart-item-right { display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; }
+
+/* qty stepper */
+.qty-stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  height: 32px;
+}
+.qty-btn {
+  width: 32px; height: 100%;
+  border: none;
+  background: var(--bg-subtle);
+  color: var(--ink);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background var(--dur-fast), color var(--dur-fast);
+  display: grid; place-items: center;
+}
+.qty-btn:hover  { background: var(--brand); color: #fff; }
+.qty-value {
+  min-width: 38px; text-align: center;
+  font-family: var(--font-numeric); font-weight: var(--weight-bold); font-size: var(--text-sm);
+  color: var(--ink); border-inline: 1.5px solid var(--border-medium);
+  height: 100%; display: grid; place-items: center;
+}
+
+/* order summary */
+.order-summary { display: flex; flex-direction: column; gap: var(--sp-2); }
+.summary-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: var(--text-sm); color: var(--ink-secondary);
+}
+.summary-row .summary-val { font-family: var(--font-numeric); font-weight: var(--weight-semibold); color: var(--ink); }
+.summary-row.summary-total {
+  font-size: var(--text-lg); font-weight: var(--weight-extrabold); color: var(--ink);
+  padding-top: var(--sp-3);
+  border-top: 1px dashed var(--border-medium);
+  margin-top: var(--sp-2);
+}
+.summary-row.summary-total .summary-val { color: var(--brand); }
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SECTION 9 — NAVIGATION
+   ───────────────────────────────────────────────────────────────────────── */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  height: 68px;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border-bottom: 1px solid var(--border);
+  transition: background var(--dur-slow);
+}
+.navbar-inner {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+}
+
+/* brand mark */
+.brand-mark {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  cursor: pointer;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.brand-icon {
+  width: 44px; height: 44px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(150deg, var(--hv-500) 0%, var(--hv-700) 100%);
+  display: grid; place-items: center;
+  box-shadow: var(--shadow-brand);
+  transition: box-shadow var(--dur-base), transform var(--dur-fast) var(--ease-spring);
+}
+.brand-mark:hover .brand-icon { transform: translateY(-2px) scale(1.04); box-shadow: var(--shadow-brand-lg); }
+.brand-icon svg { stroke: #fff; }
+.brand-name-ar { font-size: var(--text-lg); font-weight: var(--weight-black); color: var(--ink); letter-spacing: -0.02em; line-height: 1; }
+.brand-name-en { font-size: var(--text-xs); font-weight: var(--weight-bold); letter-spacing: 0.26em; color: var(--ink-tertiary); font-family: var(--font-numeric); }
+
+/* nav links */
+.nav-links { display: flex; align-items: center; gap: 2px; }
+.nav-link {
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: background var(--dur-base), color var(--dur-base);
+  white-space: nowrap;
+  text-decoration: none;
+  position: relative;
+}
+.nav-link:hover { background: var(--bg-subtle); color: var(--ink); }
+.nav-link.active { color: var(--brand); }
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  inset-inline: 14px;
+  height: 2px;
+  border-radius: var(--radius-full);
+  background: var(--brand);
+}
+
+/* breadcrumb */
+.breadcrumb { display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; }
+.breadcrumb-item { font-size: var(--text-sm); color: var(--ink-tertiary); }
+.breadcrumb-item a { color: var(--ink-tertiary); }
+.breadcrumb-item a:hover { color: var(--brand); }
+.breadcrumb-sep { color: var(--ink-disabled); font-size: var(--text-xs); }
+.breadcrumb-item:last-child { color: var(--ink); font-weight: var(--weight-semibold); }
+
+/* chip / filter bar */
+.chip-bar { display: flex; gap: var(--sp-2); overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.chip-bar::-webkit-scrollbar { display: none; }
+.chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  height: 36px;
+  padding-inline: var(--sp-4);
+  font-family: var(--font-arabic); font-weight: var(--weight-semibold); font-size: var(--text-sm);
+  background: var(--bg-base); color: var(--ink-secondary);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-full);
+  cursor: pointer; white-space: nowrap;
+  transition: all var(--dur-base) var(--ease-out);
+  flex-shrink: 0;
+}
+.chip:hover { border-color: var(--brand-border); color: var(--ink); }
+.chip.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SECTION 10 — CHECKOUT COMPONENTS
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* stepper */
+.checkout-steps { display: flex; align-items: center; }
+.checkout-step  { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; }
+.step-connector {
+  position: absolute;
+  top: 20px;
+  height: 2px;
+  background: var(--border-medium);
+  width: 100%;
+  inset-inline-start: 50%;
+  z-index: 0;
+  transition: background var(--dur-slow);
+}
+.checkout-step:last-child .step-connector { display: none; }
+.checkout-step.done .step-connector { background: var(--brand); }
+
+.step-bubble {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--border-medium);
+  background: var(--bg-base);
+  display: grid; place-items: center;
+  font-family: var(--font-numeric); font-weight: var(--weight-extrabold); font-size: var(--text-sm);
+  color: var(--ink-tertiary);
+  z-index: 1;
+  transition: all var(--dur-base) var(--ease-out);
+}
+.checkout-step.done .step-bubble { background: var(--brand); border-color: var(--brand); color: #fff; }
+.checkout-step.current .step-bubble { border-color: var(--brand); color: var(--brand); box-shadow: 0 0 0 5px var(--brand-muted); }
+.step-label { font-size: var(--text-xs); font-weight: var(--weight-semibold); color: var(--ink-tertiary); text-align: center; }
+.checkout-step.current .step-label, .checkout-step.done .step-label { color: var(--ink); }
+
+/* checkout panel */
+.checkout-panel {
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  padding: clamp(20px, 3vw, 36px);
+  box-shadow: var(--shadow-md);
+}
+.checkout-panel-title { font-size: var(--text-xl); font-weight: var(--weight-extrabold); margin-bottom: 6px; }
+.checkout-panel-sub   { font-size: var(--text-sm); color: var(--ink-secondary); margin-bottom: var(--sp-6); line-height: var(--leading-base); }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SECTION 11 — ORDER & TRACKING
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* order reference chip */
+.order-ref {
+  display: inline-flex; align-items: center; gap: var(--sp-3);
+  background: var(--brand-soft);
+  border: 1px dashed var(--brand-border);
+  padding: var(--sp-3) var(--sp-5);
+  border-radius: var(--radius-lg);
+}
+.order-ref-label { font-size: var(--text-xs); color: var(--ink-secondary); font-weight: var(--weight-semibold); }
+.order-ref-code  { font-family: var(--font-mono); font-weight: var(--weight-extrabold); font-size: var(--text-md); color: var(--brand); letter-spacing: 0.06em; }
+
+/* tracking block */
+.tracking-block {
+  background: linear-gradient(135deg, var(--brand-soft), transparent 70%);
+  border: 1px solid var(--brand-border);
+  border-radius: var(--radius-xl);
+  padding: var(--sp-6);
+  text-align: center;
+}
+.tracking-block.pending { filter: saturate(0.4); opacity: 0.82; }
+.tracking-number {
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-extrabold);
+  letter-spacing: 0.12em;
+  color: var(--ink);
+  margin-block: var(--sp-3);
+}
+.tracking-status-dot {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--warning);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SECTION 12 — SERVICE TICKET TIMELINE
+   ───────────────────────────────────────────────────────────────────────── */
+
+.ticket-timeline { display: flex; flex-direction: column; gap: 0; }
+.tl-step { display: flex; gap: var(--sp-4); position: relative; padding-bottom: var(--sp-6); }
+.tl-step:last-child { padding-bottom: 0; }
+
+.tl-rail { flex-shrink: 0; width: 28px; display: flex; flex-direction: column; align-items: center; }
+.tl-node {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border-medium);
+  background: var(--bg-base);
+  display: grid; place-items: center;
+  flex-shrink: 0;
+  z-index: 1;
+  transition: all var(--dur-base) var(--ease-out);
+}
+.tl-line { width: 2px; flex: 1; background: var(--border-medium); margin-top: 4px; min-height: 32px; transition: background var(--dur-slow); }
+.tl-step:last-child .tl-line { display: none; }
+
+/* states */
+.tl-step.done .tl-node  { background: var(--brand); border-color: var(--brand); }
+.tl-step.done .tl-node svg { stroke: #fff; }
+.tl-step.done .tl-line  { background: var(--brand); }
+
+.tl-step.current .tl-node {
+  border-color: var(--brand); background: var(--bg-base);
+  box-shadow: 0 0 0 6px var(--brand-muted);
+  animation: tl-glow 2.2s ease-in-out infinite;
+}
+@keyframes tl-glow {
+  0%,100% { box-shadow: 0 0 0 5px var(--brand-muted); }
+  50%      { box-shadow: 0 0 0 9px var(--brand-soft); }
+}
+.tl-step.current .tl-node::after {
+  content: ''; width: 10px; height: 10px;
+  border-radius: 50%; background: var(--brand);
+  box-shadow: 0 0 10px 2px color-mix(in srgb, var(--brand) 60%, transparent);
+  animation: dot-pulse 1.8s ease-out infinite;
+}
+
+.tl-step.future .tl-node { opacity: 0.45; }
+.tl-step.future .tl-body { opacity: 0.50; }
+
+.tl-body { flex: 1; padding-top: 3px; }
+.tl-title-text { font-weight: var(--weight-bold); font-size: var(--text-base); }
+.tl-step.current .tl-title-text { color: var(--brand); }
+.tl-step.future  .tl-title-text { color: var(--ink-tertiary); }
+.tl-desc  { font-size: var(--text-sm); color: var(--ink-secondary); margin-top: 3px; line-height: var(--leading-base); }
+.tl-time  { font-family: var(--font-numeric); font-size: var(--text-xs); color: var(--ink-tertiary); margin-top: 5px; }
+.tl-eta   {
+  margin-top: var(--sp-2);
+  background: var(--brand-soft);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  display: flex; align-items: center; gap: var(--sp-2);
+  font-weight: var(--weight-semibold); font-size: var(--text-sm);
+  color: var(--brand-text);
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SECTION 13 — TOAST / ALERTS / NOTICE
+   ───────────────────────────────────────────────────────────────────────── */
+
+.toast-zone { position: fixed; bottom: var(--sp-6); inset-inline-end: var(--sp-6); z-index: var(--z-toast); display: flex; flex-direction: column; gap: var(--sp-2); align-items: flex-end; }
+
+.toast {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: 14px 20px;
+  background: var(--ink);
+  color: var(--bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  max-width: 360px;
+  animation: toast-in var(--dur-slow) var(--ease-spring) both;
+  pointer-events: auto;
+}
+.toast-success { background: var(--success); }
+.toast-danger  { background: var(--danger); }
+.toast-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); }
+@keyframes toast-in { from { opacity:0; transform: translateY(16px) scale(0.9); } to { opacity:1; transform: none; } }
+
+/* alert banners */
+.alert {
+  display: flex; align-items: flex-start; gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  border: 1px solid;
+}
+.alert-icon { flex-shrink: 0; margin-top: 1px; }
+.alert-body { flex: 1; }
+.alert-title { font-weight: var(--weight-bold); margin-bottom: 3px; }
+
+.alert-success { background: var(--success-bg); border-color: var(--success-border); color: var(--success); }
+.alert-warning { background: var(--warning-bg); border-color: var(--warning-border); color: var(--warning); }
+.alert-danger  { background: var(--danger-bg);  border-color: var(--danger-border);  color: var(--danger);  }
+.alert-info    { background: var(--info-bg);    border-color: var(--info-border);    color: var(--info);    }
+
+/* inline note */
+.note {
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs); font-weight: var(--weight-semibold);
+}
+.note-info    { background: var(--info-bg);    color: var(--info);    }
+.note-success { background: var(--success-bg); color: var(--success); }
+.note-warning { background: var(--warning-bg); color: var(--warning); }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SECTION 14 — HEADER + PROMO BANNER (production-ready HTML shown in demo)
+   ───────────────────────────────────────────────────────────────────────── */
+
+.promo-banner {
+  background: linear-gradient(90deg, var(--hv-700), var(--hv-500) 50%, var(--hv-600));
+  color: #fff;
+  text-align: center;
+  padding: var(--sp-2) var(--sp-4);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.04em;
+  position: relative;
+}
+.promo-close {
+  position: absolute; inset-inline-end: var(--sp-4); top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: rgba(255,255,255,.6); cursor: pointer; font-size: 1rem;
+  transition: color var(--dur-fast);
+}
+.promo-close:hover { color: #fff; }
+
+/* cart badge */
+.cart-badge-btn { position: relative; }
+.cart-badge {
+  position: absolute; top: -8px; inset-inline-start: -8px;
+  min-width: 20px; height: 20px; padding: 0 5px;
+  background: var(--brand); color: #fff;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--bg);
+  font-family: var(--font-numeric); font-weight: 800; font-size: 0.68rem;
+  display: grid; place-items: center;
+  transform: scale(0);
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+.cart-badge.show { transform: scale(1); }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SECTION 15 — WHATSAPP FAB
+   ───────────────────────────────────────────────────────────────────────── */
+
+.wa-fab {
+  position: fixed;
+  bottom: var(--sp-6);
+  inset-inline-start: var(--sp-6);
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background: #25d366;
+  color: #fff;
+  border: none;
+  display: grid; place-items: center;
+  cursor: pointer;
+  box-shadow: 0 8px 28px -6px rgba(37,211,102,.60);
+  z-index: var(--z-toast);
+  transition: transform var(--dur-base) var(--ease-spring), box-shadow var(--dur-base);
+  animation: fab-appear 0.5s 0.8s var(--ease-spring) both;
+}
+@keyframes fab-appear { from { transform: scale(0); } to { transform: scale(1); } }
+.wa-fab:hover { transform: scale(1.10) rotate(5deg); box-shadow: 0 14px 36px -6px rgba(37,211,102,.70); }
+.wa-fab::before {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  border: 2px solid rgba(37,211,102,.50);
+  animation: wa-ring 2s ease-out infinite 1.2s;
+}
+@keyframes wa-ring { 0%{transform:scale(.9);opacity:.7} 100%{transform:scale(1.5);opacity:0} }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SECTION 16 — OVERLAY / MODAL / SCRIM
+   ───────────────────────────────────────────────────────────────────────── */
+
+.scrim {
+  position: fixed; inset: 0;
+  background: var(--bg-overlay);
+  z-index: var(--z-overlay);
+  backdrop-filter: blur(3px);
+  opacity: 0; visibility: hidden;
+  transition: opacity var(--dur-base), visibility var(--dur-base);
+}
+.scrim.open { opacity: 1; visibility: visible; }
+
+.modal {
+  position: fixed; inset: 0; z-index: var(--z-modal);
+  display: grid; place-items: center;
+  padding: var(--sp-4);
+  pointer-events: none;
+}
+.modal-box {
+  background: var(--bg-base);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-xl);
+  width: 100%; max-width: 520px;
+  padding: var(--sp-8);
+  pointer-events: auto;
+  transform: scale(0.94) translateY(16px);
+  opacity: 0;
+  transition: transform var(--dur-slow) var(--ease-spring), opacity var(--dur-base);
+}
+.modal.open .modal-box { transform: scale(1) translateY(0); opacity: 1; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SECTION 17 — UTILITY CLASSES
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* display */
+.d-flex   { display: flex; }
+.d-grid   { display: grid; }
+.d-block  { display: block; }
+.d-none   { display: none; }
+.d-contents { display: contents; }
+.place-center { place-items: center; }
+.items-center { align-items: center; }
+.items-start  { align-items: flex-start; }
+.justify-between { justify-content: space-between; }
+.justify-center  { justify-content: center; }
+.flex-1 { flex: 1; }
+.flex-col { flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
+.shrink-0 { flex-shrink: 0; }
+
+/* spacing */
+.gap-1 { gap: var(--sp-1); } .gap-2 { gap: var(--sp-2); } .gap-3 { gap: var(--sp-3); }
+.gap-4 { gap: var(--sp-4); } .gap-6 { gap: var(--sp-6); } .gap-8 { gap: var(--sp-8); }
+.mt-2  { margin-top: var(--sp-2); } .mt-3 { margin-top: var(--sp-3); } .mt-4 { margin-top: var(--sp-4); }
+.mt-6  { margin-top: var(--sp-6); } .mt-8 { margin-top: var(--sp-8); }
+.mb-2  { margin-bottom: var(--sp-2); } .mb-4 { margin-bottom: var(--sp-4); }
+.p-4   { padding: var(--sp-4); } .p-5 { padding: var(--sp-5); } .p-6 { padding: var(--sp-6); }
+.px-4  { padding-inline: var(--sp-4); } .py-4 { padding-block: var(--sp-4); }
+.px-6  { padding-inline: var(--sp-6); }
+
+/* surfaces */
+.surface-base   { background: var(--bg-base);   border: 1px solid var(--border); }
+.surface-subtle { background: var(--bg-subtle); border: 1px solid var(--border); }
+.surface-inset  { background: var(--bg-inset); }
+.surface-brand  { background: var(--brand-soft); border: 1px solid var(--brand-border); }
+.rounded-sm { border-radius: var(--radius-sm); }  .rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }  .rounded-xl { border-radius: var(--radius-xl); }
+.rounded-2xl{ border-radius: var(--radius-2xl);}  .rounded-full{border-radius: var(--radius-full);}
+
+/* overflow */
+.overflow-hidden { overflow: hidden; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* position */
+.relative { position: relative; } .absolute { position: absolute; } .fixed { position: fixed; }
+.inset-0  { inset: 0; }
+
+/* width */
+.w-full { width: 100%; } .max-w-full { max-width: 100%; }
+.min-w-0 { min-width: 0; }
+
+/* text */
+.text-start  { text-align: start; }
+.text-center { text-align: center; }
+.text-end    { text-align: end; }
+.font-bold    { font-weight: var(--weight-bold); }
+.font-medium  { font-weight: var(--weight-medium); }
+.font-semibold{ font-weight: var(--weight-semibold); }
+.font-black   { font-weight: var(--weight-black); }
+.line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* cursor & interaction */
+.cursor-pointer { cursor: pointer; }
+.select-none { user-select: none; }
+.pointer-events-none { pointer-events: none; }
+
+/* RTL helpers */
+.rtl-flip { transform: scaleX(-1); } /* for icons that need mirroring */
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SECTION 18 — RESPONSIVE BREAKPOINTS
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Mobile-first. Breakpoints: sm=480, md=768, lg=1024, xl=1280 */
+
+@media (max-width: 479px) {
+  .hide-xs { display: none; }
+  .nav-links { display: none; } /* hamburger on mobile */
+}
+@media (min-width: 480px) and (max-width: 767px) {
+  .hide-sm { display: none; }
+}
+@media (max-width: 767px) {
+  .hide-mobile { display: none; }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .address-pair { grid-template-columns: 1fr; }
+}
+@media (min-width: 768px) {
+  .show-mobile-only { display: none; }
+}
+@media (max-width: 1023px) {
+  .hide-md { display: none; }
+}
+@media (min-width: 1024px) {
+  .hide-desktop { display: none; }
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   DESIGN SYSTEM SHOWCASE STYLES (for this file only — not production)
+   ───────────────────────────────────────────────────────────────────────── */
+
+.ds-layout { min-height: 100vh; }
+
+.ds-sidebar {
+  position: fixed; inset-inline-start: 0; inset-block: 0;
+  width: 260px;
+  background: var(--bg-base);
+  border-inline-end: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: var(--z-sticky);
+  padding: var(--sp-6) 0 var(--sp-10);
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+@media (max-width: 900px) {
+  .ds-sidebar { transform: translateX(100%); } /* RTL: hidden right side */
+  .ds-sidebar.ds-open { transform: translateX(0); }
+  .ds-main { margin-inline-start: 0 !important; }
+}
+.ds-nav-brand { padding: 0 var(--sp-5) var(--sp-5); border-bottom: 1px solid var(--border); margin-bottom: var(--sp-4); }
+.ds-nav-section { padding: var(--sp-3) var(--sp-5) var(--sp-1); }
+.ds-nav-section-label { font-size: var(--text-xs); font-weight: var(--weight-extrabold); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-tertiary); }
+.ds-nav-link {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: 9px var(--sp-5); font-size: var(--text-sm); font-weight: var(--weight-medium);
+  color: var(--ink-secondary); cursor: pointer; transition: all var(--dur-fast); border-radius: 0;
+  text-decoration: none;
+}
+.ds-nav-link:hover { color: var(--ink); background: var(--bg-subtle); }
+.ds-nav-link.active { color: var(--brand); background: var(--brand-soft); font-weight: var(--weight-bold); border-inline-end: 3px solid var(--brand); }
+
+.ds-main { margin-inline-start: 260px; }
+@media (max-width: 900px) { .ds-main { margin-inline-start: 0; } }
+
+.ds-page { max-width: 960px; margin-inline: auto; padding: var(--sp-12) clamp(16px,4vw,40px); }
+.ds-section { margin-bottom: clamp(48px, 7vw, 88px); }
+.ds-section-title {
+  font-size: var(--text-2xl); font-weight: var(--weight-black); letter-spacing: -0.02em;
+  margin-bottom: var(--sp-2); color: var(--ink);
+}
+.ds-section-sub { font-size: var(--text-base); color: var(--ink-secondary); margin-bottom: var(--sp-8); max-width: 56ch; }
+
+.ds-divider { height: 1px; background: var(--border); margin-block: var(--sp-10); }
+
+.ds-label { font-size: var(--text-xs); font-weight: var(--weight-bold); letter-spacing: 0.10em; text-transform: uppercase; color: var(--ink-tertiary); margin-bottom: var(--sp-3); }
+
+.token-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--sp-3); }
+.swatch {
+  border-radius: var(--radius-lg); overflow: hidden;
+  border: 1px solid var(--border);
+}
+.swatch-color { height: 72px; }
+.swatch-info { padding: var(--sp-3); background: var(--bg-base); }
+.swatch-name { font-size: var(--text-xs); font-weight: var(--weight-bold); color: var(--ink); }
+.swatch-hex  { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--ink-tertiary); margin-top: 2px; }
+
+.ds-demo { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: clamp(20px,3vw,36px); }
+.ds-demo.center { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: var(--sp-4); }
+.ds-demo.dark-preview { background: #100d0b; border-color: rgba(240,232,228,.10); }
+
+.type-specimen { display: flex; flex-direction: column; gap: var(--sp-4); }
+.type-row { display: flex; align-items: baseline; gap: var(--sp-6); }
+.type-meta { font-size: var(--text-xs); color: var(--ink-tertiary); min-width: 110px; font-family: var(--font-mono); }
+
+.component-pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-6); }
+@media (max-width: 640px) { .component-pair { grid-template-columns: 1fr; } }
+
+.ds-topbar {
+  position: sticky; top: 0; z-index: var(--z-sticky);
+  height: 56px;
+  background: color-mix(in srgb, var(--bg-base) 90%, transparent);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: var(--sp-4);
+  padding-inline: clamp(16px,4vw,40px);
+}
+.ds-topbar .ds-breadcrumb { font-size: var(--text-sm); color: var(--ink-secondary); }
+.ds-topbar .ds-breadcrumb b { color: var(--ink); font-weight: var(--weight-semibold); }
+</style>
+</head>
+
+<body>
+<div class="ds-layout">
+
+<!-- ── SIDEBAR ─────────────────────────────────────────── -->
+<nav class="ds-sidebar" id="sidebar" aria-label="Design system navigation">
+  <div class="ds-nav-brand">
+    <div class="brand-mark" style="display:flex;align-items:center;gap:12px;text-decoration:none">
+      <div class="brand-icon" style="width:38px;height:38px;border-radius:11px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M4 20V4M4 12h11a5 5 0 005-5V4" stroke="#fff"/><path d="M20 20V12" stroke="#fff"/></svg>
+      </div>
+      <div>
+        <div class="brand-name-ar" style="font-size:1.1rem">هـفار</div>
+        <div class="brand-name-en">DESIGN SYSTEM</div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-nav-section"><span class="ds-nav-section-label">الأساسيات</span></div>
+  <a class="ds-nav-link active" href="#tokens">🎨 التوكنز</a>
+  <a class="ds-nav-link" href="#typography">🔤 الطباعة</a>
+  <a class="ds-nav-link" href="#colors">🎨 الألوان</a>
+  <div class="ds-nav-section"><span class="ds-nav-section-label">المكونات</span></div>
+  <a class="ds-nav-link" href="#buttons">🔘 الأزرار</a>
+  <a class="ds-nav-link" href="#badges">🏷️ الشارات</a>
+  <a class="ds-nav-link" href="#forms">📝 النماذج</a>
+  <a class="ds-nav-link" href="#cards">📦 البطاقات</a>
+  <a class="ds-nav-link" href="#navigation">🧭 التنقل</a>
+  <div class="ds-nav-section"><span class="ds-nav-section-label">التجارة الإلكترونية</span></div>
+  <a class="ds-nav-link" href="#product">🛒 بطاقة المنتج</a>
+  <a class="ds-nav-link" href="#checkout">💳 الدفع</a>
+  <a class="ds-nav-link" href="#order">📋 الطلب والتتبع</a>
+  <a class="ds-nav-link" href="#service">🔧 خدمة ما بعد البيع</a>
+  <div class="ds-nav-section"><span class="ds-nav-section-label">الإشعارات</span></div>
+  <a class="ds-nav-link" href="#alerts">🔔 التنبيهات</a>
+  <div class="ds-nav-section"><span class="ds-nav-section-label">التصميم</span></div>
+  <a class="ds-nav-link" href="#darkmode">🌙 الوضع الليلي</a>
+  <a class="ds-nav-link" href="#rtl">↔️ دعم RTL</a>
+</nav>
+
+<!-- ── TOP BAR ─────────────────────────────────────────── -->
+<div class="ds-topbar ds-main">
+  <button class="btn-icon" onclick="document.getElementById('sidebar').classList.toggle('ds-open')" style="display:none" id="menuBtn">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <span class="ds-breadcrumb">هـفار ستور › <b>نظام التصميم</b></span>
+  <div style="flex:1"></div>
+  <button class="btn btn-sm btn-secondary" onclick="toggleTheme()">
+    <span id="themeIcon">🌙</span>
+    <span id="themeLabel">الوضع الليلي</span>
+  </button>
+</div>
+
+<!-- ── MAIN CONTENT ─────────────────────────────────────── -->
+<main class="ds-main">
+<div class="ds-page">
+
+<!-- ═══════════════════════════ TOKENS ═══════════════════════════ -->
+<section class="ds-section" id="tokens">
+  <div class="eyebrow" style="margin-bottom:8px">الأساسيات</div>
+  <h1 class="ds-section-title">توكنز التصميم</h1>
+  <p class="ds-section-sub">متغيرات CSS مخصصة — المصدر الواحد للحقيقة. انسخ كتلة <code style="font-family:var(--font-mono);background:var(--bg-inset);padding:2px 6px;border-radius:4px">:root</code> إلى ملف <code style="font-family:var(--font-mono);background:var(--bg-inset);padding:2px 6px;border-radius:4px">globals.css</code> في مشروعك.</p>
+
+  <!-- color ramp -->
+  <div class="ds-label">سلّم ألوان هـفار</div>
+  <div class="token-grid" style="margin-bottom:var(--sp-8)">
+    <div class="swatch"><div class="swatch-color" style="background:var(--hv-50)"></div><div class="swatch-info"><div class="swatch-name">50</div><div class="swatch-hex">#fdf2f2</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--hv-100)"></div><div class="swatch-info"><div class="swatch-name">100</div><div class="swatch-hex">#fce0df</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--hv-200)"></div><div class="swatch-info"><div class="swatch-name">200</div><div class="swatch-hex">#fac4c3</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--hv-300)"></div><div class="swatch-info"><div class="swatch-name">300</div><div class="swatch-hex">#f49d9b</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--hv-400)"></div><div class="swatch-info"><div class="swatch-name">400</div><div class="swatch-hex">#ec6a68</div></div></div>
+    <div class="swatch" style="outline:2px solid var(--brand);outline-offset:3px"><div class="swatch-color" style="background:var(--hv-500)"></div><div class="swatch-info"><div class="swatch-name" style="color:var(--brand)">500 ← ANCHOR</div><div class="swatch-hex" style="color:var(--brand);font-weight:800">#d43533</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--hv-600)"></div><div class="swatch-info"><div class="swatch-name">600</div><div class="swatch-hex">#b82d2b</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--hv-700)"></div><div class="swatch-info"><div class="swatch-name">700</div><div class="swatch-hex">#9a2220</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--hv-800)"></div><div class="swatch-info"><div class="swatch-name">800</div><div class="swatch-hex">#7f1d1b</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--hv-900)"></div><div class="swatch-info"><div class="swatch-name">900</div><div class="swatch-hex">#681a18</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--hv-950)"></div><div class="swatch-info"><div class="swatch-name">950</div><div class="swatch-hex">#3d0c0b</div></div></div>
+  </div>
+
+  <div class="component-pair">
+    <div>
+      <div class="ds-label">الألوان الدلالية — فاتح</div>
+      <div class="ds-demo" style="display:flex;flex-direction:column;gap:var(--sp-2)">
+        <div style="background:var(--success-bg);border:1px solid var(--success-border);color:var(--success);padding:10px 14px;border-radius:var(--radius-md);font-weight:700;font-size:var(--text-sm)">✓ نجاح — success</div>
+        <div style="background:var(--warning-bg);border:1px solid var(--warning-border);color:var(--warning);padding:10px 14px;border-radius:var(--radius-md);font-weight:700;font-size:var(--text-sm)">⚡ تحذير — warning</div>
+        <div style="background:var(--danger-bg);border:1px solid var(--danger-border);color:var(--danger);padding:10px 14px;border-radius:var(--radius-md);font-weight:700;font-size:var(--text-sm)">✕ خطأ — danger</div>
+        <div style="background:var(--info-bg);border:1px solid var(--info-border);color:var(--info);padding:10px 14px;border-radius:var(--radius-md);font-weight:700;font-size:var(--text-sm)">ⓘ معلومة — info</div>
+      </div>
+    </div>
+    <div>
+      <div class="ds-label">الظلال</div>
+      <div class="ds-demo" style="display:flex;flex-direction:column;gap:var(--sp-5);background:var(--bg)">
+        <div style="background:var(--bg-base);border-radius:var(--radius-lg);padding:14px 18px;box-shadow:var(--shadow-xs)"><code style="font-family:var(--font-mono);font-size:var(--text-xs)">--shadow-xs</code></div>
+        <div style="background:var(--bg-base);border-radius:var(--radius-lg);padding:14px 18px;box-shadow:var(--shadow-sm)"><code style="font-family:var(--font-mono);font-size:var(--text-xs)">--shadow-sm</code></div>
+        <div style="background:var(--bg-base);border-radius:var(--radius-lg);padding:14px 18px;box-shadow:var(--shadow-md)"><code style="font-family:var(--font-mono);font-size:var(--text-xs)">--shadow-md</code></div>
+        <div style="background:var(--bg-base);border-radius:var(--radius-lg);padding:14px 18px;box-shadow:var(--shadow-lg)"><code style="font-family:var(--font-mono);font-size:var(--text-xs)">--shadow-lg</code></div>
+        <div style="background:var(--bg-base);border-radius:var(--radius-lg);padding:14px 18px;box-shadow:var(--shadow-brand)"><code style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--brand)">--shadow-brand</code></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ═══════════════════════════ TYPOGRAPHY ═══════════════════════════ -->
+<section class="ds-section" id="typography">
+  <div class="eyebrow">الطباعة</div>
+  <h2 class="ds-section-title">مقياس الخطوط</h2>
+  <p class="ds-section-sub">Cairo للعربية والواجهة، Inter للأرقام والأسعار. كل الأحجام بـ <code style="font-family:var(--font-mono);background:var(--bg-inset);padding:2px 6px;border-radius:4px">clamp()</code> للتجاوب السلس.</p>
+
+  <div class="ds-demo type-specimen" style="padding:clamp(20px,3vw,40px)">
+    <div class="type-row"><span class="type-meta">display-1 / 4xl</span><span class="display-1" style="color:var(--ink)">هـفار ستور</span></div>
+    <div class="type-row"><span class="type-meta">display-2 / 3xl</span><span class="display-2">أجهزة منزلية راقية</span></div>
+    <div class="type-row"><span class="type-meta">h1 / 2xl</span><span class="h1">تسوّق بثقة واطمئنان</span></div>
+    <div class="type-row"><span class="type-meta">h2 / xl</span><span class="h2">الأكثر مبيعاً هذا الشهر</span></div>
+    <div class="type-row"><span class="type-meta">h3 / lg</span><span class="h3">مكواة بخار برافيا</span></div>
+    <div class="type-row"><span class="type-meta">h4 / md</span><span class="h4">القلاية الهوائية ٦ لتر</span></div>
+    <div class="type-row"><span class="type-meta">body / base</span><span class="body">نوصّل لكل محافظات مصر خلال ١–٣ أيام عمل عبر بوسطة.</span></div>
+    <div class="type-row"><span class="type-meta">body-sm / sm</span><span class="body-sm text-secondary">التوصيل مجاني على الطلبات فوق ٥٠٠ جنيه.</span></div>
+    <div class="type-row"><span class="type-meta">caption / xs</span><span class="caption text-tertiary">آخر تحديث: ١ يونيو ٢٠٢٦</span></div>
+    <div class="type-row"><span class="type-meta">eyebrow</span><span class="eyebrow">الأكثر مبيعاً</span></div>
+    <div style="border-top:1px solid var(--border);padding-top:var(--sp-4)">
+      <div class="type-meta" style="margin-bottom:10px">Inter / الأسعار والأرقام</div>
+      <div style="display:flex;gap:24px;align-items:baseline;flex-wrap:wrap">
+        <span class="price-lg">٢٬١٠٠<span class="price-unit">ج.م</span></span>
+        <span class="price-md">١٬٢٥٠<span class="price-unit">ج.م</span></span>
+        <span class="price-sm">٩٨٠<span class="price-unit">ج.م</span></span>
+        <span class="price-strike">١٬٥٠٠ ج.م</span>
+        <span class="badge-discount" style="font-size:.85rem">-٢٠٪</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ═══════════════════════════ BUTTONS ═══════════════════════════ -->
+<section class="ds-section" id="buttons">
+  <div class="eyebrow">المكونات</div>
+  <h2 class="ds-section-title">الأزرار</h2>
+
+  <div class="ds-label">الأنواع</div>
+  <div class="ds-demo center" style="margin-bottom:var(--sp-6)">
+    <button class="btn btn-primary btn-md">تسوّق الآن</button>
+    <button class="btn btn-secondary btn-md">متابعة</button>
+    <button class="btn btn-ghost btn-md">إلغاء</button>
+    <button class="btn btn-brand-ghost btn-md">تفاصيل</button>
+    <button class="btn btn-danger btn-md">حذف</button>
+    <button class="btn btn-whatsapp btn-md">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1012 2z"/></svg>
+      واتساب
+    </button>
+  </div>
+
+  <div class="ds-label">الأحجام</div>
+  <div class="ds-demo center" style="margin-bottom:var(--sp-6)">
+    <button class="btn btn-primary btn-xs">صغير جداً</button>
+    <button class="btn btn-primary btn-sm">صغير</button>
+    <button class="btn btn-primary btn-md">متوسط</button>
+    <button class="btn btn-primary btn-lg">كبير</button>
+    <button class="btn btn-primary btn-xl">كبير جداً</button>
+  </div>
+
+  <div class="ds-label">أزرار الأيقونات</div>
+  <div class="ds-demo center" style="margin-bottom:var(--sp-6)">
+    <button class="btn-icon btn-icon-sm">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0112 5a5 5 0 019.5 7c-2.5 4.5-9.5 9-9.5 9z"/></svg>
+    </button>
+    <button class="btn-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6L5 2H2" stroke-linecap="round"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>
+    </button>
+    <button class="btn-icon btn-icon-lg active">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>
+    </button>
+  </div>
+
+  <div class="ds-label">الحالات</div>
+  <div class="ds-demo center">
+    <button class="btn btn-primary btn-md loading"><span class="btn-text">جاري التحميل</span></button>
+    <button class="btn btn-secondary btn-md loading"><span class="btn-text">معالجة</span></button>
+    <button class="btn btn-primary btn-md" disabled>معطّل</button>
+    <button class="btn btn-primary btn-full btn-md" style="max-width:340px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+      تأكيد الطلب
+    </button>
+  </div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ═══════════════════════════ BADGES ═══════════════════════════ -->
+<section class="ds-section" id="badges">
+  <h2 class="ds-section-title">الشارات والعلامات</h2>
+
+  <div class="ds-label">الأنواع الدلالية</div>
+  <div class="ds-demo center" style="margin-bottom:var(--sp-5)">
+    <span class="badge badge-md badge-brand"><span class="badge-dot"></span>هـفار</span>
+    <span class="badge badge-md badge-success"><span class="badge-dot"></span>متوفر</span>
+    <span class="badge badge-md badge-warning"><span class="badge-dot"></span>كمية محدودة</span>
+    <span class="badge badge-md badge-danger"><span class="badge-dot"></span>نفذت الكمية</span>
+    <span class="badge badge-md badge-info"><span class="badge-dot"></span>جديد</span>
+    <span class="badge badge-md badge-neutral">الكل</span>
+  </div>
+
+  <div class="ds-label">حالات الخدمة — service tickets</div>
+  <div class="ds-demo center" style="margin-bottom:var(--sp-5)">
+    <span class="badge badge-md badge-st-pending"><span class="badge-dot"></span>قيد الانتظار</span>
+    <span class="badge badge-md badge-st-active"><span class="badge-dot-pulse"></span>نشط</span>
+    <span class="badge badge-md badge-st-progress"><span class="badge-dot-pulse"></span>قيد المعالجة</span>
+    <span class="badge badge-md badge-st-done"><span class="badge-dot"></span>تم الإنجاز</span>
+    <span class="badge badge-md badge-st-closed"><span class="badge-dot"></span>مغلق</span>
+  </div>
+
+  <div class="ds-label">بادجات التجارة الإلكترونية</div>
+  <div class="ds-demo center">
+    <span class="badge-discount">-٢٠٪</span>
+    <span class="badge badge-sm badge-success">شحن مجاني</span>
+    <span class="badge badge-sm badge-info">جديد</span>
+    <span class="badge badge-sm badge-brand">مميز</span>
+    <span class="badge badge-sm badge-warning">٢ قطعة فقط</span>
+    <span class="badge badge-sm badge-neutral">ضمان سنة</span>
+  </div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ═══════════════════════════ FORMS ═══════════════════════════ -->
+<section class="ds-section" id="forms">
+  <h2 class="ds-section-title">عناصر النماذج</h2>
+
+  <div class="component-pair" style="margin-bottom:var(--sp-8)">
+    <div>
+      <div class="ds-label">حقول الإدخال</div>
+      <div class="ds-demo" style="display:flex;flex-direction:column;gap:var(--sp-4)">
+        <div class="field">
+          <label class="field-label">الاسم الكامل <span class="field-required">*</span></label>
+          <input class="input" placeholder="مثال: أحمد محمد علي">
+          <span class="field-hint">سيظهر اسمك على مراسلاتك معنا</span>
+        </div>
+        <div class="field">
+          <label class="field-label">عنوان الشارع <span class="field-required">*</span></label>
+          <input class="input input-error" value="12" placeholder="اسم الشارع ورقم المبنى">
+          <span class="field-error">⚠ العنوان قصير جداً — أدخل على الأقل ٨ أحرف</span>
+        </div>
+        <div class="field">
+          <label class="field-label">البريد الإلكتروني</label>
+          <input class="input input-success" value="ahmed@example.com" placeholder="اختياري">
+          <span class="field-success-msg">✓ بريد إلكتروني صحيح</span>
+        </div>
+        <div class="field">
+          <label class="field-label">حقل معطّل</label>
+          <input class="input" value="غير قابل للتعديل" disabled>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="ds-label">الحقول الخاصة</div>
+      <div class="ds-demo" style="display:flex;flex-direction:column;gap:var(--sp-4)">
+        <!-- phone -->
+        <div class="field">
+          <label class="field-label">رقم الموبايل <span class="field-required">*</span></label>
+          <div class="phone-field">
+            <span class="phone-prefix">🇪🇬 <span>٢٠+</span></span>
+            <input class="phone-number-input" type="tel" maxlength="11" placeholder="01X XXXX XXXX" id="phoneDemo">
+          </div>
+          <span class="field-hint">أرقام مصرية فقط — 01[0125]XXXXXXXX</span>
+        </div>
+        <!-- OTP -->
+        <div class="field">
+          <label class="field-label" style="justify-content:center">كود التأكيد</label>
+          <div class="otp-group">
+            <input class="otp-input otp-filled" type="text" maxlength="1" value="4">
+            <input class="otp-input otp-filled" type="text" maxlength="1" value="8">
+            <input class="otp-input" type="text" maxlength="1" placeholder="—" id="otp3">
+            <input class="otp-input" type="text" maxlength="1" placeholder="—">
+          </div>
+          <span class="field-hint" style="text-align:center">اكتب الكود المرسل على موبايلك</span>
+        </div>
+        <!-- address pair -->
+        <div class="field">
+          <label class="field-label">عنوان التوصيل <span class="field-required">*</span></label>
+          <div class="address-pair">
+            <select class="input">
+              <option value="">المحافظة</option>
+              <option selected>القاهرة</option>
+              <option>الجيزة</option>
+              <option>الإسكندرية</option>
+            </select>
+            <select class="input">
+              <option value="">المنطقة</option>
+              <option selected>مدينة نصر</option>
+              <option>المعادي</option>
+            </select>
+          </div>
+        </div>
+        <!-- textarea -->
+        <div class="field">
+          <label class="field-label">وصف المشكلة</label>
+          <textarea class="input" rows="3" placeholder="اشرح المشكلة بالتفصيل…"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-label">إدخال بأيقونة</div>
+  <div class="ds-demo" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);margin-bottom:var(--sp-6)">
+    <div class="field">
+      <label class="field-label">بحث</label>
+      <div class="input-group">
+        <svg class="input-icon input-icon-end" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+        <input class="input" placeholder="دوّر على مكواة، خلاط، قلاية…">
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">السعر الأقصى</label>
+      <div class="input-group">
+        <svg class="input-icon input-icon-start" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        <input class="input" placeholder="٥٬٠٠٠" style="font-family:var(--font-numeric)">
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-label">الاختيار</div>
+  <div class="ds-demo" style="display:flex;flex-direction:column;gap:var(--sp-4)">
+    <label class="checkbox-wrap">
+      <input type="checkbox" class="checkbox-input" checked>
+      <span class="checkbox-box"></span>
+      <span class="checkbox-label">أوافق على شروط الاستخدام وسياسة الخصوصية</span>
+    </label>
+    <label class="checkbox-wrap">
+      <input type="checkbox" class="checkbox-input">
+      <span class="checkbox-box"></span>
+      <span class="checkbox-label">أريد استلام العروض والإشعارات على واتساب</span>
+    </label>
+    <label class="radio-wrap" style="margin-top:var(--sp-2)">
+      <input type="radio" name="demo" class="radio-input" checked>
+      <span class="radio-circle"></span>
+      <span>الدفع عند الاستلام</span>
+    </label>
+    <label class="radio-wrap">
+      <input type="radio" name="demo" class="radio-input">
+      <span class="radio-circle"></span>
+      <span>بطاقة بنكية / محفظة إلكترونية</span>
+    </label>
+  </div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ═══════════════════════════ CARDS ═══════════════════════════ -->
+<section class="ds-section" id="cards">
+  <h2 class="ds-section-title">البطاقات</h2>
+
+  <div class="ds-label">بطاقة عامة</div>
+  <div class="ds-demo" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--sp-4);margin-bottom:var(--sp-6)">
+    <div class="card">
+      <div class="card-header"><div class="h4">عنوان البطاقة</div></div>
+      <div class="card-body"><p class="body text-secondary">محتوى البطاقة يظهر هنا. يمكن أن يحتوي على نص وأزرار وأي عناصر أخرى.</p><div class="cluster-3 mt-4"><button class="btn btn-primary btn-sm">إجراء رئيسي</button><button class="btn btn-ghost btn-sm">إلغاء</button></div></div>
+    </div>
+    <div class="card surface-brand">
+      <div class="card-body">
+        <div class="eyebrow">مميز</div>
+        <div class="h3 mt-2">عرض خاص</div>
+        <p class="body-sm text-secondary mt-2">خصم ٢٠٪ على كل الأجهزة الكهربائية لفترة محدودة.</p>
+        <div class="mt-4"><span class="price-lg">٨٠٠<span class="price-unit">ج.م</span></span> <span class="price-strike">١٬٠٠٠ ج.م</span></div>
+      </div>
+      <div class="card-footer"><button class="btn btn-primary btn-sm btn-full">اشترِ الآن</button></div>
+    </div>
+  </div>
+
+  <div class="ds-label">بطاقة خيار الدفع</div>
+  <div class="ds-demo" style="display:flex;flex-direction:column;gap:var(--sp-3);max-width:540px">
+    <div class="pay-option selected" onclick="this.classList.add('selected');document.querySelectorAll('.pay-option').forEach(p=>p!==this&&p.classList.remove('selected'))">
+      <div class="pay-icon">💵</div>
+      <div class="pay-info">
+        <div class="pay-title">الدفع عند الاستلام</div>
+        <div class="pay-desc">ادفع كاش لما يوصلك المنتج لباب بيتك</div>
+      </div>
+      <span class="pay-tag">الأكثر شيوعاً</span>
+    </div>
+    <div class="pay-option" onclick="this.classList.add('selected');document.querySelectorAll('.pay-option').forEach(p=>p!==this&&p.classList.remove('selected'))">
+      <div class="pay-icon">💳</div>
+      <div class="pay-info">
+        <div class="pay-title">بطاقة / محفظة / تقسيط</div>
+        <div class="pay-desc">فيزا، ماستركارد، فودافون كاش، وتقسيط — عبر Kashier</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ═══════════════════════════ NAVIGATION ═══════════════════════════ -->
+<section class="ds-section" id="navigation">
+  <h2 class="ds-section-title">التنقل</h2>
+
+  <div class="ds-label">شريط التنقل العلوي</div>
+  <div class="ds-demo" style="padding:0;overflow:hidden;border-radius:var(--radius-xl);margin-bottom:var(--sp-6)">
+    <div style="background:var(--bg);padding:8px 0">
+      <div class="promo-banner">🚚 شحن مجاني على الطلبات فوق ٥٠٠ ج.م — لفترة محدودة <button class="promo-close" onclick="this.closest('.promo-banner').style.display='none'">✕</button></div>
+    </div>
+    <nav class="navbar" style="position:relative;top:0">
+      <div class="container">
+        <div class="navbar-inner">
+          <a class="brand-mark">
+            <div class="brand-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M4 20V4M4 12h11a5 5 0 005-5V4" stroke="#fff"/><path d="M20 20V12" stroke="#fff"/></svg></div>
+            <div><div class="brand-name-ar">هـفار</div><div class="brand-name-en">HVAR STORE</div></div>
+          </a>
+          <div class="nav-links hide-mobile">
+            <a class="nav-link active">الرئيسية</a>
+            <a class="nav-link">المنتجات</a>
+            <a class="nav-link">خدمة ما بعد البيع</a>
+          </div>
+          <div style="flex:1"></div>
+          <div class="cluster-3">
+            <button class="btn-icon btn-icon-sm cart-badge-btn">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6L5 2H2" stroke-linecap="round"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>
+              <span class="cart-badge show">٣</span>
+            </button>
+            <button class="btn-icon btn-icon-sm">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <div class="ds-label">Breadcrumb + شريط الفلاتر</div>
+  <div class="ds-demo" style="display:flex;flex-direction:column;gap:var(--sp-4)">
+    <nav class="breadcrumb">
+      <span class="breadcrumb-item"><a href="#">الرئيسية</a></span>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-item"><a href="#">المنتجات</a></span>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-item">مكاوي</span>
+    </nav>
+    <div class="chip-bar">
+      <button class="chip active">الكل</button>
+      <button class="chip">مكاوي 🧺</button>
+      <button class="chip">قلايات 🍳</button>
+      <button class="chip">خلاطات 🥤</button>
+      <button class="chip">مكانس 🌀</button>
+      <button class="chip">أفران 🔥</button>
+      <button class="chip">عجّانات 🍰</button>
+    </div>
+  </div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ═══════════════════════════ PRODUCT CARD ═══════════════════════════ -->
+<section class="ds-section" id="product">
+  <h2 class="ds-section-title">بطاقة المنتج</h2>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:var(--sp-4);max-width:900px">
+    <!-- product card 1 -->
+    <div class="product-card">
+      <div class="product-card-image">
+        <div style="font-size:5rem;filter:drop-shadow(0 8px 24px rgba(0,0,0,.12))">🧺</div>
+        <div class="product-card-badges">
+          <span class="badge-discount">-٢٠٪</span>
+          <span class="badge badge-sm badge-success">شحن مجاني</span>
+        </div>
+        <button class="product-card-wishlist">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0112 5a5 5 0 019.5 7c-2.5 4.5-9.5 9-9.5 9z"/></svg>
+        </button>
+      </div>
+      <div class="product-card-body">
+        <div class="product-card-cat">مكاوي</div>
+        <div class="product-card-name">مكواة بخار برافيا ٢٤٠٠ واط — سيراميك</div>
+        <div class="product-card-price">
+          <span class="price-sm">١٬٢٥٠<span class="price-unit">ج.م</span></span>
+          <span class="price-strike">١٬٥٠٠ ج.م</span>
+        </div>
+        <div class="product-card-low-stock">⚡ متبقي ٣ قطع فقط</div>
+        <button class="product-card-add" onclick="this.classList.add('added');this.textContent='✓ اتضاف للسلة';setTimeout(()=>{this.classList.remove('added');this.innerHTML='<svg width=\'14\' height=\'14\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2.2\' stroke-linecap=\'round\'><path d=\'M12 5v14M5 12h14\'/></svg> أضف للسلة'},1400)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          أضف للسلة
+        </button>
+      </div>
+    </div>
+
+    <!-- product card 2 — no discount -->
+    <div class="product-card">
+      <div class="product-card-image">
+        <div style="font-size:5rem;filter:drop-shadow(0 8px 24px rgba(0,0,0,.12))">🍳</div>
+        <div class="product-card-badges"><span class="badge badge-sm badge-info">جديد</span></div>
+        <button class="product-card-wishlist active">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--brand)" stroke="var(--brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0112 5a5 5 0 019.5 7c-2.5 4.5-9.5 9-9.5 9z"/></svg>
+        </button>
+      </div>
+      <div class="product-card-body">
+        <div class="product-card-cat">قلايات</div>
+        <div class="product-card-name">قلاية هوائية كينوود ٦ لتر — شاشة لمس</div>
+        <div class="product-card-price">
+          <span class="price-sm">٢٬١٠٠<span class="price-unit">ج.م</span></span>
+        </div>
+        <button class="product-card-add">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          أضف للسلة
+        </button>
+      </div>
+    </div>
+
+    <!-- skeleton -->
+    <div class="skeleton-card">
+      <div class="skeleton" style="height:200px;border-radius:0"></div>
+      <div style="padding:var(--sp-4);display:flex;flex-direction:column;gap:var(--sp-2)">
+        <div class="skeleton" style="height:10px;width:40%;border-radius:var(--radius-full)"></div>
+        <div class="skeleton" style="height:14px;width:85%"></div>
+        <div class="skeleton" style="height:14px;width:65%"></div>
+        <div class="skeleton" style="height:22px;width:50%;margin-top:4px"></div>
+        <div class="skeleton" style="height:38px;margin-top:8px;border-radius:var(--radius-md)"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ═══════════════════════════ CHECKOUT ═══════════════════════════ -->
+<section class="ds-section" id="checkout">
+  <h2 class="ds-section-title">مكونات الدفع</h2>
+
+  <div class="ds-label">مؤشر الخطوات</div>
+  <div class="ds-demo" style="margin-bottom:var(--sp-6)">
+    <div class="checkout-steps">
+      <div class="checkout-step done">
+        <div class="step-connector"></div>
+        <div class="step-bubble"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
+        <span class="step-label">التواصل</span>
+      </div>
+      <div class="checkout-step current">
+        <div class="step-connector"></div>
+        <div class="step-bubble">٢</div>
+        <span class="step-label">التوصيل</span>
+      </div>
+      <div class="checkout-step">
+        <div class="step-connector"></div>
+        <div class="step-bubble">٣</div>
+        <span class="step-label">الدفع</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-label">لوحة الخطوة الثانية — عنوان التوصيل</div>
+  <div class="ds-demo" style="max-width:600px;padding:0;overflow:hidden">
+    <div class="checkout-panel">
+      <h3 class="checkout-panel-title">فين نوصّلك؟</h3>
+      <p class="checkout-panel-sub">اختار محافظتك ومنطقتك من القائمة — أدق وأسرع من الكتابة الحرة.</p>
+      <div class="stack-4">
+        <div class="address-pair">
+          <div class="field"><label class="field-label">المحافظة <span class="field-required">*</span></label><select class="input"><option>القاهرة</option></select></div>
+          <div class="field"><label class="field-label">المنطقة <span class="field-required">*</span></label><select class="input"><option>مدينة نصر</option></select></div>
+        </div>
+        <div class="field"><label class="field-label">الشارع والعقار <span class="field-required">*</span></label><input class="input" placeholder="مثال: شارع عباس العقاد، عمارة ٤٢"></div>
+        <div class="note note-info">🚚 التسليم خلال ١–٣ أيام عمل عبر بوسطة، وهتقدر تتابع شحنتك لحظة بلحظة.</div>
+        <div class="d-flex gap-3 mt-4">
+          <button class="btn btn-secondary btn-md">رجوع</button>
+          <button class="btn btn-primary btn-md" style="flex:1">متابعة للدفع ←</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ═══════════════════════════ ORDER & TRACKING ═══════════════════════════ -->
+<section class="ds-section" id="order">
+  <h2 class="ds-section-title">الطلب والتتبع</h2>
+
+  <div class="component-pair">
+    <div>
+      <div class="ds-label">تأكيد الطلب</div>
+      <div class="ds-demo" style="display:flex;flex-direction:column;align-items:center;gap:var(--sp-5);text-align:center">
+        <div style="width:88px;height:88px;border-radius:50%;background:var(--success-bg);display:grid;place-items:center;position:relative;animation:pop .6s var(--ease-spring)">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+          <div style="position:absolute;inset:-10px;border-radius:50%;border:2px solid var(--success);opacity:.25;animation:ring-out 1.4s ease-out infinite"></div>
+        </div>
+        <div>
+          <div class="h2">تم استلام طلبك! 🎉</div>
+          <p class="body-sm text-secondary mt-2">هيوصلك إشعار على واتساب بعد تأكيد الطلب.</p>
+        </div>
+        <div class="order-ref">
+          <span class="order-ref-label">رقم طلبك</span>
+          <span class="order-ref-code">HVAR-20260601-0042</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="ds-label">بلوك التتبع — Bosta</div>
+      <div class="ds-demo" style="display:flex;flex-direction:column;gap:var(--sp-4)">
+        <div class="tracking-block pending">
+          <div style="font-size:2.2rem;margin-bottom:8px">🚚</div>
+          <div class="h4">في انتظار تأكيد الشحن</div>
+          <div class="tracking-status-dot" style="margin-top:8px;justify-content:center">
+            <span class="badge-dot-pulse" style="width:8px;height:8px;background:var(--warning)"></span>
+            جاري التجهيز
+          </div>
+        </div>
+        <div class="tracking-block">
+          <div style="font-size:2.2rem;margin-bottom:8px;animation:drive 2s ease-in-out infinite">🚚</div>
+          <div class="h4">شحنتك في الطريق</div>
+          <div class="tracking-number">٦٨٣٩٤٢١</div>
+          <button class="btn btn-primary btn-sm">تتبّع عبر بوسطة ←</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ═══════════════════════════ SERVICE TICKET ═══════════════════════════ -->
+<section class="ds-section" id="service">
+  <h2 class="ds-section-title">خدمة ما بعد البيع</h2>
+
+  <div class="component-pair">
+    <div>
+      <div class="ds-label">بطاقات نوع الخدمة</div>
+      <div class="ds-demo" style="display:flex;flex-direction:column;gap:var(--sp-3)">
+        <!-- maintenance -->
+        <div style="background:var(--bg-base);border:2px solid var(--warning-border);border-radius:var(--radius-xl);padding:var(--sp-5);cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:var(--sp-4)">
+          <div style="width:52px;height:52px;border-radius:var(--radius-lg);background:var(--warning-bg);display:grid;place-items:center;font-size:1.6rem;flex-shrink:0">🔧</div>
+          <div>
+            <div class="h4" style="color:var(--warning)">صيانة</div>
+            <p class="body-sm text-secondary mt-1">جهازك وقف أو بيعمل صوت غريب؟ افتح طلب صيانة.</p>
+          </div>
+        </div>
+        <!-- replacement -->
+        <div style="background:var(--bg-base);border:2px solid var(--info-border);border-radius:var(--radius-xl);padding:var(--sp-5);cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:var(--sp-4)">
+          <div style="width:52px;height:52px;border-radius:var(--radius-lg);background:var(--info-bg);display:grid;place-items:center;font-size:1.6rem;flex-shrink:0">🔄</div>
+          <div>
+            <div class="h4" style="color:var(--info)">استبدال</div>
+            <p class="body-sm text-secondary mt-1">منتج بعيب من المصنع؟ هنستبدله بدون أي تعقيد.</p>
+          </div>
+        </div>
+        <!-- return -->
+        <div style="background:var(--brand-soft);border:2px solid var(--brand-border);border-radius:var(--radius-xl);padding:var(--sp-5);cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:var(--sp-4)">
+          <div style="width:52px;height:52px;border-radius:var(--radius-lg);background:var(--brand-muted);display:grid;place-items:center;font-size:1.6rem;flex-shrink:0">↩️</div>
+          <div>
+            <div class="h4 text-brand">مرتجع</div>
+            <p class="body-sm text-secondary mt-1">غيّرت رأيك؟ ارجّع المنتج واسترد فلوسك بسهولة.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="ds-label">تايم لاين الطلب — صيانة HVM</div>
+      <div class="ds-demo">
+        <div class="ticket-timeline">
+          <div class="tl-step done">
+            <div class="tl-rail"><div class="tl-node"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div><div class="tl-line"></div></div>
+            <div class="tl-body"><div class="tl-title-text">تم استلام الطلب</div><div class="tl-desc">طلبك وصلنا وجاري المراجعة</div><div class="tl-time">١ يونيو، ٠٩:٠٠</div></div>
+          </div>
+          <div class="tl-step done">
+            <div class="tl-rail"><div class="tl-node"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div><div class="tl-line"></div></div>
+            <div class="tl-body"><div class="tl-title-text">وصل المنتج للمركز</div><div class="tl-desc">وصل منتجك لمركز الخدمة وبدأنا التشخيص</div><div class="tl-time">٢ يونيو، ١١:٣٠</div></div>
+          </div>
+          <div class="tl-step current">
+            <div class="tl-rail"><div class="tl-node"></div><div class="tl-line"></div></div>
+            <div class="tl-body"><div class="tl-title-text">قيد الإصلاح</div><div class="tl-desc">منتجك بين إيدي فنيينا الآن</div><div class="tl-time">٣ يونيو، ١٤:٠٠</div><div class="tl-eta">⏱️ الوقت المتوقع للانتهاء: ٢-٤ أيام عمل</div></div>
+          </div>
+          <div class="tl-step future">
+            <div class="tl-rail"><div class="tl-node"></div><div class="tl-line"></div></div>
+            <div class="tl-body"><div class="tl-title-text">جاهز للاستلام</div><div class="tl-desc">منتجك جاهز للاستلام أو الشحن ليك</div><div class="tl-time">—</div></div>
+          </div>
+          <div class="tl-step future">
+            <div class="tl-rail"><div class="tl-node"></div></div>
+            <div class="tl-body"><div class="tl-title-text">تم الإغلاق</div><div class="tl-desc">تم إغلاق الطلب بنجاح، شكراً لثقتك</div><div class="tl-time">—</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ═══════════════════════════ ALERTS ═══════════════════════════ -->
+<section class="ds-section" id="alerts">
+  <h2 class="ds-section-title">التنبيهات والإشعارات</h2>
+
+  <div class="ds-label">تنبيهات مضمّنة</div>
+  <div class="ds-demo" style="display:flex;flex-direction:column;gap:var(--sp-3);margin-bottom:var(--sp-6)">
+    <div class="alert alert-success"><svg class="alert-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4M12 22c5.5 0 10-4.5 10-10S17.5 2 12 2 2 6.5 2 12s4.5 10 10 10z"/></svg><div class="alert-body"><div class="alert-title">تم تأكيد طلبك بنجاح</div><div>رقم الطلب HVAR-20260601-0042 — هتلاقي التفاصيل على واتساب.</div></div></div>
+    <div class="alert alert-warning"><svg class="alert-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg><div class="alert-body"><div class="alert-title">كمية محدودة</div><div>متبقي ٢ قطع فقط من هذا المنتج — اطلب قبل النفاد.</div></div></div>
+    <div class="alert alert-danger"><svg class="alert-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg><div class="alert-body"><div class="alert-title">رقم الموبايل غير صحيح</div><div>تأكد من الرقم — الأرقام المصرية تبدأ بـ 010، 011، 012، أو 015.</div></div></div>
+    <div class="alert alert-info"><svg class="alert-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8h.01M12 11v5"/></svg><div class="alert-body"><div class="alert-title">بيانات شخصية محمية</div><div>بياناتك مشفّرة ومش بتتشارك مع أي طرف تالت.</div></div></div>
+  </div>
+
+  <div class="ds-label">Toast Notifications</div>
+  <div class="ds-demo center">
+    <button class="btn btn-secondary btn-sm" onclick="showToast('success','✓ تم إضافة المنتج للسلة 🛒')">Toast نجاح</button>
+    <button class="btn btn-secondary btn-sm" onclick="showToast('danger','✕ حصل خطأ — حاول تاني')">Toast خطأ</button>
+    <button class="btn btn-secondary btn-sm" onclick="showToast('default','جاري تحديث الطلب…')">Toast عادي</button>
+  </div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ═══════════════════════════ DARK MODE ═══════════════════════════ -->
+<section class="ds-section" id="darkmode">
+  <h2 class="ds-section-title">الوضع الليلي</h2>
+  <p class="ds-section-sub">أجواء داكنة حقيقية — ليست ألوان مقلوبة. كل قيمة سطح ومداد ومقبض تم ضبطه منفصلاً لكل وضع.</p>
+
+  <div class="component-pair">
+    <div>
+      <div class="ds-label">الوضع الفاتح</div>
+      <div class="ds-demo" style="display:flex;flex-direction:column;gap:var(--sp-3)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="body-sm text-secondary">bg</span><div style="width:40px;height:24px;border-radius:6px;background:var(--bg);border:1px solid var(--border)"></div>
+          <span class="body-sm text-secondary">bg-base</span><div style="width:40px;height:24px;border-radius:6px;background:var(--bg-base);border:1px solid var(--border)"></div>
+          <span class="body-sm text-secondary">bg-subtle</span><div style="width:40px;height:24px;border-radius:6px;background:var(--bg-subtle);border:1px solid var(--border)"></div>
+          <span class="body-sm text-secondary">bg-inset</span><div style="width:40px;height:24px;border-radius:6px;background:var(--bg-inset);border:1px solid var(--border)"></div>
+        </div>
+        <div class="product-card" style="max-width:240px">
+          <div class="product-card-image"><div style="font-size:3.5rem">🥤</div></div>
+          <div class="product-card-body"><div class="product-card-cat">خلاطات</div><div class="product-card-name">خلاط كينوود برو</div><div class="product-card-price"><span class="price-sm">٩٨٠<span class="price-unit">ج.م</span></span></div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="ds-label">معاينة الوضع الداكن</div>
+      <div class="ds-demo dark-preview" style="display:flex;flex-direction:column;gap:var(--sp-3);border-radius:var(--radius-xl)">
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="width:40px;height:24px;border-radius:6px;background:#100d0b;border:1px solid rgba(240,232,228,.12)"></div>
+          <div style="width:40px;height:24px;border-radius:6px;background:#1a1310;border:1px solid rgba(240,232,228,.12)"></div>
+          <div style="width:40px;height:24px;border-radius:6px;background:#221a16;border:1px solid rgba(240,232,228,.12)"></div>
+          <div style="width:40px;height:24px;border-radius:6px;background:#2b2018;border:1px solid rgba(240,232,228,.12)"></div>
+          <span style="font-size:.7rem;color:rgba(240,232,228,.4);font-family:var(--font-mono)">bg scale</span>
+        </div>
+        <!-- dark mode card preview -->
+        <div style="background:#1a1310;border:1px solid rgba(240,232,228,.09);border-radius:var(--radius-xl);overflow:hidden;max-width:240px;box-shadow:0 12px 32px rgba(0,0,0,.56)">
+          <div style="background:#221a16;aspect-ratio:1;display:grid;place-items:center;max-height:140px;font-size:3.5rem;filter:drop-shadow(0 8px 24px rgba(0,0,0,.5))">🥤</div>
+          <div style="padding:var(--sp-4)">
+            <div style="font-size:.72rem;font-weight:700;color:rgba(240,232,228,.4);text-transform:uppercase;letter-spacing:.08em">خلاطات</div>
+            <div style="font-weight:700;color:#f0e8e4;margin-top:4px;font-size:.95rem">خلاط كينوود برو</div>
+            <div style="font-family:var(--font-numeric);font-weight:800;font-size:1.1rem;color:#f0e8e4;margin-top:6px">٩٨٠ <span style="font-size:.7em;font-weight:600;color:rgba(240,232,228,.5)">ج.م</span></div>
+            <div style="margin-top:10px;background:#2b2018;border:1.5px solid rgba(240,232,228,.14);border-radius:var(--radius-md);height:38px;display:grid;place-items:center;color:#c9b8b0;font-weight:700;font-size:.88rem">أضف للسلة</div>
+          </div>
+        </div>
+        <p style="color:rgba(240,232,228,.36);font-size:.74rem;font-family:var(--font-mono)">data-theme="dark"</p>
+      </div>
+    </div>
+  </div>
+  <div class="note note-info mt-6">ℹ️ استخدم <code style="font-family:var(--font-mono)">document.documentElement.setAttribute('data-theme','dark')</code> لتفعيل الوضع الداكن، واحفظ التفضيل في <code style="font-family:var(--font-mono)">localStorage</code>.</div>
+</section>
+
+<div class="ds-divider"></div>
+
+<!-- ═══════════════════════════ RTL ═══════════════════════════ -->
+<section class="ds-section" id="rtl">
+  <h2 class="ds-section-title">دعم RTL الكامل</h2>
+  <p class="ds-section-sub">النظام مبني RTL-first من الأساس. كل المسافات والحدود والظلال وتموضع العناصر تستخدم الخصائص المنطقية <code style="font-family:var(--font-mono)">inline-start / inline-end</code>.</p>
+
+  <div class="ds-demo" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-6)">
+    <div>
+      <div class="ds-label" style="margin-bottom:var(--sp-3)">RTL — عربي (الحالي)</div>
+      <div style="direction:rtl;display:flex;flex-direction:column;gap:var(--sp-3)">
+        <div class="phone-field">
+          <span class="phone-prefix">🇪🇬 <span>٢٠+</span></span>
+          <input class="phone-number-input" placeholder="01X XXXX XXXX" value="01012345678" readonly>
+        </div>
+        <select class="input"><option>المحافظة — تُفتح من اليمين</option></select>
+        <div class="alert alert-success" style="text-align:right"><div class="alert-body"><div class="alert-title">تم الحفظ ✓</div>بياناتك اتحفظت بنجاح.</div></div>
+      </div>
+    </div>
+    <div>
+      <div class="ds-label" style="margin-bottom:var(--sp-3)">LTR — English fallback</div>
+      <div style="direction:ltr;display:flex;flex-direction:column;gap:var(--sp-3)">
+        <div class="phone-field">
+          <span class="phone-prefix" style="border-inline-start:none;border-inline-end:1.5px solid var(--border-medium)">🇬🇧 <span>+44</span></span>
+          <input class="phone-number-input" placeholder="07X XXXX XXXX" style="text-align:left;direction:ltr" readonly>
+        </div>
+        <select class="input" style="background-position:right 14px center"><option>Governorate — opens LTR</option></select>
+        <div class="alert alert-info"><div class="alert-body"><div class="alert-title">Logical props adapt</div>Margins, borders, icons all flip automatically.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note note-warning mt-6">⚠ الأرقام والأسعار: دائماً اتجاه LTR داخل الصفحة العربية — استخدم <code style="font-family:var(--font-mono)">direction:ltr; text-align:right</code> لحقول الأرقام.</div>
+</section>
+
+<!-- WA FAB demo -->
+<button class="wa-fab" title="تواصل على واتساب" onclick="showToast('default','🟢 جاري فتح واتساب…')">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4-1l-3 .8.8-2.8A8 8 0 1112 20zm4.5-5.6c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1-.6.8-.8 1-.3.2-.5 0a6.5 6.5 0 01-3.2-2.8c-.2-.4.2-.4.6-1.3.1-.2 0-.3 0-.5l-.7-1.7c-.2-.5-.4-.4-.5-.4h-.5a1 1 0 00-.7.3 3 3 0 00-1 2.2 5.3 5.3 0 001.1 2.8 12 12 0 004.6 4c2.2.8 2.2.5 2.6.5a2.7 2.7 0 001.8-1.2 2.2 2.2 0 00.1-1.2c0-.1-.2-.2-.5-.3z"/></svg>
+</button>
+
+<!-- Toast zone -->
+<div class="toast-zone" id="toastZone"></div>
+
+</div><!-- /ds-page -->
+</main><!-- /ds-main -->
+</div><!-- /ds-layout -->
+
+<!-- ─────────────────────────────────────────────────────── animations ─── -->
+<style>
+@keyframes pop      { from{transform:scale(0)}to{transform:scale(1)} }
+@keyframes ring-out { 0%{transform:scale(.7);opacity:.5}100%{transform:scale(1.6);opacity:0} }
+@keyframes drive    { 0%,100%{transform:translateX(0)}50%{transform:translateX(-8px)} }
+</style>
+
+<script>
+/* theme */
+function toggleTheme(){
+  const root=document.documentElement;
+  const dark=root.getAttribute('data-theme')==='dark';
+  root.setAttribute('data-theme',dark?'light':'dark');
+  localStorage.setItem('hvar_theme',dark?'light':'dark');
+  document.getElementById('themeIcon').textContent=dark?'🌙':'☀️';
+  document.getElementById('themeLabel').textContent=dark?'الوضع الليلي':'الوضع الفاتح';
+}
+(function(){
+  const saved=localStorage.getItem('hvar_theme');
+  if(saved==='dark'){document.documentElement.setAttribute('data-theme','dark');
+    document.getElementById('themeIcon').textContent='☀️';
+    document.getElementById('themeLabel').textContent='الوضع الفاتح';}
+})();
+
+/* toast */
+function showToast(type,msg){
+  const z=document.getElementById('toastZone');
+  const t=document.createElement('div');
+  t.className='toast'+(type==='success'?' toast-success':type==='danger'?' toast-danger':'');
+  t.textContent=msg;
+  z.appendChild(t);
+  setTimeout(()=>{t.style.transition='opacity .3s,transform .3s';t.style.opacity='0';t.style.transform='translateY(12px)';
+    setTimeout(()=>t.remove(),320);},2800);
+}
+
+/* sidebar active link + mobile nav */
+const sideLinks=document.querySelectorAll('.ds-nav-link[href^="#"]');
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){
+    sideLinks.forEach(l=>l.classList.remove('active'));
+    const match=document.querySelector(`.ds-nav-link[href="#${e.target.id}"]`);
+    if(match)match.classList.add('active');
+  }});
+},{rootMargin:'-30% 0px -60% 0px'});
+document.querySelectorAll('.ds-section[id]').forEach(s=>observer.observe(s));
+sideLinks.forEach(l=>l.addEventListener('click',e=>{e.preventDefault();
+  document.querySelector(l.getAttribute('href')).scrollIntoView({behavior:'smooth',block:'start'});
+}));
+
+/* phone validation demo */
+const ph=document.getElementById('phoneDemo');
+if(ph){ph.addEventListener('input',function(){
+  const v=this.value.replace(/\D/g,'');
+  const ok=/^01[0125]\d{8}$/.test(v);
+  this.closest('.phone-field').classList.toggle('input-error',v.length>=11&&!ok);
+});}
+
+/* OTP auto-hop demo */
+document.querySelectorAll('.otp-input').forEach((inp,i,arr)=>{
+  inp.addEventListener('input',function(){
+    this.value=this.value.replace(/\D/g,'');
+    if(this.value&&i<arr.length-1)arr[i+1].focus();
+    this.classList.toggle('otp-filled',!!this.value);
+  });
+});
+
+/* chip bar single-select */
+document.querySelectorAll('.chip-bar').forEach(bar=>{
+  bar.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click',function(){
+      bar.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+});
+
+/* mobile sidebar */
+const menuBtn=document.getElementById('menuBtn');
+if(window.innerWidth<=900&&menuBtn){menuBtn.style.display='grid';}
+window.addEventListener('resize',()=>{if(menuBtn)menuBtn.style.display=window.innerWidth<=900?'grid':'none';});
+</script>
+</body>
+</html>

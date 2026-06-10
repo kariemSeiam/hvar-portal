@@ -30,8 +30,6 @@ __pycache__/
 
 # Scratch / temp
 temp/
-/hvar-design-system.html
-/stage-and-commit.html
 
 # Separate embedded project (own repo / own .env — not part of this repo)
 hvarstore-main/
