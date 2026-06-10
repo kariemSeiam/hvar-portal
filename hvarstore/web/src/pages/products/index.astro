@@ -342,8 +342,10 @@ function buildUrl(params: Record<string, string | number | undefined | null>) {
     inset-block: 0;
     inset-inline-end: 0;
     width: 3.5rem;
-    background: linear-gradient(to inline-start, var(--c-bg) 0%, transparent 100%);
+    /* RTL: inline-end is physical left — fade from solid left to transparent right */
+    background: linear-gradient(to right, var(--c-bg) 0%, transparent 100%);
     z-index: 1;
+    pointer-events: none;
   }
   @media (min-width: 1024px) { .chip-fade-end { display: none; } }
 </style>
