@@ -353,7 +353,7 @@ const breadcrumbJsonld = JSON.stringify({
   .pdp-frame :global(.pdp-ph-icon) { position: relative; z-index: 2; width: clamp(7rem, 30vw, 12rem); height: clamp(7rem, 30vw, 12rem); color: var(--c-brand); opacity: 0.30; }
   .pdp-mesh { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(var(--c-brand-rgb),0.10) 0%, transparent 65%); }
   .dark .pdp-mesh { background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(var(--c-brand-rgb),0.16) 0%, transparent 65%); }
-  .pdp-img { width:100%; height:100%; object-fit:cover; display:block; position:relative; z-index:0; }
+  .pdp-img { width:100%; height:100%; object-fit:contain; padding:1.5rem; display:block; position:relative; z-index:0; background: linear-gradient(160deg,#ffffff 0%,#faf6f0 100%); }
   @media (prefers-reduced-motion: no-preference) { .pdp-img { animation: pdp-breath 20s ease-in-out infinite; transform-origin: center; } }
   @keyframes pdp-breath { 0%,100%{transform:scale(1)} 50%{transform:scale(1.018)} }
 
@@ -386,7 +386,7 @@ const breadcrumbJsonld = JSON.stringify({
   @media (max-width:639px) {
     .pdp-related-scroll { display:flex; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; gap:0.875rem; padding-bottom:0.5rem; }
     .pdp-related-scroll::-webkit-scrollbar { display:none; }
-    .pdp-related-card { min-width:160px; flex-shrink:0; }
+    .pdp-related-card { min-width:min(200px,48vw); flex-shrink:0; }
   }
   @media (min-width:640px) { .pdp-related-scroll { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; } }
   @media (min-width:1024px) { .pdp-related-scroll { grid-template-columns:repeat(4,1fr); } }

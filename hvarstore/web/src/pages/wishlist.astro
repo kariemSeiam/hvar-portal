@@ -1,27 +1,23 @@
 ---
 import Base from '../layouts/Base.astro'
 import WishlistView from '../components/WishlistView'
+import InnerHero from '../components/InnerHero.astro'
 ---
 
 <Base
   title="المفضلة | هفار"
   description="المنتجات اللي حفظتيها للرجوع ليها — قارني واختاري في وقتك."
 >
+
+  <InnerHero
+    label="قائمتك"
+    title="المفضلة"
+    subtitle="المنتجات اللي حفظتيها — قارني واختاري في وقتك"
+    variant="utility"
+  />
+
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-    <nav class="mb-6" aria-label="مسار التنقل">
-      <ol class="flex items-center gap-2 text-xs font-cairo text-muted">
-        <li><a href="/" class="hover:text-[var(--c-brand)] transition-colors">البيت</a></li>
-        <li class="opacity-40" aria-hidden="true">‹</li>
-        <li class="text-ink font-semibold">المفضلة</li>
-      </ol>
-    </nav>
-
-    <h1 class="font-cairo font-black text-2xl text-ink mb-7">
-      المفضلة
-    </h1>
-
     <WishlistView client:load />
-
   </div>
+
 </Base>
