@@ -7,61 +7,122 @@ export default function CartFab() {
 	const count = useStore(cartCount);
 	const hasItems = count > 0;
 
+	const ariaLabel = `السلة — ${count} ${count === 1 ? "منتج" : "منتجات"}`;
+
 	return (
-		<button
-			type="button"
-			onClick={() => cartDrawerOpen.set(true)}
-			aria-label={`السلة — ${count} ${count === 1 ? "منتج" : "منتجات"}`}
-			className="fixed bottom-5 left-5 z-40 flex items-center justify-center w-14 h-14 rounded-2xl text-white transition-all duration-300 hover:-translate-y-1 active:scale-95"
-			style={{
-				background: hasItems
-					? "linear-gradient(135deg, var(--c-brand) 0%, #a81f1d 100%)"
-					: "rgba(35,27,24,0.45)",
-				backdropFilter: "blur(8px)",
-				WebkitBackdropFilter: "blur(8px)",
-				boxShadow: hasItems
-					? "0 8px 28px rgba(var(--c-brand-rgb),0.3)"
-					: "0 2px 12px rgba(35,27,24,0.10)",
-				paddingBottom: "calc(0px + env(safe-area-inset-bottom, 0px))",
-				transition: "all 0.35s cubic-bezier(0.22,1,0.36,1)",
-				border: "none",
-				cursor: "pointer",
-			}}
-		>
-			<div className="relative flex items-center justify-center">
-				{/* Ember glow ring when items exist */}
-				{hasItems && (
+		<>
+			{/* ── Mobile pill — floats above bottom nav, visible only when cart has items ── */}
+			<button
+				type="button"
+				onClick={() => cartDrawerOpen.set(true)}
+				aria-label={ariaLabel}
+				className="md:hidden fixed z-50 flex items-center gap-2 font-cairo font-bold text-white rounded-2xl"
+				style={{
+					bottom: "calc(3.5rem + env(safe-area-inset-bottom, 0px) + 0.625rem)",
+					insetInlineEnd: "0.875rem",
+					height: "48px",
+					paddingInline: "0.875rem 1.125rem",
+					background: "linear-gradient(135deg, var(--c-brand) 0%, #a81f1d 100%)",
+					boxShadow: "0 8px 28px rgba(var(--c-brand-rgb), 0.38), 0 2px 8px rgba(0,0,0,0.14)",
+					opacity: hasItems ? 1 : 0,
+					pointerEvents: hasItems ? "auto" : "none",
+					transform: hasItems ? "translateY(0) scale(1)" : "translateY(14px) scale(0.94)",
+					transition: "opacity 0.3s cubic-bezier(0.22,1,0.36,1), transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease",
+					border: "none",
+					cursor: "pointer",
+					fontSize: "0.875rem",
+				}}
+			>
+				{/* Bag icon + count badge */}
+				<span className="relative flex-shrink-0 flex items-center justify-center">
+					<ShoppingBag size={18} />
 					<span
-						className="absolute inset-0 rounded-2xl"
+						className="absolute flex items-center justify-center rounded-full font-inter font-bold leading-none pointer-events-none"
 						style={{
-							border: "1.5px solid rgba(255,107,82,0.3)",
-							animation: "fabGlow 2.4s ease-in-out infinite",
+							top: "-6px",
+							insetInlineEnd: "-7px",
+							minWidth: "16px",
+							height: "16px",
+							fontSize: "9px",
+							paddingInline: "2px",
+							background: "#fff",
+							color: "var(--c-brand)",
+							opacity: hasItems ? 1 : 0,
+							transform: hasItems ? "scale(1)" : "scale(0)",
+							transition: "all 0.3s cubic-bezier(0.34,1.56,0.64,1)",
+						}}
+					>
+						{count > 99 ? "99+" : count}
+					</span>
+				</span>
+
+				{/* Label */}
+				<span>السلة</span>
+
+
+			</button>
+
+			{/* ── Desktop FAB ── */}
+			<button
+				type="button"
+				onClick={() => cartDrawerOpen.set(true)}
+				aria-label={ariaLabel}
+				className="hidden md:flex fixed z-40 items-center justify-center rounded-2xl text-white"
+				style={{
+					bottom: "1.5rem",
+					insetInlineEnd: "1.25rem",
+					width: "3.5rem",
+					height: "3.5rem",
+					background: "linear-gradient(135deg, var(--c-brand) 0%, #a81f1d 100%)",
+					boxShadow: "0 8px 28px rgba(var(--c-brand-rgb),0.32), 0 2px 8px rgba(0,0,0,0.10)",
+					opacity: hasItems ? 1 : 0,
+					pointerEvents: hasItems ? "auto" : "none",
+					transform: hasItems ? "translateY(0) scale(1)" : "translateY(14px) scale(0.92)",
+					transition: "opacity 0.3s cubic-bezier(0.22,1,0.36,1), transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease",
+					border: "none",
+					cursor: "pointer",
+				}}
+			>
+				<span className="relative flex items-center justify-center">
+					{/* Glow ring when active */}
+					{hasItems && (
+						<span
+							className="absolute inset-0 rounded-2xl pointer-events-none"
+							style={{
+								border: "1.5px solid rgba(255,107,82,0.32)",
+								animation: "fabGlow 2.4s ease-in-out infinite",
+							}}
+						/>
+					)}
+
+					<ShoppingBag
+						size={20}
+						style={{
+							color: hasItems ? "#fff" : "rgba(255,255,255,0.52)",
+							transition: "color 0.3s",
 						}}
 					/>
-				)}
 
-				<ShoppingBag
-					size={20}
-					style={{
-						color: hasItems ? "#fff" : "rgba(255,255,255,0.55)",
-						transition: "color 0.3s",
-					}}
-				/>
-
-				{/* Badge */}
-				<span
-					className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center text-[9px] font-bold rounded-full leading-none pointer-events-none"
-					style={{
-						fontFamily: "'Inter', sans-serif",
-						background: hasItems ? "#fff" : "transparent",
-						color: hasItems ? "var(--c-brand)" : "transparent",
-						transform: hasItems ? "scale(1)" : "scale(0)",
-						transition: "all 0.3s cubic-bezier(0.34,1.56,0.64,1)",
-					}}
-				>
-					{count > 99 ? "99+" : count}
+					{/* Count badge */}
+					<span
+						className="absolute flex items-center justify-center rounded-full font-inter font-bold leading-none pointer-events-none"
+						style={{
+							top: "-4px",
+							insetInlineEnd: "-4px",
+							minWidth: "18px",
+							height: "18px",
+							fontSize: "9px",
+							paddingInline: "3px",
+							background: hasItems ? "#fff" : "transparent",
+							color: hasItems ? "var(--c-brand)" : "transparent",
+							transform: hasItems ? "scale(1)" : "scale(0)",
+							transition: "all 0.3s cubic-bezier(0.34,1.56,0.64,1)",
+						}}
+					>
+						{count > 99 ? "99+" : count}
+					</span>
 				</span>
-			</div>
-		</button>
+			</button>
+		</>
 	);
 }
