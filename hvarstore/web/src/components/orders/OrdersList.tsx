@@ -68,18 +68,41 @@ export default function OrdersList() {
 
 	if (orders.length === 0) {
 		return (
-			<div className="text-center py-20">
-				<div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-2xl bg-stone-100 dark:bg-stone-800 text-faint">
-					<Package size={28} />
-				</div>
-				<p className="font-cairo text-lg text-muted mb-2">
-					لا يوجد طلبات
+			<div className="relative flex flex-col items-center justify-center text-center px-4 py-20 overflow-hidden">
+				<div
+					className="absolute inset-0 pointer-events-none"
+					aria-hidden="true"
+					style={{ background: "radial-gradient(ellipse 55% 50% at 50% 40%, rgba(var(--c-brand-rgb),0.06) 0%, transparent 70%)" }}
+				/>
+				<Package
+					className="relative select-none"
+					strokeWidth={0.9}
+					style={{ width: "clamp(96px,18vw,150px)", height: "auto", color: "var(--c-brand)", opacity: 0.14 }}
+					aria-hidden="true"
+				/>
+				<p className="relative font-cairo font-black text-xl sm:text-2xl mt-5" style={{ color: "var(--c-ink)" }}>
+					لسه مفيش طلبات
+				</p>
+				<p className="relative font-cairo text-sm mt-2 mb-8" style={{ color: "var(--c-ink-muted)" }}>
+					أول طلب ليكِ هيبان هنا — البلدوزر بيستناكِ
 				</p>
 				<a
 					href="/products"
-					className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand hover:bg-[var(--c-brand-hover)] text-white font-cairo font-bold text-sm transition-all mt-4"
+					className="relative inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-cairo font-bold text-base text-white"
+					style={{ background: "var(--c-brand)", transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)" }}
+					onMouseEnter={(e) => {
+						(e.currentTarget as HTMLAnchorElement).style.background = "var(--c-brand-hover)";
+						(e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-2px)";
+					}}
+					onMouseLeave={(e) => {
+						(e.currentTarget as HTMLAnchorElement).style.background = "var(--c-brand)";
+						(e.currentTarget as HTMLAnchorElement).style.transform = "";
+					}}
 				>
-					تسوق الآن
+					تسوق دلوقتي
+					<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+						<path d="M4 8h8M8 4l4 4-4 4" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+					</svg>
 				</a>
 			</div>
 		);
