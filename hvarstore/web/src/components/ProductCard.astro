@@ -419,12 +419,14 @@ const addPayload = JSON.stringify({
     padding: clamp(0.7rem, 5cqi, 1rem);
   }
   .pc-cat {
+    align-self: flex-start;
     font-size: clamp(0.62rem, 3cqi, 0.72rem);
     color: var(--c-ink-faint);
     margin-block-end: 0.25rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 100%;
   }
   .pc-nick {
     font-weight: 700;

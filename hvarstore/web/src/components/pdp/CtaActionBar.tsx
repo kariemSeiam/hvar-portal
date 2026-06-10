@@ -318,13 +318,14 @@ export default function CtaActionBar({ product }: Props) {
 						)}
 					</button>
 
-					{/* Zone 3: WhatsApp */}
+					{/* Zone 3: WhatsApp — explicit width so it never shrinks to just icon padding */}
 					<a
 						href={waInquiry}
 						target="_blank"
 						rel="noopener noreferrer"
-						className="flex items-center justify-center px-4 transition-opacity hover:opacity-90 flex-shrink-0"
+						className="flex items-center justify-center transition-opacity hover:opacity-90 flex-shrink-0"
 						style={{
+							width: "56px",
 							backgroundColor: "#25D366",
 							color: "#fff",
 							borderInlineStart: "1px solid rgba(0,0,0,0.08)",
