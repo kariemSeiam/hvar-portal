@@ -121,7 +121,7 @@ function buildUrl(params: Record<string, string | number | undefined | null>) {
             </h1>
             <p class="reveal-child font-cairo text-sm mt-2"
                style="color:rgba(245,239,230,0.40)">
-              من ٨٠٠ إلى ٢٢٠٠ وات — بيتك دايما جاهز
+              من ٥٠٠ لـ ٨٠٠٠ وات — بيتك دايما جاهز
             </p>
           </div>
 
@@ -129,7 +129,7 @@ function buildUrl(params: Record<string, string | number | undefined | null>) {
           <p class="hidden sm:block font-cairo font-black select-none pointer-events-none leading-none flex-shrink-0"
              style="font-size:clamp(2.5rem,7vw,5rem);color:var(--c-brand);opacity:0.08;letter-spacing:-0.04em"
              aria-hidden="true">
-            ٢٢٠٠
+            ٨٠٠٠
           </p>
 
         </div>
@@ -200,12 +200,14 @@ function buildUrl(params: Record<string, string | number | undefined | null>) {
 
   <!-- Categories filter chips -->
   {categories.length > 0 && (
-    <div class="bg-bg border-b border-hvar py-3">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+    <div class="bg-bg border-b border-hvar py-3 relative">
+      <!-- edge fade to hint scroll -->
+      <div class="chip-fade-end pointer-events-none" aria-hidden="true"></div>
+      <div class="max-w-7xl mx-auto">
+        <div class="chip-row flex items-center gap-2 overflow-x-auto px-4 sm:px-6 lg:px-8 pb-1 scrollbar-none">
           <a
             href="/products"
-            class={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-cairo font-semibold transition-colors ${
+            class={`chip-item flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-cairo font-semibold transition-colors ${
               !categoryId
                 ? 'bg-brand text-white'
                 : 'bg-surface border border-hvar text-muted hover:border-[var(--c-brand)] hover:text-[var(--c-brand)]'
@@ -216,7 +218,7 @@ function buildUrl(params: Record<string, string | number | undefined | null>) {
           {categories.map((cat) => (
             <a
               href={buildUrl({ category: cat.id })}
-              class={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-cairo font-semibold transition-colors ${
+              class={`chip-item flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-cairo font-semibold transition-colors ${
                 categoryId === cat.id
                   ? 'bg-brand text-white'
                   : 'bg-surface border border-hvar text-muted hover:border-[var(--c-brand)] hover:text-[var(--c-brand)]'
@@ -248,18 +250,29 @@ function buildUrl(params: Record<string, string | number | undefined | null>) {
     <div class="absolute inset-0 -z-10 grid-dot-sm rounded-3xl pointer-events-none" aria-hidden="true" style="mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,0.06) 30%,rgba(0,0,0,0.04) 70%,transparent 100%)"></div>
 
     {products.length === 0 ? (
-      <div class="text-center py-24">
-        <div class="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-2xl bg-stone-100 dark:bg-stone-800 text-faint">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="7"/>
-            <line x1="16.5" y1="16.5" x2="21" y2="21"/>
-          </svg>
-        </div>
-        <p class="font-cairo text-lg text-muted">
-          {q ? `لا توجد نتائج لـ "${q}"` : 'لا توجد منتجات متاحة حالياً'}
+      <div class="relative flex flex-col items-center justify-center text-center py-24 overflow-hidden">
+        <div class="absolute inset-0 pointer-events-none" aria-hidden="true"
+             style="background:radial-gradient(ellipse 55% 50% at 50% 40%, rgba(var(--c-brand-rgb),0.06) 0%, transparent 70%)"></div>
+        <svg class="relative" aria-hidden="true"
+             style="width:clamp(80px,16vw,130px);height:auto;color:var(--c-brand);opacity:0.15"
+             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          <path d="M8 11h6M11 8v6" />
+        </svg>
+        <p class="relative font-cairo font-black text-xl sm:text-2xl mt-5" style="color:var(--c-ink)">
+          {q ? `مفيش نتائج لـ "${q}"` : 'مفيش منتجات دلوقتي'}
         </p>
-        <a href="/products" class="inline-block mt-4 font-cairo text-sm text-brand hover:underline">
-          عرض كل المنتجات
+        <p class="relative font-cairo text-sm mt-2 mb-8" style="color:var(--c-ink-muted)">
+          {q ? 'جربي كلمة تانية أو تصفّحي الكل' : 'جربي تصفّحي كل المنتجات'}
+        </p>
+        <a href="/products"
+           class="relative inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-cairo font-bold text-base text-white"
+           style="background:var(--c-brand);transition:all 0.3s cubic-bezier(0.22,1,0.36,1)">
+          كل المنتجات
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M4 8h8M8 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </a>
       </div>
     ) : (
@@ -313,4 +326,26 @@ function buildUrl(params: Record<string, string | number | undefined | null>) {
 <style>
   .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-none::-webkit-scrollbar { display: none; }
+
+  /* Chip row — scroll-snap */
+  .chip-row {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .chip-row::-webkit-scrollbar { display: none; }
+  .chip-item { scroll-snap-align: start; }
+
+  /* Trailing fade mask to hint more content */
+  .chip-fade-end {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    width: 3.5rem;
+    /* RTL: inline-end is physical left — fade from solid left to transparent right */
+    background: linear-gradient(to right, var(--c-bg) 0%, transparent 100%);
+    z-index: 1;
+    pointer-events: none;
+  }
+  @media (min-width: 1024px) { .chip-fade-end { display: none; } }
 </style>

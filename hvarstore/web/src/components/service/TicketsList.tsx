@@ -82,18 +82,39 @@ export default function TicketsList() {
 
 	if (tickets.length === 0) {
 		return (
-			<div className="text-center py-20">
-				<div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-2xl bg-stone-100 dark:bg-stone-800 text-muted">
-					<Wrench size={28} />
-				</div>
-				<p className="font-cairo text-lg text-muted mb-2">
-					لا يوجد تذاكر خدمة
+			<div className="relative flex flex-col items-center justify-center text-center px-4 py-20 overflow-hidden">
+				<div
+					className="absolute inset-0 pointer-events-none"
+					aria-hidden="true"
+					style={{ background: "radial-gradient(ellipse 55% 50% at 50% 40%, rgba(var(--c-brass-rgb),0.07) 0%, transparent 70%)" }}
+				/>
+				<Wrench
+					className="relative select-none"
+					strokeWidth={0.9}
+					style={{ width: "clamp(80px,15vw,120px)", height: "auto", color: "var(--c-brass)", opacity: 0.18 }}
+					aria-hidden="true"
+				/>
+				<p className="relative font-cairo font-black text-xl sm:text-2xl mt-5" style={{ color: "var(--c-ink)" }}>
+					مفيش طلبات خدمة
+				</p>
+				<p className="relative font-cairo text-sm mt-2 mb-8" style={{ color: "var(--c-ink-muted)" }}>
+					لو عندك منتج محتاج صيانة أو استبدال — افتحي تذكرة وفريقنا هيرد خلال ٢٤ ساعة
 				</p>
 				<a
 					href="/service/new"
-					className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand hover:bg-[var(--c-brand-hover)] text-white font-cairo font-bold text-sm transition-all mt-4"
+					className="relative inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-cairo font-bold text-base text-white"
+					style={{ background: "var(--c-brand)", transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)" }}
+					onMouseEnter={(e) => {
+						(e.currentTarget as HTMLAnchorElement).style.background = "var(--c-brand-hover)";
+						(e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-2px)";
+					}}
+					onMouseLeave={(e) => {
+						(e.currentTarget as HTMLAnchorElement).style.background = "var(--c-brand)";
+						(e.currentTarget as HTMLAnchorElement).style.transform = "";
+					}}
 				>
-					فتح تذكرة جديدة
+					<Wrench size={16} />
+					افتحي طلب خدمة
 				</a>
 			</div>
 		);

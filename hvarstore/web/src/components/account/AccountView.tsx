@@ -46,23 +46,51 @@ export default function AccountView() {
 		},
 	];
 
+	const firstName = user.name.split(" ")[0];
+
 	return (
-		<div className="space-y-6">
-			{/* Profile card */}
-			<div className="flex items-center gap-4 p-5 rounded-2xl bg-surface border border-hvar">
-				<div className="w-14 h-14 flex items-center justify-center rounded-2xl bg-red-50 dark:bg-red-950/20 text-brand">
-					<User size={24} />
-				</div>
-				<div className="flex-1 min-w-0">
-					<p className="font-cairo font-bold text-lg text-ink">
-						{user.name}
-					</p>
-					<p
-						className="font-inter text-sm text-muted tabular-nums"
-						dir="ltr"
+		<div className="space-y-5">
+
+			{/* Welcome + profile hero */}
+			<div
+				className="relative overflow-hidden rounded-2xl p-6"
+				style={{
+					background: "linear-gradient(135deg, #130F0C 0%, #1e1208 100%)",
+					border: "1px solid rgba(var(--c-brand-rgb),0.20)",
+				}}
+			>
+				{/* Ember glow */}
+				<div
+					className="absolute inset-0 pointer-events-none"
+					style={{
+						background: "radial-gradient(ellipse 70% 80% at 20% 50%, rgba(var(--c-brand-rgb),0.12) 0%, transparent 65%)",
+					}}
+					aria-hidden="true"
+				/>
+
+				<div className="relative flex items-center gap-4">
+					{/* Avatar monogram */}
+					<div
+						className="w-14 h-14 flex-shrink-0 flex items-center justify-center rounded-2xl font-cairo font-black text-xl text-white select-none"
+						style={{ background: "rgba(var(--c-brand-rgb),0.25)", border: "1.5px solid rgba(var(--c-brand-rgb),0.40)" }}
 					>
-						{user.phone}
-					</p>
+						{firstName[0]}
+					</div>
+
+					<div className="flex-1 min-w-0">
+						<p
+							className="font-cairo font-semibold text-xs uppercase tracking-[0.14em] mb-0.5"
+							style={{ color: "var(--c-brass)" }}
+						>
+							مرحباً بيكِ
+						</p>
+						<p className="font-cairo font-black text-xl leading-tight" style={{ color: "#F5EFE6" }}>
+							{firstName}
+						</p>
+						<p className="font-inter text-sm mt-0.5 tabular-nums" dir="ltr" style={{ color: "rgba(245,239,230,0.45)" }}>
+							{user.phone}
+						</p>
+					</div>
 				</div>
 			</div>
 
@@ -72,33 +100,68 @@ export default function AccountView() {
 					<a
 						key={l.href}
 						href={l.href}
-						className="flex items-center gap-4 p-4 rounded-2xl bg-surface border border-hvar hover:border-[var(--c-brand)] transition-all group"
+						className="flex items-center gap-4 p-4 rounded-2xl transition-all group"
+						style={{ background: "var(--c-surface)", border: "1px solid var(--c-border)" }}
+						onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--c-brand)")}
+						onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--c-border)")}
 					>
-						<div className="w-10 h-10 flex items-center justify-center rounded-xl bg-red-50 dark:bg-red-950/20 text-brand group-hover:bg-brand group-hover:text-white transition-all">
+						<div
+							className="w-10 h-10 flex items-center justify-center rounded-xl transition-all group-hover:scale-105"
+							style={{ background: "rgba(var(--c-brand-rgb),0.07)", color: "var(--c-brand)" }}
+						>
 							<l.icon size={18} />
 						</div>
 						<div className="flex-1">
-							<p className="font-cairo font-bold text-sm text-ink">
+							<p className="font-cairo font-bold text-sm" style={{ color: "var(--c-ink)" }}>
 								{l.label}
 							</p>
-							<p className="font-cairo text-xs text-muted">
+							<p className="font-cairo text-xs" style={{ color: "var(--c-ink-muted)" }}>
 								{l.desc}
 							</p>
 						</div>
 						<ChevronLeft
 							size={16}
-							className="text-stone-300 dark:text-stone-600 group-hover:text-[var(--c-brand)] transition-colors"
+							style={{ color: "var(--c-ink-faint)" }}
+							className="group-hover:text-[var(--c-brand)] transition-colors"
 						/>
 					</a>
+				))}
+			</div>
+
+			{/* Trust strip */}
+			<div
+				className="flex items-center justify-center gap-4 py-3.5 px-4 rounded-xl"
+				style={{ background: "var(--c-surface-2)", border: "1px solid var(--c-border)" }}
+			>
+				{[
+					{ icon: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z", text: "ضمان أصلي" },
+					{ icon: "M5 12h14M12 5l7 7-7 7", text: "شحن مجاني" },
+					{ icon: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z", text: "دعم ٢٤/٧" },
+				].map((t, i) => (
+					<span key={i} className="flex items-center gap-1.5 font-cairo text-xs" style={{ color: "var(--c-ink-muted)" }}>
+						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--c-brand)", flexShrink: 0 }}>
+							<path d={t.icon} />
+						</svg>
+						{t.text}
+					</span>
 				))}
 			</div>
 
 			{/* Logout */}
 			<button
 				onClick={handleLogout}
-				className="flex items-center gap-2 w-full p-4 rounded-2xl border border-hvar text-stone-500 hover:text-red-500 hover:border-red-200 dark:hover:border-red-900/30 font-cairo font-semibold text-sm transition-all"
+				className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-2xl font-cairo font-semibold text-sm transition-all"
+				style={{ border: "1px solid var(--c-border)", color: "var(--c-ink-muted)" }}
+				onMouseEnter={(e) => {
+					(e.currentTarget as HTMLButtonElement).style.borderColor = "#ef4444";
+					(e.currentTarget as HTMLButtonElement).style.color = "#ef4444";
+				}}
+				onMouseLeave={(e) => {
+					(e.currentTarget as HTMLButtonElement).style.borderColor = "var(--c-border)";
+					(e.currentTarget as HTMLButtonElement).style.color = "var(--c-ink-muted)";
+				}}
 			>
-				<LogOut size={16} />
+				<LogOut size={15} />
 				تسجيل الخروج
 			</button>
 		</div>

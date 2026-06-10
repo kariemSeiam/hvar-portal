@@ -276,6 +276,51 @@ The stand mixer has a cross-platform name inconsistency: **"المدفع"** on I
 
 ---
 
+## Brand Fragmentation & Commerce Reality (absorbed 2026-06-10)
+
+Hvar does not run one storefront — it runs two, on two platforms, behind two phone numbers. This is a trust and SEO liability before it is anything else, and it is the single highest-leverage fix in this section.
+
+### Two storefronts, two phones, one brand
+
+There is a **sister storefront**, `hvarbrand.com`, separate from the main `hvarstore.com` operation:
+
+| Attribute | Sister storefront (hvarbrand.com) | Main storefront (hvarstore.com) |
+|-----------|-----------------------------------|----------------------------------|
+| Platform | EasyOrders (assets on `files.easy-orders.net` CDN) | Dukan (دكان) white-label platform |
+| Phone | 01090359105 | 01204444196 / hotline 17566 |
+| Facebook | `hvar.eg` — "منتجات هفار HVAR", ~8,408 likes | `hvarstore` — 147,558 followers |
+| Instagram | `@hvar.brand` | `@hvar222` |
+| Email | hvarbrand@gmail.com | info@hvarstore.com |
+| Base | Zagazig, Sharqia / 10th of Ramadan industrial zone | — |
+
+Two phones and two storefronts mean **trust dilution and SEO dilution**: an Egyptian buyer who checks the brand finds two numbers and two sites and wonders which is real; search engines split authority, backlinks, and reviews across two domains that should be one.
+
+**#1 recommendation: unify and 301-redirect.** Pick the canonical domain (`hvarstore.com` carries the larger audience, the hotline, and the Dukan storefront), 301-redirect `hvarbrand.com` to it, consolidate the phone lines, and merge the social presences. Every week the two run in parallel is brand equity and search authority leaking out.
+
+### Quality positioning facts (from the storefronts)
+
+These are stated product-quality claims observed on the storefronts. They sharpen the Ruler-archetype "why Hvar" language:
+
+| Claim | Detail |
+|-------|--------|
+| Materials | "100% Turkish materials/components" with Egyptian final assembly ("تقفيل مصري") — imported quality, locally finished |
+| Jug warranty | **20-year warranty on the break-proof acrylic jug** — distinct from, and far longer than, the standard 2–3 year appliance warranty |
+| Returns | 14-day exchange/return with courier pickup |
+| Spare parts | Free spare parts during the warranty period |
+| Shipping risk | No shipping fee if the customer refuses the order on delivery — zero-risk COD |
+
+The 20-year jug warranty is a standout trust claim — it is the kind of specific, provable detail the tone-voice file prizes over superlatives. The "تقفيل مصري" framing also lets Hvar claim both imported quality (Turkish) and local accountability (Egyptian assembly) in one line.
+
+### Historical tagline variant
+
+A third, likely-older tagline seen in the wild:
+
+**"هفار اختيارك الأول في المطبخ"** — *"Hvar, your first choice in the kitchen"*
+
+Note as a **historical variant** only. It is narrower than the two confirmed taglines (kitchen-only vs. whole-home) and was likely superseded by "بيتك دايما جاهز مع هفار". Do not put it into new use; record it so old assets carrying it are recognizable.
+
+---
+
 ## Logo System
 
 **[TBD: Awaiting formal brand identity delivery]**

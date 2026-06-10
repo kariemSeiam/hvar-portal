@@ -10,6 +10,8 @@ import "@fontsource/inter/600.css"
 import "@fontsource/jetbrains-mono/500.css"
 import Navbar from "../components/Navbar.astro"
 import Footer from "../components/Footer.astro"
+import BottomNav from "../components/BottomNav.astro"
+import WhatsAppFab from "../components/WhatsAppFab.astro"
 import CartFab from "../components/cart/CartFab"
 import CartDrawer from "../components/cart/CartDrawer"
 
@@ -19,6 +21,8 @@ interface Props {
   description?: string
   image?: string
   noFooter?: boolean
+  /** PDP passes this — StickyMobileCta owns the mobile bottom edge there. */
+  noBottomNav?: boolean
   /** JSON-LD structured data snippets (injected before </head>) */
   jsonld?: string[]
 }
@@ -28,6 +32,7 @@ const {
   description = 'تسوق أجهزة المطبخ من هفار: خلاطات، قلايات هوائية، مكاوي، عجانات. ضمان سنتين، شحن مجاني لجميع المحافظات، افحص قبل الدفع.',
   image,
   noFooter = false,
+  noBottomNav = false,
   jsonld = [],
 } = Astro.props
 
@@ -48,12 +53,19 @@ const orgJsonld = ld({
   url: 'https://hvarstore.com',
   logo: defaultOgImage,
   description: 'أجهزة منزلية موثوقة لكل مطبخ مصري. ضمان سنتين، شحن مجاني، افحص قبل الدفع.',
+  telephone: '17566',
+  contactPoint: {
+    ['@type']: 'ContactPoint',
+    telephone: '17566',
+    contactType: 'customer service',
+    areaServed: 'EG',
+    availableLanguage: 'ar',
+  },
   sameAs: [
     'https://www.facebook.com/hvar22',
     'https://www.instagram.com/hvar222',
     'https://www.tiktok.com/@hvarstore1',
   ],
-  // TODO: replace telephone with real Hvar customer service number
 })
 
 const websiteJsonld = ld({
@@ -79,7 +91,7 @@ const websiteJsonld = ld({
     <meta name="format-detection" content="telephone=no" />
     <meta name="author" content="هفار — HVAR" />
 
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <title>{title}</title>
@@ -124,17 +136,31 @@ const websiteJsonld = ld({
     <slot name="head" />
   </head>
 
-  <body class="min-h-screen antialiased" style="background-color:var(--c-bg);color:var(--c-ink)">
+  <body class:list={['min-h-screen antialiased', !noBottomNav && 'has-bnav']} style="background-color:var(--c-bg);color:var(--c-ink)">
     <Navbar />
 
     <main>
       <slot />
     </main>
 
-    <CartFab client:load />
-    <CartDrawer client:load />
+    {/* Mobile: bottom nav owns the cart; CartFab stays for desktop */}
+    <div class="hidden md:block">
+      <CartFab client:idle />
+    </div>
+    <CartDrawer client:idle />
+    <WhatsAppFab hideOnMobile={noBottomNav} />
+    {!noBottomNav && <BottomNav />}
 
     {!noFooter && <Footer />}
+
+    <style is:global>
+      /* Reserve the thumb-zone: keep page content clear of the bottom nav */
+      @media (max-width: 767px) {
+        body.has-bnav {
+          padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px));
+        }
+      }
+    </style>
 
     <!-- Wilson P7: Scroll reveal observer -->
     <script>

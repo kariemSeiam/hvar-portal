@@ -10,7 +10,15 @@ import {
 	LocateFixed,
 } from "lucide-react";
 import { cartItems, cartTotal, cartCount } from "../../stores/cart";
-import { authUser, isLoggedIn, getAuthHeaders } from "../../lib/auth";
+import {
+	authUser,
+	isLoggedIn,
+	getAuthHeaders,
+	login,
+	register,
+	logout,
+	normalizeEgyptPhone,
+} from "../../lib/auth";
 
 interface Gov {
 	id: number;
@@ -60,17 +68,18 @@ export default function CheckoutForm() {
 	const [geoHit, setGeoHit] = useState<string | null>(null);
 	const [pendingDistName, setPendingDistName] = useState<string | null>(null);
 
+	// Inline contact/auth (phone-first — no redirect away from checkout)
+	const [authMode, setAuthMode] = useState<"new" | "existing">("new");
+	const [authName, setAuthName] = useState("");
+	const [authPassword, setAuthPassword] = useState("");
+
 	useEffect(() => {
-		if (!loggedIn) {
-			window.location.href = "/login?redirect=/checkout";
-			return;
-		}
 		if (items.length === 0 && !success) {
 			window.location.href = "/cart";
 			return;
 		}
 		if (user?.phone) setShippingPhone(user.phone);
-	}, [loggedIn, items.length]);
+	}, [items.length, user?.phone]);
 
 	useEffect(() => {
 		fetch(`${API}/api/locations/governorates`)
@@ -259,7 +268,7 @@ export default function CheckoutForm() {
 	const distName = dists.find((d) => d.id === distId)?.nameAr ?? "";
 
 	const STEPS = [
-		{ n: 1, label: "العنوان", icon: MapPin },
+		{ n: 1, label: "بياناتك وعنوانك", icon: MapPin },
 		{ n: 2, label: "الدفع", icon: CreditCard },
 		{ n: 3, label: "المراجعة", icon: CheckCircle2 },
 	] as const;
@@ -306,10 +315,49 @@ export default function CheckoutForm() {
 	}
 
 	function validateStep1() {
+		if (!normalizeEgyptPhone(shippingPhone)) {
+			setError("رقم الموبايل المصري لازم يبدأ بـ 01 و يكون ١١ رقم.");
+			return false;
+		}
+		if (!loggedIn) {
+			if (authMode === "new" && !authName.trim()) { setError("اكتب اسمك"); return false; }
+			if (authPassword.length < 6) { setError("كلمة السر لازم تكون ٦ حروف على الأقل"); return false; }
+		}
 		if (!govId || !distId) { setError("اختر المحافظة والمنطقة"); return false; }
 		if (!street.trim() || !building.trim()) { setError("أكمل بيانات العنوان"); return false; }
-		if (!shippingPhone.trim()) { setError("أدخل رقم الموبايل"); return false; }
 		return true;
+	}
+
+	// Step 1 → Step 2: authenticate inline when needed, never leave /checkout
+	async function handleStep1Next() {
+		setError(null);
+		if (!validateStep1()) return;
+		const phone = normalizeEgyptPhone(shippingPhone)!;
+		setShippingPhone(phone);
+
+		if (!loggedIn) {
+			setLoading(true);
+			try {
+				if (authMode === "new") {
+					await register(phone, authName.trim(), authPassword);
+				} else {
+					await login(phone, authPassword);
+				}
+			} catch (err) {
+				const msg = err instanceof Error ? err.message : "حدث خطأ";
+				// Account already exists → nudge to password mode instead of failing
+				if (authMode === "new" && /موجود|exists|registered/i.test(msg)) {
+					setAuthMode("existing");
+					setError("الرقم ده متسجل عندنا — اكتبي كلمة السر للدخول");
+				} else {
+					setError(msg);
+				}
+				setLoading(false);
+				return;
+			}
+			setLoading(false);
+		}
+		setStep(2);
 	}
 
 	return (
@@ -322,9 +370,90 @@ export default function CheckoutForm() {
 				</div>
 			)}
 
-			{/* ── Step 1: Address ── */}
+			{/* ── Step 1: Contact (phone-first) + Address ── */}
 			{step === 1 && (
 				<div className="space-y-4">
+					{/* Contact — phone is identity. Inline auth, never a redirect. */}
+					<section className="rounded-2xl bg-surface border border-hvar p-5 space-y-4">
+						<div className="flex items-center gap-2 mb-1">
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--c-brand)" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+								<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2-.5c.9.3 1.9.6 2.9.7A2 2 0 0 1 22 16.9Z"/>
+							</svg>
+							<h2 className="font-cairo font-bold text-sm text-ink">بياناتك</h2>
+						</div>
+
+						{loggedIn && user ? (
+							<div
+								className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl"
+								style={{ background: "color-mix(in srgb, var(--c-brand) 6%, transparent)", border: "1px solid var(--c-brand-line)" }}
+							>
+								<div className="flex items-center gap-2.5 min-w-0">
+									<CheckCircle2 size={16} className="text-brand shrink-0" />
+									<div className="min-w-0">
+										<p className="font-cairo font-bold text-sm text-ink truncate">{user.name}</p>
+										<p className="font-inter text-xs text-muted" dir="ltr">{user.phone}</p>
+									</div>
+								</div>
+								<button
+									type="button"
+									onClick={() => { logout(); setShippingPhone(""); }}
+									className="font-cairo text-xs text-brand hover:underline shrink-0"
+								>
+									مش أنتِ؟
+								</button>
+							</div>
+						) : (
+							<>
+								<div>
+									<label className="block font-cairo text-xs font-semibold text-muted mb-1.5">رقم الموبايل</label>
+									<input
+										type="tel"
+										dir="ltr"
+										value={shippingPhone}
+										onChange={(e) => setShippingPhone(e.target.value)}
+										placeholder="01xxxxxxxxx"
+										autoComplete="tel"
+										className="hvar-input w-full px-4 py-3 rounded-xl font-inter text-sm text-left transition-colors"
+									/>
+								</div>
+
+								{authMode === "new" && (
+									<div>
+										<label className="block font-cairo text-xs font-semibold text-muted mb-1.5">الاسم</label>
+										<input
+											type="text"
+											value={authName}
+											onChange={(e) => setAuthName(e.target.value)}
+											placeholder="اسمك الكامل"
+											autoComplete="name"
+											className="hvar-input w-full px-4 py-3 rounded-xl font-cairo text-sm transition-colors"
+										/>
+									</div>
+								)}
+
+								<div>
+									<label className="block font-cairo text-xs font-semibold text-muted mb-1.5">كلمة السر</label>
+									<input
+										type="password"
+										value={authPassword}
+										onChange={(e) => setAuthPassword(e.target.value)}
+										placeholder={authMode === "new" ? "كلمة سر جديدة (٦ حروف على الأقل)" : "كلمة السر"}
+										autoComplete={authMode === "new" ? "new-password" : "current-password"}
+										className="hvar-input w-full px-4 py-3 rounded-xl font-cairo text-sm transition-colors"
+									/>
+								</div>
+
+								<button
+									type="button"
+									onClick={() => { setError(null); setAuthMode(authMode === "new" ? "existing" : "new"); }}
+									className="font-cairo text-xs text-brand hover:underline"
+								>
+									{authMode === "new" ? "عندك حساب؟ ادخلي بكلمة السر" : "أول مرة؟ كملي ببياناتك وهنعملك حساب"}
+								</button>
+							</>
+						)}
+					</section>
+
 					<section className="rounded-2xl bg-surface border border-hvar p-5 space-y-4">
 						<div className="flex items-center justify-between mb-1">
 							<div className="flex items-center gap-2">
@@ -399,11 +528,6 @@ export default function CheckoutForm() {
 						</div>
 
 						<div>
-							<label className="block font-cairo text-xs font-semibold text-muted mb-1.5">رقم موبايل الشحن</label>
-							<input type="tel" dir="ltr" value={shippingPhone} onChange={(e) => setShippingPhone(e.target.value)} placeholder="01xxxxxxxxx" className="hvar-input w-full px-4 py-3 rounded-xl font-inter text-sm text-left transition-colors" />
-						</div>
-
-						<div>
 							<label className="block font-cairo text-xs font-semibold text-muted mb-1.5">ملاحظات (اختياري)</label>
 							<textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="ملاحظات للتوصيل..." className="hvar-input w-full px-4 py-3 rounded-xl font-cairo text-sm transition-colors resize-none" />
 						</div>
@@ -411,12 +535,19 @@ export default function CheckoutForm() {
 
 					<button
 						type="button"
-						onClick={() => { setError(null); if (validateStep1()) setStep(2); }}
-						className="w-full py-4 rounded-xl bg-brand hover:bg-[var(--c-brand-hover)] text-white font-cairo font-bold text-base flex items-center justify-center gap-2"
+						onClick={handleStep1Next}
+						disabled={loading}
+						className="w-full py-4 rounded-xl bg-brand hover:bg-[var(--c-brand-hover)] disabled:opacity-60 text-white font-cairo font-bold text-base flex items-center justify-center gap-2"
 						style={{ transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)" }}
 					>
-						التالي — طريقة الدفع
-						<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 8h8M8 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+						{loading ? (
+							<><Loader2 size={18} className="animate-spin" />ثواني...</>
+						) : (
+							<>
+								التالي — طريقة الدفع
+								<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 8h8M8 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+							</>
+						)}
 					</button>
 				</div>
 			)}
@@ -521,7 +652,7 @@ export default function CheckoutForm() {
 										<p className="font-cairo text-sm text-ink truncate">{item.name}</p>
 										<p className="font-cairo text-xs text-faint">{item.quantity} × {item.price.toLocaleString("ar-EG")} ج.م</p>
 									</div>
-									<p className="font-inter font-bold text-sm text-ink mr-4">{(item.price * item.quantity).toLocaleString("ar-EG")} ج.م</p>
+									<p className="font-inter font-bold text-sm text-ink ms-4">{(item.price * item.quantity).toLocaleString("ar-EG")} ج.م</p>
 								</div>
 							))}
 						</div>

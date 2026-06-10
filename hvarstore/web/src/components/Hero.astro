@@ -7,7 +7,7 @@ import Doodles from './Doodles.astro'
 
 <!-- Wilson P6: Grain texture is now inline via style block -->
 
-<section class="relative overflow-hidden pt-16 pb-24 sm:pt-24 sm:pb-32 min-h-[calc(100svh-4rem)] flex flex-col justify-center" style="background-color:var(--c-bg)">
+<section class="relative overflow-hidden pt-12 pb-14 sm:pt-24 sm:pb-32 md:min-h-[calc(100svh-4rem)] flex flex-col justify-center" style="background-color:var(--c-bg)">
 
   <!-- Grain texture overlay -->
   <div class="absolute inset-0 pointer-events-none opacity-[0.035] dark:opacity-[0.05] z-0" aria-hidden="true"
@@ -39,7 +39,7 @@ import Doodles from './Doodles.astro'
 
         <!-- Headline — Direction A: editorial Arabic warmth, red like a ribbon -->
         <h1 class="font-cairo font-black text-[2.6rem] sm:text-[3.4rem] lg:text-[3.8rem] leading-[1.12] mb-5 reveal-fade" style="color:var(--c-ink);transition-delay: 0.1s;">
-          <span class="block">في مطبخك</span>
+          <span class="block">مطبخك</span>
           <span class="relative inline-block">
             يستاهل الأحسن
             <span class="absolute -bottom-2 right-0 left-0 h-[3px] rounded-full"
@@ -81,7 +81,7 @@ import Doodles from './Doodles.astro'
         <!-- Hero stats -->
         <div class="flex flex-wrap items-center gap-x-8 gap-y-2 mt-8 reveal-fade" style="transition-delay: 0.35s;">
           <div>
-            <div class="font-inter font-black text-[1.4rem] sm:text-[1.7rem] tabular-nums" style="color:var(--c-ink)" dir="ltr">+50K</div>
+            <div class="font-inter font-black text-[1.4rem] sm:text-[1.7rem] tabular-nums" style="color:var(--c-ink)" dir="ltr">+100K</div>
             <div class="text-[11px] font-cairo" style="color:var(--c-ink-faint)">عميل واثق</div>
           </div>
           <div>
@@ -94,8 +94,8 @@ import Doodles from './Doodles.astro'
           </div>
         </div>
 
-        <!-- Trust line -->
-        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-6 text-xs font-cairo reveal-fade" style="color:var(--c-ink-muted);transition-delay: 0.4s;">
+        <!-- Trust line — single swipeable line on mobile, wraps on larger screens -->
+        <div class="hero-trust flex sm:flex-wrap items-center gap-x-5 gap-y-2 mt-6 text-xs font-cairo reveal-fade" style="color:var(--c-ink-muted);transition-delay: 0.4s;">
           <span class="inline-flex items-center gap-1.5">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -147,8 +147,8 @@ import Doodles from './Doodles.astro'
             </svg>
           </div>
           <div>
-            <div class="font-cairo font-bold text-sm" style="color:var(--c-ink)">مكواة بخار</div>
-            <div class="font-inter font-bold text-xs tabular-nums" style="color:var(--c-brand)" dir="ltr">١٬٢٥٠ ج.م</div>
+            <div class="font-cairo font-bold text-sm" style="color:var(--c-ink)">مكواة بخار ٢٨٠٠ وات</div>
+            <div class="font-inter font-bold text-xs tabular-nums" style="color:var(--c-brand)" dir="ltr">١٬٣٥٠ ج.م</div>
           </div>
         </div>
 
@@ -164,8 +164,8 @@ import Doodles from './Doodles.astro'
             </svg>
           </div>
           <div>
-            <div class="font-cairo font-bold text-sm" style="color:var(--c-ink)">قلاية هوائية</div>
-            <div class="font-inter font-bold text-xs tabular-nums" style="color:var(--c-brand)" dir="ltr">٢٬١٠٠ ج.م</div>
+            <div class="font-cairo font-bold text-sm" style="color:var(--c-ink)">قلاية هوائية ٦.٥ لتر</div>
+            <div class="font-inter font-bold text-xs tabular-nums" style="color:var(--c-brand)" dir="ltr">٤٬٢٥٠ ج.م</div>
           </div>
         </div>
 
@@ -210,6 +210,20 @@ import Doodles from './Doodles.astro'
   @keyframes morphOrb {
     0%, 100% { border-radius: 36% 64% 58% 42% / 52% 44% 56% 48%; }
     50% { border-radius: 58% 42% 38% 62% / 46% 58% 42% 54%; }
+  }
+
+  /* Trust line: one swipeable line on mobile */
+  @media (max-width: 639px) {
+    .hero-trust {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      margin-inline: -1rem;
+      padding-inline: 1rem;
+    }
+    .hero-trust::-webkit-scrollbar { display: none; }
+    .hero-trust > span { white-space: nowrap; flex-shrink: 0; }
   }
 
   /* Fade-in reveals */

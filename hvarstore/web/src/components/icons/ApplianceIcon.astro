@@ -8,13 +8,18 @@ const n = name.toLowerCase()
 
 function pick(): string {
   if (n.includes('مكو') || n.includes('كوي')) return 'iron'
-  if (n.includes('خلا') || n.includes('عصا') || n.includes('عجان')) return 'blender'
+  if (n.includes('هاند') || n.includes('بلندر')) return 'handblender'
+  if (n.includes('كبة') || n.includes('كبه')) return 'chopper'
+  if (n.includes('عجان')) return 'mixer'
+  if (n.includes('مضرب')) return 'beater'
+  if (n.includes('مطحن') || n.includes('توابل')) return 'grinder'
+  if (n.includes('خلا') || n.includes('عصا')) return 'blender'
   if (n.includes('فرن') || n.includes('ميكر') || n.includes('طهي')) return 'oven'
   if (n.includes('مكنس') || n.includes('تنظيف')) return 'vacuum'
   if (n.includes('قلاي') || n.includes('هواء')) return 'airfryer'
   if (n.includes('غسال')) return 'washer'
   if (n.includes('ثلاج') || n.includes('تبريد')) return 'fridge'
-  if (n.includes('سخان') || n.includes('غلاي')) return 'kettle'
+  if (n.includes('كاتيل') || n.includes('سخان') || n.includes('غلاي')) return 'kettle'
   if (n.includes('إكسس') || n.includes('ادوات') || n.includes('كسار')) return 'tool'
   return 'bolt'
 }
@@ -96,6 +101,58 @@ const type = pick()
     <path d="M18 8c1.5 0 3 .5 3 2s-1.5 2-3 2"/>
     <line x1="7" y1="5" x2="17" y2="5"/>
     <line x1="12" y1="3" x2="12" y2="5"/>
+  </svg>
+)}
+
+{type === 'chopper' && (
+  <svg class={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- كبة: squat bowl + domed lid + motor cap on top -->
+    <path d="M5 10h14l-1 7a3 3 0 0 1-3 2.6H9A3 3 0 0 1 6 17l-1-7Z"/>
+    <path d="M7 10a5 5 0 0 1 10 0"/>
+    <rect x="10" y="2.5" width="4" height="3" rx="1"/>
+    <line x1="12" y1="5.5" x2="12" y2="7.5"/>
+  </svg>
+)}
+
+{type === 'handblender' && (
+  <svg class={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- هاند بلندر: tilted stick body + bell head -->
+    <rect x="12.2" y="1.6" width="5" height="9" rx="2.2" transform="rotate(18 14.7 6.1)"/>
+    <path d="M11.6 10.5 9.2 16"/>
+    <path d="M6.8 15.4l4.9 1.6-1 3a3 3 0 0 1-3.8 1.9A3 3 0 0 1 5 18.2l1-2.8Z" transform="rotate(4 9 18)"/>
+    <line x1="8.6" y1="18.4" x2="9.4" y2="18.7"/>
+  </svg>
+)}
+
+{type === 'mixer' && (
+  <svg class={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- عجان: stand base + tilted head + bowl + whisk -->
+    <path d="M4 21h16"/>
+    <path d="M6 21V8a2.5 2.5 0 0 1 2.5-2.5H17a2.5 2.5 0 0 1 0 5h-3"/>
+    <line x1="13" y1="10.5" x2="13" y2="13"/>
+    <path d="M9.5 13h7l-.8 5a2.5 2.5 0 0 1-2.5 2h-.4a2.5 2.5 0 0 1-2.5-2l-.8-5Z"/>
+  </svg>
+)}
+
+{type === 'beater' && (
+  <svg class={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- مضرب: hand mixer body + two whisks -->
+    <path d="M5 4h11a3 3 0 0 1 3 3v1.5a2.5 2.5 0 0 1-2.5 2.5H5a1.5 1.5 0 0 1-1.5-1.5V5.5A1.5 1.5 0 0 1 5 4Z"/>
+    <line x1="9" y1="11" x2="9" y2="14"/>
+    <line x1="14" y1="11" x2="14" y2="14"/>
+    <path d="M9 14c-1.6 0-2.4 1.7-2.4 3.2S7.4 20.5 9 20.5s2.4-1.8 2.4-3.3S10.6 14 9 14Z"/>
+    <path d="M14 14c-1.6 0-2.4 1.7-2.4 3.2s.8 3.3 2.4 3.3 2.4-1.8 2.4-3.3S15.6 14 14 14Z"/>
+  </svg>
+)}
+
+{type === 'grinder' && (
+  <svg class={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- مطحنة: compact cup + dome lid + beans -->
+    <path d="M7 9h10v8a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3V9Z"/>
+    <path d="M7.5 9a4.5 4.5 0 0 1 9 0"/>
+    <circle cx="10.5" cy="14" r="0.6"/>
+    <circle cx="13.5" cy="15.5" r="0.6"/>
+    <circle cx="12" cy="17" r="0.6"/>
   </svg>
 )}
 

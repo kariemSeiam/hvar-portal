@@ -495,3 +495,58 @@ Show what happened + what to do next + a reference code for escalation. Never ra
 - `erp_order_id` is the ERP link; `bosta_tracking_number` is the shipping link — both on the order
 - `customer_services` JSON on the customer record auto-updates when ticket is created/confirmed/completed
 - All state changes go into `service_ticket_history` — append-only, no deletes, no edits
+
+---
+
+## Absorbed Operational Detail — Bosta, ERP Sync, and Schema (2026-06-10)
+
+> Net-new mechanics harvested from the mCRM project docs that the sections above gestured at but did not specify.
+
+### Bosta Integration (internal)
+
+mCRM calls Bosta directly — the customer portal does not (see `products/erp.md`). Load-bearing detail:
+
+- **Four numeric order types:** `10 SEND`, `20 RETURN_TO_ORIGIN`, `25 CUSTOMER_RETURN_PICKUP`, `30 EXCHANGE`. **Type 25 reads different fields:** address from `pickupAddress` (not `dropOffAddress`), description from `returnSpecs.packageDetails` (not `specs`).
+- **Address inversion (the recurring trap):** Bosta `city` = Egyptian **governorate**, Bosta `zone` = Egyptian **city**. Map `dropOffAddress.city.nameAr → customers.governorate`, `zone.nameAr → customers.city`, `firstLine → address_details`.
+- **Fees:** `bostaFeesNet` / `bostaFeesGross` (= "مستحقات بوسطة"); `feesSource` ∈ `cash_cycle | shipment_fees_plus_vat | pricing_fallback`.
+- **Timeouts:** search 12s · order 10s · health 5s. Cached results never expire — refresh with `force_sync=true`.
+- 5 Bosta endpoints; surface Arabic error copy for 400 / 401 / 404 / 503, never raw.
+
+### ERP Sync — How Orders Enter from the ERP
+
+`erp_sync_worker` is a **scraper**, not an API client:
+
+- `POST /api/call-center/orders/sync-from-erp` `{username, password, start_date, end_date}`.
+- Logs into `erp.hvarstore.com/login` via **CSRF-scraped HTML form**, then reads the `draft-dt` DataTables grid. Re-logs in on 401/403; the session expires after ~1h.
+- **No update path:** orders matched by `erp_order_id` are never modified (`updated` is always 0). Skip reasons: missing phone / invoice, already-synced, insert error.
+- **8 of ~30 ERP keys are stored**, the rest dropped:
+  `invoice_no → erp_order_id`, `mobile → customer_phone`, `contact_name_text → customer_name`, `shipping_address → delivery_address`, `shipping_state → governorate`, `shipping_city → city`, `shipping_details → order_description`, `final_total (data-orig-value) → cod_amount`. Fixed on sync: `source='erp'`, `service_type='sell'`, `status='new'`.
+- **`order_description` quirk:** for synced orders the "notes" field actually shows `delivery_address` (the true `shipping_details` only appears on raw-row mapping).
+
+### `calls` Table — Dual Link
+
+- A call links to `linked_to_order_id` **XOR** `linked_to_ticket_id` (CHECK constraint), or neither for ASK. Agent calls → order; Hub follow-up calls → ticket; ASK → nothing.
+- **Encoding mismatch:** `calls.call_type` uses full words (`sell / replacement / maintenance / return`); `orders.service_type` uses single letters (`S / R / M / T`).
+- Queue indexes: `idx_orders_status_next_action(status, next_action_at)`, `idx_orders_source_type`, `idx_calls_phone`.
+
+### Tickets Filter API
+
+`GET /api/tickets/` params: `status` (comma-separated, multi), `service_type`, `customer_id`, `start_date` / `end_date`, `include_bosta` (default true), **`force_sync`** (force a Bosta refresh). Envelope `{total, limit, offset, has_more}`.
+
+**Maintenance sub-state recipe (client-side):** `available_actions` is computed server-side; disambiguate بدأت vs اكتملت with `available_actions.includes('start_maintenance') && !available_actions.includes('complete_maintenance')`. This is the concrete form of the "reads history in reverse" note in the Maintenance section above.
+
+### Service-Type Business Rules (policy constants)
+
+- **Replacement (HVR):** R-003 defective accepted ≤ 7 days; R-004 warranty ≤ 6mo free / > 6mo paid. Carries **3 tracking numbers** (original / send / receive).
+- **Maintenance (HVM):** M-003 customer approval required for any repair > 500 EGP. **2 tracking numbers.**
+- **Return (HVT):** T-003 full refund ≤ 14 days. **1 tracking number.**
+- **Sell (HVS):** S-002 payment required before `READY_FOR_DISPATCH`. **1 tracking number.**
+
+### Customer & Stock Schema
+
+- `customers`: `bosta_orders JSON` (full cached array, no expiry), `customer_services JSON`, phone `UNIQUE` and **immutable on update**; search is local-first then Bosta-sync fallback (`created_by='bosta_sync'`).
+- Stock: `quantity_available = quantity_on_hand − quantity_reserved`. `product_components` is a BOM table (`product_id → part_id`, `quantity_needed`). `stock_movements.reference_type` ∈ `service_ticket | manual_adjustment`.
+
+### Automation Gap — Read This Before Trusting the State Diagram
+
+**There is no day-end cron.** `scheduled → new` "at callback time" is documented behavior but **not implemented** — scheduled orders sit until an agent manually works them. The "Today" chip = backlog (past-open) ∪ today. Do not assume any time-based auto-transition exists.

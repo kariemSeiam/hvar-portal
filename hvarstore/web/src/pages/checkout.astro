@@ -1,28 +1,21 @@
 ---
 import Base from '../layouts/Base.astro'
 import CheckoutForm from '../components/checkout/CheckoutForm'
+import InnerHero from '../components/InnerHero.astro'
 ---
 
 <Base title="إتمام الطلب | هفار">
 
+  <InnerHero
+    label="خطوة أخيرة"
+    title="إتمام الشراء"
+    subtitle="أدخل بياناتك — هنوصلك المنتج لباب البيت مجاناً"
+    variant="service"
+    cta={{ label: "السلة", href: "/cart" }}
+  />
+
   <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-    <nav class="mb-6" aria-label="مسار التنقل">
-      <ol class="flex items-center gap-2 text-xs font-cairo text-muted">
-        <li><a href="/" class="hover:text-[var(--c-brand)] transition-colors">البيت</a></li>
-        <li class="opacity-40">›</li>
-        <li><a href="/cart" class="hover:text-[var(--c-brand)] transition-colors">السلة</a></li>
-        <li class="opacity-40">›</li>
-        <li class="text-ink font-semibold">إتمام الشراء</li>
-      </ol>
-    </nav>
-
-    <h1 class="font-cairo font-black text-2xl text-ink mb-6">
-      إتمام الشراء
-    </h1>
-
     <CheckoutForm client:load />
-
   </div>
 
 </Base>

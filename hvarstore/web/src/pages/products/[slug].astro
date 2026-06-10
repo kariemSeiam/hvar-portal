@@ -9,6 +9,8 @@ import FaqSection from '../../components/pdp/FaqSection.astro'
 import SpecsSection from '../../components/pdp/SpecsSection.astro'
 import AccessoriesGrid from '../../components/pdp/AccessoriesGrid.astro'
 import ComparisonNudge from '../../components/pdp/ComparisonNudge.astro'
+import ApplianceIcon from '../../components/icons/ApplianceIcon.astro'
+import ColorFamilySwatches from '../../components/pdp/ColorFamilySwatches.astro'
 import { api } from '../../lib/api'
 import { getEnrichment, getWarrantyText } from '../../lib/enrichment'
 
@@ -48,6 +50,25 @@ const displayDescription = product.description || descriptionFallback
 const enrichment = getEnrichment(product.sku)
 const comparisonGroupKey = enrichment?.comparisonGroup ?? null
 const warrantyText = getWarrantyText(product.sku)
+
+/* ── Color family (e.g. 5070 البلدوزر shells) — map variant SKUs to live PDPs ── */
+let familySwatches: Array<{ sku: string; nameAr: string; hex: string; slug: string | null; current: boolean }> = []
+const variants = enrichment?.colorVariants ?? []
+if (variants.length > 0 && variants.some((v) => v.sku === product.sku)) {
+  try {
+    // Shortest variant SKU is the family base (e.g. "5070") — one LIKE query finds all siblings
+    const baseSku = variants.reduce((a, b) => (a.sku.length <= b.sku.length ? a : b)).sku
+    const fam = await api.products.list({ q: baseSku, limit: 20 })
+    const bySku = new Map(fam.items.map((p) => [p.sku, p.slug]))
+    familySwatches = variants.map((v) => ({
+      ...v,
+      slug: bySku.get(v.sku) ?? null,
+      current: v.sku === product.sku,
+    }))
+  } catch {
+    /* swatches are progressive enhancement — PDP renders without them */
+  }
+}
 
 /* ── JSON-LD ── */
 const productJsonld = JSON.stringify({
@@ -95,6 +116,7 @@ const breadcrumbJsonld = JSON.stringify({
   title={`${product.name} — سعر ومواصفات | هفار`}
   description={product.description ?? `${product.name} — بضمان سنتين وشحن مجاني. تسوق من هفار، اختيارك الأول في المطبخ.`}
   image={product.image ?? undefined}
+  noBottomNav
   jsonld={[productJsonld, breadcrumbJsonld]}
 >
 
@@ -151,11 +173,10 @@ const breadcrumbJsonld = JSON.stringify({
                   <svg width="80%" height="80%" viewBox="0 0 200 200" fill="none" opacity="0.08">
                     <circle cx="100" cy="100" r="80" stroke="var(--c-brand)" stroke-width="1" stroke-dasharray="6 8"/>
                     <circle cx="100" cy="100" r="58" stroke="var(--c-brand)" stroke-width="0.8"/>
-                    <circle cx="100" cy="100" r="36" stroke="var(--c-brand)" stroke-width="0.6" stroke-dasharray="3 5"/>
-                    <path d="M80 100h40M100 80v40" stroke="var(--c-brand)" stroke-width="0.8" stroke-linecap="round"/>
                   </svg>
                 </div>
-                <span class="relative z-10 font-cairo font-black select-none" style="font-size:5rem;line-height:1;color:var(--c-brand);opacity:0.14">هـ</span>
+                <ApplianceIcon name={product.name} class="pdp-ph-icon" />
+                <span class="absolute z-10 font-cairo font-black select-none" style="inset-block-end:1.25rem;inset-inline-start:1.5rem;font-size:1.75rem;line-height:1;color:var(--c-brand);opacity:0.14">هـ</span>
               </div>
             )}
 
@@ -245,7 +266,10 @@ const breadcrumbJsonld = JSON.stringify({
           </div>
         )}
 
-        <!-- d. CTA action bar (React island) -->
+        <!-- d. Color family swatches (5070-style shell colors) -->
+        {familySwatches.length > 0 && <ColorFamilySwatches swatches={familySwatches} />}
+
+        <!-- e. CTA action bar (React island) -->
         <CtaActionBar product={product} client:load />
 
         <!-- e. Warranty callout -->
@@ -326,9 +350,10 @@ const breadcrumbJsonld = JSON.stringify({
 
   /* gallery */
   .pdp-frame { position: relative; aspect-ratio: 1/1; border-radius: var(--radius-lg); overflow: hidden; background: var(--c-bg); border: 1px solid var(--c-border); }
+  .pdp-frame :global(.pdp-ph-icon) { position: relative; z-index: 2; width: clamp(7rem, 30vw, 12rem); height: clamp(7rem, 30vw, 12rem); color: var(--c-brand); opacity: 0.30; }
   .pdp-mesh { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(var(--c-brand-rgb),0.10) 0%, transparent 65%); }
   .dark .pdp-mesh { background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(var(--c-brand-rgb),0.16) 0%, transparent 65%); }
-  .pdp-img { width:100%; height:100%; object-fit:cover; display:block; position:relative; z-index:0; }
+  .pdp-img { width:100%; height:100%; object-fit:contain; padding:1.5rem; display:block; position:relative; z-index:0; background: linear-gradient(160deg,#ffffff 0%,#faf6f0 100%); }
   @media (prefers-reduced-motion: no-preference) { .pdp-img { animation: pdp-breath 20s ease-in-out infinite; transform-origin: center; } }
   @keyframes pdp-breath { 0%,100%{transform:scale(1)} 50%{transform:scale(1.018)} }
 
@@ -361,7 +386,7 @@ const breadcrumbJsonld = JSON.stringify({
   @media (max-width:639px) {
     .pdp-related-scroll { display:flex; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; gap:0.875rem; padding-bottom:0.5rem; }
     .pdp-related-scroll::-webkit-scrollbar { display:none; }
-    .pdp-related-card { min-width:160px; flex-shrink:0; }
+    .pdp-related-card { min-width:min(200px,48vw); flex-shrink:0; }
   }
   @media (min-width:640px) { .pdp-related-scroll { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; } }
   @media (min-width:1024px) { .pdp-related-scroll { grid-template-columns:repeat(4,1fr); } }

@@ -1,0 +1,102 @@
+---
+/**
+ * Color family swatches — one product identity, many shell colors (the 5070 البلدوزر pattern).
+ * Each swatch links to the sibling PDP. Variants without a live DB row are hidden.
+ */
+interface Swatch {
+  sku: string;
+  nameAr: string;
+  hex: string;
+  slug: string | null;
+  current: boolean;
+}
+
+interface Props {
+  swatches: Swatch[];
+}
+
+const { swatches } = Astro.props;
+const visible = swatches.filter((s) => s.slug !== null);
+const current = visible.find((s) => s.current);
+---
+
+{visible.length > 1 && (
+  <div class="cfs" role="group" aria-label="ألوان متاحة">
+    <p class="cfs-label font-cairo">
+      اللون:
+      {current && <span class="cfs-current">{current.nameAr}</span>}
+    </p>
+    <div class="cfs-row">
+      {visible.map((s) => (
+        <a
+          href={`/products/${s.slug}`}
+          class:list={['cfs-dot', s.current && 'cfs-dot--current']}
+          style={`--swatch:${s.hex}`}
+          aria-label={`اللون ${s.nameAr}`}
+          aria-current={s.current ? 'page' : undefined}
+          title={s.nameAr}
+        >
+          <span class="cfs-fill" aria-hidden="true"></span>
+        </a>
+      ))}
+    </div>
+  </div>
+)}
+
+<style>
+  .cfs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .cfs-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--c-ink-muted);
+    margin: 0;
+  }
+  .cfs-current {
+    color: var(--c-ink);
+    font-weight: 700;
+    margin-inline-start: 0.25rem;
+  }
+  .cfs-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+  }
+  .cfs-dot {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 9999px;
+    border: 1.5px solid var(--c-border-strong);
+    transition: transform 0.2s var(--ease-spring), border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .cfs-fill {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 9999px;
+    background: var(--swatch);
+    /* hairline so near-white shells stay visible on the warm canvas */
+    box-shadow: inset 0 0 0 1px rgba(35, 27, 24, 0.12);
+  }
+  @media (hover: hover) {
+    .cfs-dot:hover {
+      transform: scale(1.12);
+      border-color: var(--c-brand);
+    }
+  }
+  .cfs-dot:focus-visible {
+    outline: 2px solid var(--c-brand);
+    outline-offset: 2px;
+  }
+  .cfs-dot--current {
+    border-color: var(--c-brand);
+    box-shadow: 0 0 0 3px var(--c-brand-tint);
+  }
+</style>

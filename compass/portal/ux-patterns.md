@@ -907,6 +907,31 @@ Use Arabic-Indic numerals for dates displayed in Arabic context where appropriat
 - Ticket timeline timestamps: "٠٩:٠٠"
 - If mixing with Western numerals, be consistent per context
 
+### Arabic Number & Value Formatting
+
+Money and quantities render in **Arabic-Indic numerals** (٠١٢٣٤٥٦٧٨٩) with the **Arabic separators** — not the Western `,` and `.`:
+
+- Thousands separator: **٬** (U+066C, Arabic Thousands Separator)
+- Decimal separator: **٫** (U+066B, Arabic Decimal Separator)
+
+These are distinct from the Latin comma/period. `formatCurrency(1991.26)` is `١٬٩٩١٫٢٦ ج.م` — note the ٬ between thousands and the ٫ before the fraction.
+
+| Function | Input | Output |
+|----------|-------|--------|
+| `formatCurrency` | `1991.26` | `١٬٩٩١٫٢٦ ج.م` |
+| `formatNumber` | `1234` | `١٬٢٣٤` |
+| `formatRelativeTime` | `(3h ago)` | `منذ ٣ ساعات` |
+| `formatTrackingNumber` | `ABC123DEF456` | `ABCD-123D-EF45` (4-char groups) |
+| `formatPhone` | `01234567890` | `012 3456 7890` |
+| `formatDuration` | `3661` | `1 ساعة 1 دقيقة` |
+
+**Rules:**
+- **Money and quantities** → Arabic-Indic digits + Arabic thousands (٬) and decimal (٫) separators. Currency suffix `ج.م` follows the number (RTL flow): `١٬٩٩١٫٢٦ ج.م`.
+- **Tracking numbers** group in **4-character blocks** joined by `-` (`ABCD-123D-EF45`). These are alphanumeric codes, kept LTR — do not Arabic-ize the letters/digits inside a tracking code (it must match the Bosta `bill_code`).
+- **Phone numbers** group as `012 3456 7890` (3-4-4) and stay LTR (`dir="ltr"`), consistent with the Phone Fields rule above.
+- **Relative time and durations** render the numeric part in Arabic-Indic digits with Arabic unit words (`منذ ٣ ساعات`, `1 ساعة 1 دقيقة`).
+- This formatting layer pairs with the price-display rule (Inter + `tabular-nums`): the font handles fixed-width digits, these functions handle the digit script and separators. Apply formatters at the display boundary, never store Arabic-Indic digits in the DB.
+
 ---
 
 ## 18. Loading States

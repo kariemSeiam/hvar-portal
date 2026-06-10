@@ -5,23 +5,142 @@ import AuthForm from '../components/auth/AuthForm'
 
 <Base title="دخول وتسجيل | هفار">
 
-  <div class="max-w-md mx-auto px-4 sm:px-6 py-12">
+  <div class="login-page">
 
-    <div class="text-center mb-8">
-      <a href="/" class="inline-flex items-center gap-0.5 mb-6">
-        <span class="text-brand font-cairo font-black text-3xl">هفار</span>
-        <span class="text-stone-400 dark:text-stone-500 font-cairo text-sm mt-2">ستور</span>
-      </a>
-      <h1 class="font-cairo font-black text-xl text-ink">
-        أهلاً بيك
-      </h1>
-      <p class="font-cairo text-sm text-muted mt-1">
-        سجل دخول أو أنشئ حساب جديد
-      </p>
+    <!-- Left panel: brand canvas with trust content (desktop only) -->
+    <div class="login-brand" aria-hidden="true">
+
+      <!-- Grain -->
+      <div class="absolute inset-0 pointer-events-none" style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E&quot;);opacity:0.04;mix-blend-mode:overlay;pointer-events:none"></div>
+
+      <!-- Glow ember from top -->
+      <div class="absolute inset-0" style="background:radial-gradient(ellipse 70% 50% at 50% -10%, rgba(var(--c-brand-rgb),0.12) 0%, transparent 70%);pointer-events:none"></div>
+      <!-- Brass warmth from bottom -->
+      <div class="absolute inset-0" style="background:radial-gradient(ellipse 60% 40% at 50% 110%, rgba(var(--c-brass-rgb),0.10) 0%, transparent 70%);pointer-events:none"></div>
+
+      <div class="relative z-10 flex flex-col justify-between h-full px-10 py-10">
+
+        <!-- Logo -->
+        <a href="/" class="flex items-center gap-2.5 select-none w-fit">
+          <div class="w-9 h-9 rounded-[10px] flex items-center justify-center flex-shrink-0"
+               style="background:linear-gradient(150deg,var(--c-brand),color-mix(in srgb, var(--c-brand) 80%, #000));box-shadow:0 4px 14px rgba(var(--c-brand-rgb),0.30)">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+              <path d="M3 2v12M13 2v12M3 8h10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="font-cairo font-black text-xl" style="color:#F5EFE6">هفار ستور</span>
+        </a>
+
+        <!-- Hero copy block -->
+        <div>
+          <p class="font-cairo font-semibold text-xs uppercase tracking-[0.16em] mb-3" style="color:var(--c-brass)">مرحبتين فيك</p>
+          <h1 class="font-cairo font-black leading-tight mb-4" style="font-size:clamp(1.8rem,3.2vw,2.5rem);color:#F5EFE6">
+            مطبخك يستاهل<br/>الأحسن دايماً
+          </h1>
+          <p class="font-cairo text-sm leading-relaxed mb-8" style="color:rgba(245,239,230,0.55);max-width:24rem">
+            سجلي دخولك وتابعي طلباتك، المفضلة، وتاريخ شرائك في مكان واحد.
+          </p>
+
+          <!-- Mini trust pillars -->
+          <div class="space-y-3.5">
+            {([
+              { icon: 'M12 2L4 6v6c0 5 3.5 9.5 8 11 4.5-1.5 8-6 8-11V6L12 2Z', label: 'ضمان حقيقي سنتين' },
+              { icon: 'M5 12h14M12 5l7 7-7 7', label: 'شحن مجاني لباب البيت' },
+              { icon: 'M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4 12 14.01 9 11.01', label: 'افحصي قبل ما تدفعي' },
+            ]).map(({ icon, label }) => (
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(var(--c-brand-rgb),0.12)">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--c-brand)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d={icon}/>
+                  </svg>
+                </div>
+                <span class="font-cairo text-sm font-semibold" style="color:rgba(245,239,230,0.80)">{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <!-- Bottom stat -->
+        <div>
+          <p class="font-inter font-black" style="font-size:clamp(2rem,3.5vw,3rem);color:var(--c-brand);line-height:1">+١٤٧K</p>
+          <p class="font-cairo text-sm mt-1" style="color:rgba(245,239,230,0.45)">عميل اختار هفار</p>
+        </div>
+
+      </div>
     </div>
 
-    <AuthForm client:load />
+    <!-- Right panel: form -->
+    <div class="login-form-panel">
+      <div class="w-full max-w-sm mx-auto">
+
+        <!-- Mobile logo only -->
+        <a href="/" class="md:hidden flex items-center justify-center gap-2 select-none mb-8">
+          <div class="w-9 h-9 rounded-[10px] flex items-center justify-center" style="background:linear-gradient(150deg,var(--c-brand),color-mix(in srgb, var(--c-brand) 80%, #000))">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+              <path d="M3 2v12M13 2v12M3 8h10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="font-cairo font-black text-2xl" style="color:var(--c-brand)">هفار</span>
+        </a>
+
+        <h2 class="font-cairo font-black text-2xl mb-1.5" style="color:var(--c-ink)">أهلاً بيك</h2>
+        <p class="font-cairo text-sm mb-7" style="color:var(--c-ink-muted)">سجل دخول أو أنشئ حساب جديد</p>
+
+        <AuthForm client:load />
+
+        <p class="text-center font-cairo text-xs mt-6" style="color:var(--c-ink-faint)">
+          بالدخول أو التسجيل أنت توافق على
+          <a href="/terms" class="underline hover:text-[var(--c-brand)]">الشروط والأحكام</a>
+          وسياسة الخصوصية الخاصة بهفار.
+        </p>
+
+      </div>
+    </div>
 
   </div>
 
 </Base>
+
+<style>
+  .login-page {
+    min-height: calc(100vh - 3.5rem);
+    display: flex;
+    flex-direction: column;
+  }
+  @media (min-width: 768px) {
+    .login-page {
+      flex-direction: row;
+      min-height: calc(100vh - 4rem);
+    }
+  }
+
+  /* Brand canvas — dark side */
+  .login-brand {
+    display: none;
+    position: relative;
+    overflow: hidden;
+    background-color: #130F0C;
+  }
+  @media (min-width: 768px) {
+    .login-brand {
+      display: flex;
+      flex: 1;
+      max-width: 44%;
+    }
+  }
+
+  /* Form panel */
+  .login-form-panel {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    background-color: var(--c-bg);
+  }
+  @media (min-width: 768px) {
+    .login-form-panel {
+      padding: 3rem 2.5rem;
+    }
+  }
+</style>

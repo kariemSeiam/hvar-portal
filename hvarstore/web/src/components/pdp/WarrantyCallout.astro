@@ -141,10 +141,14 @@ const warrantyText =
     white-space: nowrap;
   }
 
-  /* On very narrow screens, icon hides to save space */
-  @media (max-width: 380px) {
-    .wc-icon { display: none; }
-    .wc-item { gap: 0; }
-    .wc-label { font-size: 0.75rem; }
+  /* Narrow screens: wrap instead of overflowing the page.
+     Warranty (with its sub-label) takes the full first row;
+     shipping + COD share the second. */
+  @media (max-width: 480px) {
+    .wc-row { flex-wrap: wrap; row-gap: 0.625rem; }
+    .wc-item { flex: 1 1 40%; padding-inline: 0; }
+    .wc-item:first-child { flex-basis: 100%; }
+    .wc-sep { display: none; }
+    .wc-label { font-size: 0.8125rem; }
   }
 </style>

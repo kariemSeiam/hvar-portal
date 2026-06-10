@@ -349,3 +349,42 @@ The POS terminal does not notify the portal when stock changes. There is no webh
 **A `website_order_id` in the ERP always has a valid portal order behind it.** Failed webhooks, test orders, and deleted-order scenarios can leave orphaned `website_order_id` values. Handle the missing ERP transaction gracefully — show what we know from our `orders` table, note that ERP sync is pending.
 
 **Phone formats are normalized in the POS.** They are not. Cashier entry is freeform. Normalize before every phone lookup, regardless of origin.
+
+---
+
+## Legacy Reality — Kashier Internals, the Real POS Terminal, and the Second Courier (absorbed 2026-06-10)
+
+> The forward model is above. This preserves how checkout, the POS terminal, and shipping actually worked in the inherited Active eCommerce build — needed during migration and for reading legacy data.
+
+### Kashier — Specifics Beyond the Correct Model
+
+- **Leaked credentials — rotate.** The legacy `KashierController` baked live values in as code-level constructor defaults: `KASHIER_MERCHANT_ID=MID-27070-591` and a live `KASHIER_SECRET_KEY` (UUID). **Action item: rotate the secret** — it sits in the git history of the old docs. New code: secrets from `.env` only, never code-level defaults. The compass `MID-XXXXX-XXX` placeholder posture is the correct one.
+- **`display=ar` is hardcoded** in the HPP URL — the Kashier page always renders Arabic; there is no locale switch.
+- **The hash key is `apiKey`, which defaults to `secret`.** Legacy: `hash_hmac('sha256', $path, $apiKey)`, where `$apiKey` falls back to the secret key when `KASHIER_API_KEY` is empty. Pick the right key explicitly in the new implementation.
+- **Five routing strings, not three.** `get_allowed_methods` must also map the generic aliases production actually sends: `kashier_card`→card, `kashier_installments`→installments, `kashier_wallets`→wallet, **plus bare `card`→card and `wallet`→wallet** (both fall through to Kashier).
+- **Installment programs** were wired as method strings: `valu`, `karmaly`, `installment_plan` (ValU confirmed live).
+- **Bug #3, concretely.** The legacy callback URL was `{APP_URL}/payment-status?...` with the **entire shipping payload urlencoded into the query string** — `owner_id, name, phone, state_id, city, address, country_id, orderId, amount, payment_option`. That session/URL state leak is exactly what the `pending_payments` table (ref-only callback) replaces.
+
+### The "POS Terminal" Is Not Ultimate POS — Naming, Corrected
+
+The Naming Clarification at the top says the in-store terminal is Ultimate POS. There are in fact **three distinct POS notions**; keep them straight:
+
+1. **hvarstore.com** — the customer portal we build (the source of this `pos/` directory's confusing name).
+2. **Ultimate POS** — the ERP backend (`hvar_erp`), the accounting and inventory authority.
+3. **The legacy built-in POS terminal** — a cashier screen inside Active eCommerce (`PosController`, `routes/pos.php`, 18 routes, `/admin/pos` and `/seller/pos`, gated by `pos_activation_for_seller`). Session-cart based (`Session::get('pos.cart')`, `pos.shipping_info`, `pos.discount`), 16 products/page, searches `ProductStock JOIN products`, deducts `product_stocks.qty` at `order_store`.
+
+When the docs say "the POS terminal deducts stock at sale," they mean #3 — the legacy Active eCommerce terminal. The new build replaces it with a direct-ERP-write terminal (the atomic `transactions` / `transaction_sell_lines` / `transaction_payments` writes documented in `products/erp.md`).
+
+**Legacy `order_store` sequence:** validate shipping (name / phone / address) → create Order (`guest_id` | `user_id`, JSON shipping address, code `Ymd-His-rand`) → deduct stock (guard `if qty > product_stock->qty { $order->delete(); return 'Stock outs.' }`) → create OrderDetails → compute totals → invoice to customer + admin + each seller → clear session.
+
+### The Auto-Cancel Race
+
+Legacy cron `order:cancel` hard-deletes orders that are `payment_status='unpaid'` AND `payment_type != 'cash_on_delivery'` AND older than 1 hour, restocking `product_stock.qty += quantity`. **These die before the ERP webhook fires — the ERP never sees them.** (One doc keys the query off `delivery_status='unpaid'` instead of `payment_status` — treat the field as ambiguous when reading legacy data.) This 1-hour, COD-exempt purge is the orphan-prevention reasoning behind the soft-delete sequencing rule.
+
+### Turbo — the Second Courier Compass Omits
+
+Bosta lives in the ERP (covered in `products/erp.md`). The **storefront / POS side used Turbo**. Cron `shipping:status` polls Turbo: `POST {TURBO_Order_Search}` with `{search_Key: order.shipping_barcode, authentication_key: TURBO_AUTHENTICATION_KEY, main_client_code: TURBO_CLIENT_Code}`; on `success==1` it writes `order.turbo_status` (Arabic), and stops polling once the status is `تم التسليم`. Legacy orders carry `orders.shipping_barcode` + `orders.turbo_status` — watch for this when reading historical shipping data. The new portal tracks via Bosta `bill_code` only.
+
+### Stack
+
+Legacy storefront: Active eCommerce CMS on Laravel 8 / PHP ^7.1.3; 20+ inherited payment-gateway controllers, only Kashier configured and live.

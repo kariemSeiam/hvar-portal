@@ -75,6 +75,8 @@ Read: `brand/00_brand-nucleus.md` → `brand/01_visual-direction.md` → `brand/
 | `brand/01_visual-direction.md` | Colors, typography, spacing, photography, motion, texture, do/don't |
 | `brand/02_tone-voice.md` | How Hvar sounds in Arabic and English, per platform, what we never say |
 | `brand/03_personality.md` | The brand's personality architecture — use this when decisions are ambiguous |
+| `brand/04_facebook-intelligence.md` | Facebook audience, competitor, and content intelligence |
+| `brand/05_market-intelligence.md` | Egypt appliance market sizing, channel/online share, retail distribution, competitor structure, competitive gap matrix |
 
 ### Social
 
@@ -92,6 +94,7 @@ Read: `brand/00_brand-nucleus.md` → `brand/01_visual-direction.md` → `brand/
 | `products/mcrm.md` | mCRM design principles, ticket state machine, order flow, access control direction |
 | `products/pos.md` | POS integration points, naming conventions, what we control vs. what we don't |
 | `products/catalog.md` | Complete product catalog — all products, categories, parts, spec display rules, naming conventions |
+| `products/hvar_erp.schema.sql` | Ground-truth structure-only DDL of the live `hvar_erp` database (80 tables, real columns and indexes). The schema `products/erp.md` is the narrative of — diff against it after any Ultimate POS upgrade |
 
 ### Print
 
@@ -128,4 +131,6 @@ Run through this checklist when the brand identity project delivers final assets
 
 ---
 
-*Compass version: 1.0 — Written 2026-06-06. Brand identity in progress.*
+*Compass version: 1.1 — Written 2026-06-06, consolidated 2026-06-10. Brand identity in progress.*
+
+*The 2026-06-10 consolidation absorbed the entire scattered `workspace/docs/` tree, the `.venom/` memory workspace, and loose root scratch files into compass — folding net-new signal (legacy ERP/POS/Kashier internals, Turbo courier, Bosta sync mechanics, market intelligence, the live `hvar_erp` DDL) into the files above and removing everything redundant or dead. Compass is now the single source of truth.*

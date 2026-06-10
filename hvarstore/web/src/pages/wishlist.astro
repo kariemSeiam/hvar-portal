@@ -1,0 +1,23 @@
+---
+import Base from '../layouts/Base.astro'
+import WishlistView from '../components/WishlistView'
+import InnerHero from '../components/InnerHero.astro'
+---
+
+<Base
+  title="المفضلة | هفار"
+  description="المنتجات اللي حفظتيها للرجوع ليها — قارني واختاري في وقتك."
+>
+
+  <InnerHero
+    label="قائمتك"
+    title="المفضلة"
+    subtitle="المنتجات اللي حفظتيها — قارني واختاري في وقتك"
+    variant="utility"
+  />
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <WishlistView client:load />
+  </div>
+
+</Base>

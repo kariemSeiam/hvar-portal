@@ -212,7 +212,20 @@ export default function CartDrawer() {
 								gap: "12px",
 							}}
 						>
-							<div style={{ fontSize: "3.4rem", opacity: 0.5 }}>🛒</div>
+							<svg
+								aria-hidden="true"
+								style={{ width: 72, height: 72, color: "var(--c-brand)", opacity: 0.15 }}
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth={0.9}
+								strokeLinecap="round"
+								strokeLinejoin="round"
+							>
+								<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+								<line x1="3" y1="6" x2="21" y2="6" />
+								<path d="M16 10a4 4 0 0 1-8 0" />
+							</svg>
 							<h4
 								style={{
 									fontFamily: "'Cairo', sans-serif",
@@ -283,7 +296,7 @@ export default function CartDrawer() {
 												width: 64,
 												height: 64,
 												borderRadius: "14px",
-												background: "var(--c-surface-2)",
+												background: item.image ? "linear-gradient(160deg,#ffffff 0%,#faf6f0 100%)" : "var(--c-surface-2)",
 												display: "grid",
 												placeItems: "center",
 												overflow: "hidden",
@@ -294,7 +307,7 @@ export default function CartDrawer() {
 												<img
 													src={item.image}
 													alt={item.name}
-													style={{ width: "100%", height: "100%", objectFit: "cover" }}
+													style={{ width: "100%", height: "100%", objectFit: "contain", padding: "6px" }}
 												/>
 											) : (
 												<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--c-ink-faint)" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">

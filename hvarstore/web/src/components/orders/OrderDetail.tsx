@@ -74,6 +74,10 @@ const PAYMENT_LABELS: Record<string, string> = {
 	kashier_installments: "تقسيط",
 };
 
+const ORDER_STEPS = ["pending", "confirmed", "processing", "shipped", "delivered"] as const;
+type OrderStep = (typeof ORDER_STEPS)[number];
+const TERMINAL_ORDER_STATUSES = new Set(["cancelled", "payment_failed"]);
+
 const API = import.meta.env?.PUBLIC_API_URL ?? "http://localhost:5000";
 
 export default function OrderDetail() {
@@ -155,6 +159,12 @@ export default function OrderDetail() {
 			</div>
 		);
 	}
+
+	const isOrderTerminal = TERMINAL_ORDER_STATUSES.has(order.status);
+	const orderCurrentIndex = ORDER_STEPS.indexOf(order.status as OrderStep);
+	const stepPct = ORDER_STEPS.length > 1 && orderCurrentIndex > 0
+		? (orderCurrentIndex / (ORDER_STEPS.length - 1)) * 80
+		: 0;
 
 	return (
 		<div className="space-y-6">
@@ -240,6 +250,82 @@ export default function OrderDetail() {
 				)}
 			</div>
 
+			{/* Status stepper */}
+			<section className="rounded-2xl bg-surface border border-hvar p-5">
+				<style dangerouslySetInnerHTML={{ __html: `
+					@keyframes orderNodeGlow {
+						0%, 100% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-brand) 20%, transparent), 0 0 12px color-mix(in srgb, var(--c-brand) 30%, transparent); }
+						50% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--c-brand) 12%, transparent), 0 0 20px color-mix(in srgb, var(--c-brand) 22%, transparent); }
+					}
+				` }} />
+				<h3 className="font-cairo font-bold text-sm text-ink mb-5">مسار الطلب</h3>
+
+				{isOrderTerminal ? (
+					<div
+						className="flex items-center gap-3 p-4 rounded-xl"
+						style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.20)" }}
+					>
+						<XCircle size={18} className="text-red-500 shrink-0" />
+						<p className="font-cairo text-sm font-bold text-red-600 dark:text-red-400">
+							{STATUS_LABELS[order.status] ?? order.status}
+						</p>
+					</div>
+				) : (
+					<div className="relative">
+						{/* Background track */}
+						<div
+							className="absolute h-[2px] pointer-events-none"
+							style={{ top: "16px", insetInlineStart: "10%", insetInlineEnd: "10%", background: "var(--c-hairline)" }}
+						/>
+						{/* Filled progress */}
+						{stepPct > 0 && (
+							<div
+								className="absolute h-[2px] pointer-events-none"
+								style={{ top: "16px", insetInlineStart: "10%", width: `${stepPct}%`, background: "var(--c-brand)" }}
+							/>
+						)}
+						{/* Step dots */}
+						<div className="relative flex">
+							{ORDER_STEPS.map((step, idx) => {
+								const isPast = orderCurrentIndex >= 0 && idx < orderCurrentIndex;
+								const isCurrent = idx === orderCurrentIndex;
+								return (
+									<div key={step} className="flex flex-col items-center gap-2 flex-1">
+										<div
+											className="w-8 h-8 rounded-full flex items-center justify-center z-10 transition-all duration-300"
+											style={
+												isCurrent
+													? { background: "var(--c-brand)", animation: "orderNodeGlow 2.4s ease-in-out infinite", transform: "scale(1.12)" }
+													: isPast
+													? { background: "var(--c-brand)" }
+													: { background: "var(--c-surface)", border: "2px solid var(--c-hairline)" }
+											}
+										>
+											{isPast ? (
+												<CheckCircle2 size={14} color="#fff" />
+											) : isCurrent ? (
+												<div className="w-3 h-3 rounded-full bg-white" />
+											) : (
+												<div className="w-2 h-2 rounded-full" style={{ background: "var(--c-hairline)" }} />
+											)}
+										</div>
+										<p
+											className="font-cairo text-[10px] text-center leading-tight font-semibold"
+											style={{
+												color: isCurrent ? "var(--c-brand)" : isPast ? "var(--c-ink)" : "var(--c-ink-faint)",
+												maxWidth: "56px",
+											}}
+										>
+											{STATUS_LABELS[step]}
+										</p>
+									</div>
+								);
+							})}
+						</div>
+					</div>
+				)}
+			</section>
+
 			{/* Items */}
 			<section className="rounded-2xl bg-surface border border-hvar p-5">
 				<div className="flex items-center gap-2 mb-4">
@@ -262,7 +348,7 @@ export default function OrderDetail() {
 									{item.quantity} x {item.unitPrice.toLocaleString("ar-EG")} ج.م
 								</p>
 							</div>
-							<p className="font-inter font-bold text-sm text-ink mr-4">
+							<p className="font-inter font-bold text-sm text-ink ms-4">
 								{item.subtotal.toLocaleString("ar-EG")} ج.م
 							</p>
 						</div>
