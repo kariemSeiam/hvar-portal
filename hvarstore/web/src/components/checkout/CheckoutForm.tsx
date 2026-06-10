@@ -17,6 +17,7 @@ import {
 	login,
 	register,
 	logout,
+	normalizeEgyptPhone,
 } from "../../lib/auth";
 
 interface Gov {
@@ -35,14 +36,6 @@ const GEO_KEY = "0ae3efb1-9685-4530-86e2-606dccecec50";
 
 function matchAr(a: string, b: string): boolean {
 	return a.includes(b) || b.includes(a);
-}
-
-/** Normalize any Egyptian mobile input to 01XXXXXXXXX, or null if invalid. */
-function normalizeEgyptPhone(raw: string): string | null {
-	let digits = raw.replace(/\D/g, "");
-	if (digits.startsWith("20")) digits = digits.slice(2);
-	if (digits.length === 10 && digits.startsWith("1")) digits = "0" + digits;
-	return /^01[0125]\d{8}$/.test(digits) ? digits : null;
 }
 
 export default function CheckoutForm() {

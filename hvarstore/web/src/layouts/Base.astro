@@ -48,12 +48,19 @@ const orgJsonld = ld({
   url: 'https://hvarstore.com',
   logo: defaultOgImage,
   description: 'أجهزة منزلية موثوقة لكل مطبخ مصري. ضمان سنتين، شحن مجاني، افحص قبل الدفع.',
+  telephone: '17566',
+  contactPoint: {
+    ['@type']: 'ContactPoint',
+    telephone: '17566',
+    contactType: 'customer service',
+    areaServed: 'EG',
+    availableLanguage: 'ar',
+  },
   sameAs: [
     'https://www.facebook.com/hvar22',
     'https://www.instagram.com/hvar222',
     'https://www.tiktok.com/@hvarstore1',
   ],
-  // TODO: replace telephone with real Hvar customer service number
 })
 
 const websiteJsonld = ld({

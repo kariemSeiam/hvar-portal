@@ -1,6 +1,7 @@
 ---
 import type { ProductCard as ProductCardType } from '../lib/api'
 import { getEnrichment, getWarrantyText } from '../lib/enrichment'
+import ApplianceIcon from './icons/ApplianceIcon.astro'
 
 interface Props {
   product: ProductCardType
@@ -59,8 +60,8 @@ const addPayload = JSON.stringify({
             <svg class="pc-ph-rings" viewBox="0 0 200 200" fill="none">
               <circle cx="100" cy="100" r="70" stroke="var(--c-brand)" stroke-width="1" stroke-dasharray="4 6" />
               <circle cx="100" cy="100" r="50" stroke="var(--c-brand)" stroke-width="0.8" />
-              <circle cx="100" cy="100" r="30" stroke="var(--c-brand)" stroke-width="0.6" stroke-dasharray="2 4" />
             </svg>
+            <ApplianceIcon name={product.name} class="pc-ph-icon" />
             <span class="pc-ph-mono font-cairo">هـ</span>
           </span>
         )}
@@ -238,13 +239,24 @@ const addPayload = JSON.stringify({
     height: 80%;
     opacity: 0.08;
   }
-  .pc-ph-mono {
+  /* Category-aware appliance line drawing — the placeholder IS the illustration */
+  .pc-ph :global(.pc-ph-icon) {
     position: relative;
+    width: clamp(3.2rem, 38cqi, 6rem);
+    height: clamp(3.2rem, 38cqi, 6rem);
+    color: var(--c-brand);
+    opacity: 0.34;
+  }
+  /* هـ watermark — small brand stamp, bottom corner */
+  .pc-ph-mono {
+    position: absolute;
+    inset-block-end: 0.5rem;
+    inset-inline-start: 0.75rem;
     font-weight: 900;
     line-height: 1;
     color: var(--c-brand);
-    opacity: 0.16;
-    font-size: clamp(2.5rem, 26cqi, 4rem);
+    opacity: 0.14;
+    font-size: clamp(1rem, 9cqi, 1.4rem);
   }
 
   /* Badges */

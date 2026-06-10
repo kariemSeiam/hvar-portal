@@ -9,7 +9,15 @@ import {
 	ChevronDown,
 	Ticket,
 } from "lucide-react";
-import { isLoggedIn, getAuthHeaders } from "../../lib/auth";
+import {
+	isLoggedIn,
+	authUser,
+	getAuthHeaders,
+	login,
+	register,
+	logout,
+	normalizeEgyptPhone,
+} from "../../lib/auth";
 
 const API = import.meta.env?.PUBLIC_API_URL ?? "http://localhost:5000";
 
@@ -45,6 +53,7 @@ interface Order {
 
 export default function NewTicketForm() {
 	const loggedIn = useStore(isLoggedIn);
+	const user = useStore(authUser);
 
 	const [type, setType] = useState<TicketType>("M");
 	const [transactionId, setTransactionId] = useState<number | null>(null);
@@ -58,12 +67,14 @@ export default function NewTicketForm() {
 	} | null>(null);
 	const [orders, setOrders] = useState<Order[]>([]);
 
-	useEffect(() => {
-		if (!loggedIn) {
-			window.location.href = "/login?redirect=/service/new";
-			return;
-		}
+	// Inline contact/auth — a customer with a broken appliance never hits a login wall
+	const [authMode, setAuthMode] = useState<"new" | "existing">("new");
+	const [authPhone, setAuthPhone] = useState("");
+	const [authName, setAuthName] = useState("");
+	const [authPassword, setAuthPassword] = useState("");
 
+	useEffect(() => {
+		if (!loggedIn) return;
 		fetch(`${API}/api/orders`, {
 			headers: { ...getAuthHeaders() },
 		})
@@ -108,8 +119,44 @@ export default function NewTicketForm() {
 	async function handleSubmit(e: FormEvent) {
 		e.preventDefault();
 		setError(null);
-		setLoading(true);
 
+		// Authenticate inline first when needed — same phone-first pattern as checkout
+		if (!loggedIn) {
+			const phone = normalizeEgyptPhone(authPhone);
+			if (!phone) {
+				setError("رقم الموبايل المصري لازم يبدأ بـ 01 و يكون ١١ رقم.");
+				return;
+			}
+			if (authMode === "new" && !authName.trim()) {
+				setError("اكتبي اسمك");
+				return;
+			}
+			if (authPassword.length < 6) {
+				setError("كلمة السر لازم تكون ٦ حروف على الأقل");
+				return;
+			}
+			setLoading(true);
+			try {
+				if (authMode === "new") {
+					await register(phone, authName.trim(), authPassword);
+				} else {
+					await login(phone, authPassword);
+				}
+			} catch (err) {
+				const msg = err instanceof Error ? err.message : "حدث خطأ";
+				if (authMode === "new" && /موجود|exists|registered/i.test(msg)) {
+					setAuthMode("existing");
+					setError("الرقم ده متسجل عندنا — اكتبي كلمة السر للدخول");
+				} else {
+					setError(msg);
+				}
+				setLoading(false);
+				return;
+			}
+			setLoading(false);
+		}
+
+		setLoading(true);
 		try {
 			const body: {
 				type: TicketType;
@@ -152,6 +199,79 @@ export default function NewTicketForm() {
 					{error}
 				</div>
 			)}
+
+			{/* Contact — phone is identity, auth happens inline */}
+			<section className="rounded-2xl bg-surface border border-hvar p-5 space-y-4">
+				<h2 className="font-cairo font-bold text-sm text-ink">بياناتك</h2>
+
+				{loggedIn && user ? (
+					<div
+						className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl"
+						style={{ background: "color-mix(in srgb, var(--c-brand) 6%, transparent)", border: "1px solid var(--c-brand-line)" }}
+					>
+						<div className="flex items-center gap-2.5 min-w-0">
+							<CheckCircle2 size={16} className="text-brand shrink-0" />
+							<div className="min-w-0">
+								<p className="font-cairo font-bold text-sm text-ink truncate">{user.name}</p>
+								<p className="font-inter text-xs text-muted" dir="ltr">{user.phone}</p>
+							</div>
+						</div>
+						<button
+							type="button"
+							onClick={() => logout()}
+							className="font-cairo text-xs text-brand hover:underline shrink-0"
+						>
+							مش أنتِ؟
+						</button>
+					</div>
+				) : (
+					<>
+						<div>
+							<label className="block font-cairo text-xs font-semibold text-muted mb-1.5">رقم الموبايل</label>
+							<input
+								type="tel"
+								dir="ltr"
+								value={authPhone}
+								onChange={(e) => setAuthPhone(e.target.value)}
+								placeholder="01xxxxxxxxx"
+								autoComplete="tel"
+								className="hvar-input w-full px-4 py-3 rounded-xl font-inter text-sm text-left"
+							/>
+						</div>
+						{authMode === "new" && (
+							<div>
+								<label className="block font-cairo text-xs font-semibold text-muted mb-1.5">الاسم</label>
+								<input
+									type="text"
+									value={authName}
+									onChange={(e) => setAuthName(e.target.value)}
+									placeholder="اسمك الكامل"
+									autoComplete="name"
+									className="hvar-input w-full px-4 py-3 rounded-xl font-cairo text-sm"
+								/>
+							</div>
+						)}
+						<div>
+							<label className="block font-cairo text-xs font-semibold text-muted mb-1.5">كلمة السر</label>
+							<input
+								type="password"
+								value={authPassword}
+								onChange={(e) => setAuthPassword(e.target.value)}
+								placeholder={authMode === "new" ? "كلمة سر جديدة (٦ حروف على الأقل)" : "كلمة السر"}
+								autoComplete={authMode === "new" ? "new-password" : "current-password"}
+								className="hvar-input w-full px-4 py-3 rounded-xl font-cairo text-sm"
+							/>
+						</div>
+						<button
+							type="button"
+							onClick={() => { setError(null); setAuthMode(authMode === "new" ? "existing" : "new"); }}
+							className="font-cairo text-xs text-brand hover:underline"
+						>
+							{authMode === "new" ? "عندك حساب؟ ادخلي بكلمة السر" : "أول مرة؟ كملي ببياناتك وهنعملك حساب"}
+						</button>
+					</>
+				)}
+			</section>
 
 			{/* Type selector */}
 			<section className="rounded-2xl bg-surface border border-hvar p-5 space-y-3">

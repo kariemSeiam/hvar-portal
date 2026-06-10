@@ -171,21 +171,43 @@ export async function getProductById(
 	};
 }
 
+/**
+ * Curated bestseller order — compass/products/catalog.md merchandising reality:
+ * البلدوزر (flagship) → النينجا (top TikTok) → الجامبو → هاند بلندر 4×1 →
+ * المكواة (most-reviewed on site) → then the rest of the lineup.
+ * SKUs not in this list fall back after it, newest first.
+ */
+const FEATURED_SKU_ORDER = [
+	"5070",
+	"5029",
+	"5019",
+	"5057",
+	"1115",
+	"5070+04",
+	"5027",
+	"1104",
+	"7720",
+	"5062",
+] as const;
+
 export async function listFeatured(
 	env: Env,
 	limit: number,
 ): Promise<ProductCard[]> {
+	const fieldArgs = FEATURED_SKU_ORDER.map(() => "?").join(",");
 	const sql = `
 		${SELECT_CARD}
 		WHERE p.business_id = ?
 		GROUP BY p.id
 		HAVING stock > 0
-		ORDER BY p.id DESC
+		ORDER BY (FIELD(p.sku, ${fieldArgs}) = 0) ASC, FIELD(p.sku, ${fieldArgs}) ASC, p.id DESC
 		LIMIT ?
 	`;
 	const rows = await query<ProductCardRow[]>(getErpPool(env), sql, [
 		env.ERP_LOCATION_ID,
 		env.ERP_BUSINESS_ID,
+		...FEATURED_SKU_ORDER,
+		...FEATURED_SKU_ORDER,
 		limit,
 	]);
 	return rows.map((r) => toCard(env, r));
