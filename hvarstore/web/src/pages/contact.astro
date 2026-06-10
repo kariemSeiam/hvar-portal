@@ -1,139 +1,838 @@
 ---
 import Base from '../layouts/Base.astro'
+import Doodles from '../components/Doodles.astro'
+
+const waProductUrl  = `https://wa.me/201204444196?text=${encodeURIComponent('مرحباً، عايزة أستفسر عن منتج')}`
+const waOrderUrl    = `https://wa.me/201204444196?text=${encodeURIComponent('مرحباً، عايزة أستفسر عن طلبي')}`
+const waGeneralUrl  = `https://wa.me/201204444196?text=${encodeURIComponent('مرحباً، عايزة أستفسر')}`
+const waWholesale   = 'https://wa.me/message/RURCTAQLT5ASO1'
 
 const faqItems = [
-  { q: 'ما مدة الضمان؟', a: 'جميع المنتجات بضمان من سنتين لثلاث سنوات حسب المنتج. يبدأ الضمان من تاريخ الاستلام.' },
-  { q: 'هل يمكنني الدفع عند الاستلام؟', a: 'نعم، نوفر خدمة الدفع عند الاستلام (كاش أو فيزا عند التسليم) مع إمكانية الفحص قبل الدفع.' },
-  { q: 'كم يستغرق التوصيل؟', a: 'من ٢ لـ٥ أيام عمل لجميع المحافظات. التوصيل مجاني.' },
-  { q: 'كيف أطلب صيانة؟', a: 'من صفحة خدمة ما بعد البيع اختر نوع الخدمة (صيانة / استبدال / مرتجع) وسيتواصل معك الفريق خلال ٢٤ ساعة.' },
-  { q: 'هل يمكنني إرجاع المنتج؟', a: 'نعم، خلال ١٤ يوم من الاستلام. المنتج يجب أن يكون بحالته الأصلية مع العبوة.' },
+  {
+    q: 'ما مدة ضمان منتجات هفار؟',
+    a: 'من سنتين لثلاث سنوات حسب المنتج — يبدأ من تاريخ الاستلام. الضمان يشمل قطع الغيار والإصلاح من غير شروط مخبّية.',
+  },
+  {
+    q: 'هل الدفع عند الاستلام متاح؟',
+    a: 'أيوه. افحصي المنتج قبل ما تدفعي — ده حقك. كمان متاح الدفع بالبطاقة أو بالتقسيط عن طريق فاليو وسهولة وأمان.',
+  },
+  {
+    q: 'كم يستغرق التوصيل وهل له رسوم؟',
+    a: 'من ١ لـ٣ أيام عمل لأغلب المحافظات. التوصيل مجاني على كل الطلبات — مفيش رسوم إضافية.',
+  },
+  {
+    q: 'عندي منتج وقف أو بيعمل مشكلة — إزاي أطلب صيانة؟',
+    a: 'ادخلي على صفحة الخدمة واختاري "صيانة". ادخلي اسم المنتج والمشكلة بالتفصيل وفريقنا هيتواصل معاكِ خلال ٢٤ ساعة لتحديد موعد الاستلام.',
+  },
+  {
+    q: 'إزاي أرجع منتج مش عاجبني؟',
+    a: 'خلال ١٤ يوم من الاستلام طالما المنتج بحالته الأصلية مع العبوة. افتحي طلب مرتجع من صفحة الخدمة وهنتواصل معاكِ.',
+  },
+  {
+    q: 'هل هفار عندها فروع أو معارض؟',
+    a: 'أيوه، هفار لها فروع في عدة محافظات. تواصلي على الخط الساخن ١٧٥٦٦ أو واتساب عشان تعرفي أقرب فرع ليكِ.',
+  },
+  {
+    q: 'عايزة أشتري كميات كبيرة أو بالجملة؟',
+    a: 'تواصلي على واتساب الجملة مباشرة وفريق المبيعات هيرد عليكِ. نوفر خصومات خاصة للكميات والموزعين والمطاعم.',
+  },
 ]
 
-/* JSON-LD FAQ schema */
 const faqJsonld = JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
   mainEntity: faqItems.map(({ q, a }) => ({
-    "@type": "Question",
+    '@type': 'Question',
     name: q,
-    acceptedAnswer: { "@type": "Answer", text: a },
+    acceptedAnswer: { '@type': 'Answer', text: a },
   })),
+})
+
+const contactJsonld = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  name: 'تواصل مع هفار',
+  url: 'https://hvarstore.com/contact',
+  mainEntity: {
+    '@type': 'Organization',
+    name: 'هفار',
+    telephone: '+201204444196',
+    email: 'info@hvarstore.com',
+    contactPoint: {
+      '@type': 'ContactPoint',
+      telephone: '+201204444196',
+      contactType: 'customer service',
+      areaServed: 'EG',
+      availableLanguage: 'Arabic',
+      hoursAvailable: 'Mo-Su 09:00-21:00',
+    },
+  },
 })
 ---
 
 <Base
-  title="تواصل مع هفار — واتساب وخدمة العملاء"
-  description="تواصل مع هفار عبر واتساب أو راسلنا مباشرة. نرد خلال ٢٤ ساعة. ضمان، شحن، خدمة بعد البيع."
-  jsonld={[faqJsonld]}
+  title="تواصل مع هفار — خط ساخن ١٧٥٦٦، واتساب، خدمة عملاء"
+  description="تواصلي مع هفار عبر الخط الساخن ١٧٥٦٦، واتساب ٠١٢٠٤٤٤٤١٩٦، أو راسلينا مباشرة. نرد خلال ٢٤ ساعة. ضمان حقيقي وشحن مجاني."
+  jsonld={[faqJsonld, contactJsonld]}
 >
 
-  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<style>
+  /* Wilson motion signature */
+  :root { --curve: cubic-bezier(0.22, 1, 0.36, 1); }
 
-    <!-- Breadcrumb -->
-    <nav class="mb-6" aria-label="مسار التنقل">
-      <ol class="flex items-center gap-2 text-xs font-cairo text-[#57534e] dark:text-[#a8a29e]">
-        <li><a href="/" class="hover:text-[#d43533] transition-colors">البيت</a></li>
-        <li class="opacity-40">›</li>
-        <li class="text-[#1c1917] dark:text-[#f5f5f4] font-semibold">تواصل معنا</li>
-      </ol>
-    </nav>
+  /* ── P2: Grain Texture ────────────────────────────────────────────────── */
+  .grain-overlay { position: relative; isolation: isolate; }
+  .grain-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 256px 256px;
+    opacity: 0.04;
+    mix-blend-mode: overlay;
+  }
+  .dark .grain-overlay::before { opacity: 0.06; }
 
-    <h1 class="font-cairo font-black text-2xl text-[#1c1917] dark:text-[#f5f5f4] mb-8">
-      تواصل معنا
-    </h1>
+  /* ── P4: Red Mesh ─────────────────────────────────────────────────────── */
+  .mesh-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, hsl(1 64% 51% / 0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 90% 80%, hsl(32 55% 51% / 0.06) 0%, transparent 60%);
+  }
+  .dark .mesh-hero::after {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, hsl(2 75% 58% / 0.14) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 90% 80%, hsl(32 55% 51% / 0.10) 0%, transparent 60%);
+  }
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  /* ── P6: Card Shine ───────────────────────────────────────────────────── */
+  .card-shine { position: relative; overflow: hidden; }
+  .card-shine::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 0%, transparent 40%,
+      hsl(1 64% 51% / 0.06) 45%,
+      hsl(1 64% 51% / 0.12) 50%,
+      hsl(1 64% 51% / 0.06) 55%,
+      transparent 60%, transparent 100%
+    );
+    opacity: 0;
+    transform: translateX(-100%);
+    transition: opacity 0.4s var(--curve), transform 0.5s var(--curve);
+    pointer-events: none;
+  }
+  .card-shine:hover::after { opacity: 1; transform: translateX(100%); }
+  @media (prefers-reduced-motion: reduce) { .card-shine::after { display: none; } }
 
-      <!-- WhatsApp -->
-      <a
-        href="https://wa.me/201XXXXXXXXX"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="group flex items-center gap-4 p-6 rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] hover:border-[#25d366] transition-all"
-      >
-        <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-[#25d366]/10 text-[#25d366] group-hover:bg-[#25d366] group-hover:text-white transition-all">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-          </svg>
-        </div>
-        <div>
-          <p class="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">واتساب</p>
-          <p class="font-cairo text-xs text-[#57534e] dark:text-[#a8a29e] mt-0.5">راسلنا مباشرة — رد سريع</p>
-        </div>
-      </a>
+  /* ── P7: Scroll Reveals (Base already adds .visible via IO) ───────────── */
+  .reveal-section {
+    opacity: 0;
+    transform: translateY(2rem);
+    transition: opacity 700ms var(--curve), transform 700ms var(--curve);
+  }
+  .reveal-section.visible { opacity: 1; transform: translateY(0); }
+  .reveal-child {
+    opacity: 0;
+    transform: translateY(1.125rem);
+    transition: opacity 500ms var(--curve), transform 500ms var(--curve);
+  }
+  .visible .reveal-child { opacity: 1; transform: translateY(0); }
+  .visible .reveal-child:nth-child(1) { transition-delay:   0ms; }
+  .visible .reveal-child:nth-child(2) { transition-delay:  80ms; }
+  .visible .reveal-child:nth-child(3) { transition-delay: 160ms; }
+  .visible .reveal-child:nth-child(4) { transition-delay: 240ms; }
+  .visible .reveal-child:nth-child(5) { transition-delay: 320ms; }
+  .visible .reveal-child:nth-child(6) { transition-delay: 400ms; }
+  .visible .reveal-child:nth-child(7) { transition-delay: 480ms; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal-section,
+    .reveal-child { opacity: 1; transform: none; transition: none; }
+  }
 
-      <!-- Phone -->
-      <a
-        href="tel:+201XXXXXXXXX"
-        class="group flex items-center gap-4 p-6 rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] hover:border-[#d43533] transition-all"
-      >
-        <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-red-50 dark:bg-red-950/20 text-[#d43533] group-hover:bg-[#d43533] group-hover:text-white transition-all">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2-.5c.9.3 1.9.6 2.9.7A2 2 0 0 1 22 16.9Z"/>
-          </svg>
-        </div>
-        <div>
-          <p class="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">اتصل بنا</p>
-          <p class="font-cairo text-xs text-[#57534e] dark:text-[#a8a29e] mt-0.5">من ٩ صباحاً لـ٩ مساءً</p>
-        </div>
-      </a>
+  /* ── P9: Trust Line ───────────────────────────────────────────────────── */
+  .trust-line {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.375rem 1rem;
+    font-size: 0.8125rem;
+    color: var(--c-muted);
+    margin-block-start: 0.75rem;
+    font-family: 'Cairo', sans-serif;
+  }
+  .trust-line__item { display: inline-flex; align-items: center; gap: 0.3rem; }
 
-      <!-- Facebook -->
-      <a
-        href="https://facebook.com/hvarstore"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="group flex items-center gap-4 p-6 rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] hover:border-[#1877f2] transition-all"
-      >
-        <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-[#1877f2]/10 text-[#1877f2] group-hover:bg-[#1877f2] group-hover:text-white transition-all">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-          </svg>
-        </div>
-        <div>
-          <p class="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">فيسبوك</p>
-          <p class="font-cairo text-xs text-[#57534e] dark:text-[#a8a29e] mt-0.5">تابعنا وشوف أحدث العروض</p>
-        </div>
-      </a>
+  /* ── Intent cards lift ────────────────────────────────────────────────── */
+  .intent-card {
+    transition:
+      border-color 250ms var(--curve),
+      transform    250ms var(--curve),
+      box-shadow   250ms var(--curve);
+  }
+  .intent-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px hsl(1 64% 51% / 0.10);
+  }
+  .intent-card:active { transform: translateY(0); }
 
-      <!-- Address -->
-      <div class="flex items-center gap-4 p-6 rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825]">
-        <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-red-50 dark:bg-red-950/20 text-[#d43533]">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-            <circle cx="12" cy="10" r="3"/>
-          </svg>
+  /* ── Hotline number display ───────────────────────────────────────────── */
+  .hotline-num {
+    font-family: 'Cairo', sans-serif;
+    font-variant-numeric: tabular-nums;
+    font-size: clamp(3.5rem, 14vw, 8rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    color: var(--c-brass);
+    line-height: 1;
+  }
+
+  /* ── WhatsApp live pulse ──────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: no-preference) {
+    .wa-live {
+      animation: wa-pulse 2.8s ease-in-out infinite;
+    }
+    @keyframes wa-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.35); }
+      50%       { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); }
+    }
+  }
+
+  /* ── FAQ chevron ──────────────────────────────────────────────────────── */
+  details summary::-webkit-details-marker { display: none; }
+  .faq-chevron { transition: transform 250ms var(--curve); }
+  details[open] .faq-chevron { transform: rotate(180deg); }
+
+  /* ── Community stat ───────────────────────────────────────────────────── */
+  .stat-num {
+    font-family: 'Cairo', sans-serif;
+    font-size: clamp(3rem, 10vw, 5rem);
+    font-weight: 900;
+    line-height: 1;
+    color: #fff;
+  }
+
+  /* ── Divider dot ──────────────────────────────────────────────────────── */
+  .dot-sep { opacity: 0.3; }
+</style>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     HERO — P1 doodles + P2 grain + P4 mesh
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section
+  class="relative overflow-hidden grain-overlay mesh-hero
+         bg-[#FBF7F1] dark:bg-[#130F0C]
+         min-h-[400px] sm:min-h-[460px]
+         flex items-center"
+>
+
+  <!-- P1: Doodle field — shared, theme-aware, animated -->
+  <Doodles variant="hero" />
+
+  <!-- Content ─────────────────────────────────────────── -->
+
+  <!-- Breadcrumb — visually hidden, kept for accessibility -->
+  <nav class="sr-only" aria-label="مسار التنقل">
+    <ol>
+      <li><a href="/">البيت</a></li>
+      <li>تواصل معنا</li>
+    </ol>
+  </nav>
+
+  <div class="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
+    <div class="reveal-section flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 sm:gap-12">
+
+      <!-- Left: hotline as the hero -->
+      <div>
+        <!-- Brass pre-heading -->
+        <p class="reveal-child font-cairo font-semibold text-xs uppercase tracking-[0.16em] mb-3"
+           style="color:var(--c-brass)">
+          الخط الساخن الرسمي
+        </p>
+
+        <!-- THE NUMBER — this IS the header -->
+        <div class="reveal-child flex items-baseline gap-3">
+          <span class="hotline-num"
+                style="color:var(--c-brand)">
+            ١٧٥٦٦
+          </span>
         </div>
-        <div>
-          <p class="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">الفرع</p>
-          <p class="font-cairo text-xs text-[#57534e] dark:text-[#a8a29e] mt-0.5">القاهرة، مصر</p>
-        </div>
+
+        <!-- Subline -->
+        <p class="reveal-child font-cairo text-base sm:text-lg mt-3 leading-relaxed"
+           style="color:rgba(245,239,230,0.50)">
+          في ثواني — كل يوم، كل وقت
+        </p>
+      </div>
+
+      <!-- Right: ghosted phone icon (desktop only) -->
+      <div class="hidden sm:block flex-shrink-0 select-none pointer-events-none" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"
+             style="color:var(--c-brand);opacity:0.12;width:clamp(80px,12vw,120px);height:clamp(80px,12vw,120px)">
+          <path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012 4.2 2 2 0 014 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.4 2L8 9.9a16 16 0 006 6l1.3-1.3a2 2 0 012-.5c.9.3 1.9.6 2.9.7A2 2 0 0122 16.9z"/>
+        </svg>
       </div>
 
     </div>
+  </div>
+</section>
 
-    <!-- FAQ section -->
-    <section class="mt-14">
-      <h2 class="font-cairo font-bold text-lg text-[#1c1917] dark:text-[#f5f5f4] mb-5">
-        أسئلة شائعة
-      </h2>
-      <div class="space-y-3">
-        {faqItems.map(({ q, a }) => (
-          <details class="group rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] overflow-hidden">
-            <summary class="flex items-center justify-between px-5 py-4 cursor-pointer font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4] select-none hover:bg-stone-50 dark:hover:bg-stone-900/30 transition-colors list-none">
-              <span>{q}</span>
-              <svg class="w-4 h-4 text-stone-400 transition-transform group-open:rotate-180" viewBox="0 0 16 16" fill="none">
-                <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </summary>
-            <div class="px-5 pb-4 pt-1 font-cairo text-sm text-[#57534e] dark:text-[#a8a29e] leading-relaxed">
-              {a}
-            </div>
-          </details>
-        ))}
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     INTENT CARDS — catch every visitor type
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section
+  class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-14 reveal-section"
+  aria-label="اختاري سبب تواصلك"
+>
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+
+    <!-- Intent A: Pre-purchase inquiry -->
+    <a
+      href={waProductUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="group reveal-child intent-card card-shine
+             flex flex-col gap-4 p-7 rounded-2xl
+             bg-surface
+             border-2 border-hvar
+             hover:border-[var(--c-brand)] dark:hover:border-[var(--c-brand)]
+             focus-visible:outline-2 focus-visible:outline-[var(--c-brand)]"
+    >
+      <div class="w-14 h-14 rounded-2xl bg-[#fef2f2] dark:bg-[var(--c-brand)]/10
+                  flex items-center justify-center text-brand
+                  group-hover:bg-brand group-hover:text-white"
+           style="transition:background 250ms cubic-bezier(0.22,1,0.36,1),color 250ms cubic-bezier(0.22,1,0.36,1)">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
       </div>
-    </section>
+      <div class="flex-1">
+        <p class="font-cairo font-bold text-base text-ink mb-1.5">
+          عايزة تشتري أو تستفسري
+        </p>
+        <p class="font-cairo text-sm text-muted leading-relaxed">
+          سؤال عن منتج، مقارنة بين موديلين، أو تأكيد قبل ما تطلبي — كلمينا على واتساب
+        </p>
+      </div>
+      <span class="font-cairo text-sm font-bold text-brand flex items-center gap-1.5 mt-auto">
+        واتساب الآن
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"
+             class="rtl:rotate-180" aria-hidden="true">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+    </a>
+
+    <!-- Intent B: After-sale service -->
+    <a
+      href="/service/new"
+      class="group reveal-child intent-card card-shine
+             flex flex-col gap-4 p-7 rounded-2xl
+             bg-surface
+             border-2 border-hvar
+             hover:border-[#C8893B] dark:hover:border-[#C8893B]
+             focus-visible:outline-2 focus-visible:outline-[#C8893B]"
+    >
+      <div class="w-14 h-14 rounded-2xl bg-[#C8893B]/10
+                  flex items-center justify-center text-brass"
+           style="transition:background 250ms cubic-bezier(0.22,1,0.36,1),color 250ms cubic-bezier(0.22,1,0.36,1)">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+        </svg>
+      </div>
+      <div class="flex-1">
+        <p class="font-cairo font-bold text-base text-ink mb-1.5">
+          منتج محتاج خدمة
+        </p>
+        <p class="font-cairo text-sm text-muted leading-relaxed">
+          صيانة، استبدال تحت الضمان، أو إرجاع — افتحي طلب وفريقنا هيرد خلال ٢٤ ساعة
+        </p>
+      </div>
+      <span class="font-cairo text-sm font-bold text-brass flex items-center gap-1.5 mt-auto">
+        افتحي طلب خدمة
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"
+             class="rtl:rotate-180" aria-hidden="true">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+    </a>
+
+    <!-- Intent C: Order / complaint -->
+    <a
+      href={waOrderUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="group reveal-child intent-card card-shine
+             flex flex-col gap-4 p-7 rounded-2xl
+             bg-surface
+             border-2 border-hvar
+             hover:border-[#1d9a4a] dark:hover:border-[#1d9a4a]
+             focus-visible:outline-2 focus-visible:outline-[#1d9a4a]"
+    >
+      <div class="w-14 h-14 rounded-2xl bg-[#1d9a4a]/10
+                  flex items-center justify-center text-[#1d9a4a]"
+           style="transition:background 250ms cubic-bezier(0.22,1,0.36,1),color 250ms cubic-bezier(0.22,1,0.36,1)">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </div>
+      <div class="flex-1">
+        <p class="font-cairo font-bold text-base text-ink mb-1.5">
+          طلبي وصل؟ عندي استفسار؟
+        </p>
+        <p class="font-cairo text-sm text-muted leading-relaxed">
+          تتبع طلب، تأخير في التوصيل، أو أي سؤال بعد الشراء — كلمينا مباشرة
+        </p>
+      </div>
+      <span class="font-cairo text-sm font-bold text-[#1d9a4a] flex items-center gap-1.5 mt-auto">
+        راسلينا الآن
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"
+             class="rtl:rotate-180" aria-hidden="true">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+    </a>
 
   </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PRIMARY CONTACT CHANNELS
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section
+  id="contact"
+  class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16"
+  aria-label="قنوات التواصل"
+>
+
+  <!-- ── Hotline 17566 hero card ──────────────────────────────────────── -->
+  <div class="reveal-section mb-6">
+    <div class="relative overflow-hidden rounded-3xl grain-overlay
+                bg-gradient-to-br from-[#1e1814] to-[#2d1f10]
+                dark:from-[#0e0b07] dark:to-[#1a1007]
+                p-8 sm:p-10 sm:p-12">
+
+      <!-- Brass ambient glow -->
+      <div class="absolute inset-0 pointer-events-none" aria-hidden="true"
+           style="background:radial-gradient(ellipse 70% 60% at 85% 20%,hsl(32 55% 51% / 0.22) 0%,transparent 65%)">
+      </div>
+      <!-- Red ember top-left -->
+      <div class="absolute inset-0 pointer-events-none" aria-hidden="true"
+           style="background:radial-gradient(ellipse 50% 40% at 5% 5%,hsl(1 64% 51% / 0.15) 0%,transparent 60%)">
+      </div>
+
+      <div class="relative flex flex-col sm:flex-row sm:items-center gap-8">
+
+        <!-- Number block -->
+        <div class="flex flex-col gap-3">
+          <span class="font-cairo text-xs font-semibold text-brass tracking-widest uppercase">
+            الخط الساخن — مسجّل لدى NTRA
+          </span>
+          <p class="hotline-num" dir="ltr" aria-label="رقم الخط الساخن ١٧٥٦٦">17566</p>
+          <p class="font-cairo text-sm text-[#a8a29e] max-w-xs leading-relaxed">
+            اتصلي من أي شبكة في مصر. الخط متاح من ٩ صباحاً لـ٩ مساءً طوال أيام الأسبوع.
+          </p>
+        </div>
+
+        <!-- CTA block -->
+        <div class="sm:ms-auto flex flex-col items-start sm:items-end gap-4 flex-shrink-0">
+          <a
+            href="tel:17566"
+            class="inline-flex items-center gap-3
+                   px-8 py-4 rounded-xl min-h-[52px]
+                   bg-[#C8893B] hover:bg-[#b07830]
+                   text-white font-cairo font-bold text-base
+                   focus-visible:outline-2 focus-visible:outline-[#C8893B]"
+            style="transition:background 250ms cubic-bezier(0.22,1,0.36,1),box-shadow 250ms cubic-bezier(0.22,1,0.36,1);
+                   box-shadow:0 4px 20px hsl(32 55% 51% / 0.40)"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2-.5c.9.3 1.9.6 2.9.7A2 2 0 0 1 22 16.9Z"/>
+            </svg>
+            اتصلي على ١٧٥٦٦
+          </a>
+
+          <!-- P9 mini trust -->
+          <p class="font-cairo text-xs text-[#a8a29e]">
+            من ٩ صباحاً لـ٩ مساءً · ٧ أيام في الأسبوع
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── WhatsApp + Phone ──────────────────────────────────────────────── -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5 reveal-section">
+
+    <!-- WhatsApp — primary support channel -->
+    <a
+      href={waGeneralUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="card-shine group flex items-center gap-5 p-6 rounded-2xl
+             bg-surface
+             border border-hvar
+             hover:border-[#25D366] dark:hover:border-[#25D366]
+             focus-visible:outline-2 focus-visible:outline-[#25D366]"
+      style="transition:border-color 250ms cubic-bezier(0.22,1,0.36,1)"
+    >
+      <div class="wa-live w-14 h-14 rounded-2xl bg-[#25D366]/10 flex items-center justify-center
+                  flex-shrink-0 text-[#25D366]
+                  group-hover:bg-[#25D366] group-hover:text-white"
+           style="transition:background 250ms cubic-bezier(0.22,1,0.36,1),color 250ms cubic-bezier(0.22,1,0.36,1)">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="font-cairo font-bold text-base text-ink">
+          واتساب
+        </p>
+        <p class="font-cairo text-sm text-muted mt-0.5 tabular-nums" dir="ltr">
+          01204444196
+        </p>
+        <p class="font-cairo text-xs text-muted">
+          رد خلال ساعات · الأسرع دايماً
+        </p>
+      </div>
+    </a>
+
+    <!-- Direct phone call -->
+    <a
+      href="tel:+201204444196"
+      class="card-shine group flex items-center gap-5 p-6 rounded-2xl
+             bg-surface
+             border border-hvar
+             hover:border-[var(--c-brand)] dark:hover:border-[var(--c-brand)]
+             focus-visible:outline-2 focus-visible:outline-[var(--c-brand)]"
+      style="transition:border-color 250ms cubic-bezier(0.22,1,0.36,1)"
+    >
+      <div class="w-14 h-14 rounded-2xl bg-[#fef2f2] dark:bg-[var(--c-brand)]/10
+                  flex items-center justify-center text-brand flex-shrink-0
+                  group-hover:bg-brand group-hover:text-white"
+           style="transition:background 250ms cubic-bezier(0.22,1,0.36,1),color 250ms cubic-bezier(0.22,1,0.36,1)">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2-.5c.9.3 1.9.6 2.9.7A2 2 0 0 1 22 16.9Z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="font-cairo font-bold text-base text-ink">
+          اتصال مباشر
+        </p>
+        <p class="font-cairo text-sm text-muted mt-0.5 tabular-nums" dir="ltr">
+          01204444196
+        </p>
+        <p class="font-cairo text-xs text-muted">
+          ٩ صباحاً — ٩ مساءً
+        </p>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- ── Secondary channels 2×2 ────────────────────────────────────────── -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10 reveal-section">
+
+    <!-- Email -->
+    <a
+      href="mailto:info@hvarstore.com"
+      class="card-shine group flex flex-col items-center gap-3 p-5 rounded-2xl text-center
+             bg-surface
+             border border-hvar
+             hover:border-[var(--c-brand)] dark:hover:border-[var(--c-brand)]
+             focus-visible:outline-2 focus-visible:outline-[var(--c-brand)]
+             min-h-[44px]"
+      style="transition:border-color 250ms cubic-bezier(0.22,1,0.36,1)"
+    >
+      <div class="w-11 h-11 rounded-xl bg-[#fef2f2] dark:bg-[var(--c-brand)]/10
+                  flex items-center justify-center text-brand
+                  group-hover:bg-brand group-hover:text-white"
+           style="transition:background 250ms cubic-bezier(0.22,1,0.36,1),color 250ms cubic-bezier(0.22,1,0.36,1)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect width="20" height="16" x="2" y="4" rx="2"/>
+          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+        </svg>
+      </div>
+      <div>
+        <p class="font-cairo font-bold text-sm text-ink">البريد</p>
+        <p class="font-cairo text-xs text-muted mt-0.5" dir="ltr">
+          info@hvarstore.com
+        </p>
+      </div>
+    </a>
+
+    <!-- Facebook -->
+    <a
+      href="https://facebook.com/hvarstore"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="card-shine group flex flex-col items-center gap-3 p-5 rounded-2xl text-center
+             bg-surface
+             border border-hvar
+             hover:border-[#1877f2] dark:hover:border-[#1877f2]
+             focus-visible:outline-2 focus-visible:outline-[#1877f2]
+             min-h-[44px]"
+      style="transition:border-color 250ms cubic-bezier(0.22,1,0.36,1)"
+    >
+      <div class="w-11 h-11 rounded-xl bg-[#1877f2]/10
+                  flex items-center justify-center text-[#1877f2]
+                  group-hover:bg-[#1877f2] group-hover:text-white"
+           style="transition:background 250ms cubic-bezier(0.22,1,0.36,1),color 250ms cubic-bezier(0.22,1,0.36,1)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="font-cairo font-bold text-sm text-ink">فيسبوك</p>
+        <p class="font-cairo text-xs text-muted mt-0.5">١٤٧ ألف متابع</p>
+      </div>
+    </a>
+
+    <!-- Instagram -->
+    <a
+      href="https://instagram.com/hvar222"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="card-shine group flex flex-col items-center gap-3 p-5 rounded-2xl text-center
+             bg-surface
+             border border-hvar
+             hover:border-[#e1306c] dark:hover:border-[#e1306c]
+             focus-visible:outline-2 focus-visible:outline-[#e1306c]
+             min-h-[44px]"
+      style="transition:border-color 250ms cubic-bezier(0.22,1,0.36,1)"
+    >
+      <div class="w-11 h-11 rounded-xl bg-[#e1306c]/10
+                  flex items-center justify-center text-[#e1306c]
+                  group-hover:bg-[#e1306c] group-hover:text-white"
+           style="transition:background 250ms cubic-bezier(0.22,1,0.36,1),color 250ms cubic-bezier(0.22,1,0.36,1)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="font-cairo font-bold text-sm text-ink">إنستغرام</p>
+        <p class="font-cairo text-xs text-muted mt-0.5" dir="ltr">@hvar222</p>
+      </div>
+    </a>
+
+    <!-- Wholesale -->
+    <a
+      href={waWholesale}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="card-shine group flex flex-col items-center gap-3 p-5 rounded-2xl text-center
+             bg-surface
+             border border-hvar
+             hover:border-[#C8893B] dark:hover:border-[#C8893B]
+             focus-visible:outline-2 focus-visible:outline-[#C8893B]
+             min-h-[44px]"
+      style="transition:border-color 250ms cubic-bezier(0.22,1,0.36,1)"
+    >
+      <div class="w-11 h-11 rounded-xl bg-[#C8893B]/10
+                  flex items-center justify-center text-brass
+                  group-hover:bg-[#C8893B] group-hover:text-white"
+           style="transition:background 250ms cubic-bezier(0.22,1,0.36,1),color 250ms cubic-bezier(0.22,1,0.36,1)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/>
+          <path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2"/>
+          <line x1="12" y1="12" x2="12" y2="19"/>
+          <line x1="8"  y1="15" x2="16" y2="15"/>
+        </svg>
+      </div>
+      <div>
+        <p class="font-cairo font-bold text-sm text-ink">بيع بالجملة</p>
+        <p class="font-cairo text-xs text-muted mt-0.5">موزعين ومطاعم</p>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- ── P9: Trust Line ────────────────────────────────────────────────── -->
+  <div class="trust-line reveal-section" role="list" aria-label="مزايا هفار">
+
+    <span class="trust-line__item" role="listitem">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"
+           class="text-brand" aria-hidden="true">
+        <path d="M8 1.5L2 4v4c0 3.3 2.5 6.4 6 7 3.5-.6 6-3.7 6-7V4L8 1.5z"
+              fill="currentColor" opacity=".18"/>
+        <path d="M8 1.5L2 4v4c0 3.3 2.5 6.4 6 7 3.5-.6 6-3.7 6-7V4L8 1.5z"
+              stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M5.5 8l2 2 3-3" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      ضمان ٣ سنوات
+    </span>
+
+    <span class="dot-sep" aria-hidden="true">·</span>
+
+    <span class="trust-line__item" role="listitem">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"
+           class="text-brand" aria-hidden="true">
+        <rect x="1.5" y="7.5" width="13" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M4.5 7.5V5a3.5 3.5 0 0 1 7 0v2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      شحن مجاني لكل المحافظات
+    </span>
+
+    <span class="dot-sep" aria-hidden="true">·</span>
+
+    <span class="trust-line__item" role="listitem">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"
+           class="text-brand" aria-hidden="true">
+        <rect x="1.5" y="3.5" width="13" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M1.5 6.5h13" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M5.5 10h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      ادفعي لما الطلب يوصل
+    </span>
+
+    <span class="dot-sep" aria-hidden="true">·</span>
+
+    <span class="trust-line__item" role="listitem">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"
+           class="text-brand" aria-hidden="true">
+        <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M8 4.5v4l2.5 2.5" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      خدمة عملاء ٢٤ ساعة
+    </span>
+
+  </div>
+
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     FAQ
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section
+  class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-16"
+  aria-labelledby="faq-heading"
+>
+
+  <div class="reveal-section mb-8">
+    <h2 id="faq-heading"
+        class="font-cairo font-black text-2xl text-ink mb-2">
+      أسئلة كتير — إجابات واضحة
+    </h2>
+    <p class="font-cairo text-sm text-muted">
+      مش لاقية إجابتك هنا؟
+      <a href={waGeneralUrl} target="_blank" rel="noopener noreferrer"
+         class="text-brand hover:underline">كلمينا على واتساب.</a>
+    </p>
+  </div>
+
+  <div class="space-y-3 reveal-section">
+    {faqItems.map(({ q, a }) => (
+      <details
+        class="group rounded-2xl overflow-hidden
+               bg-surface
+               border border-hvar
+               hover:border-[var(--c-brand)]/30 dark:hover:border-[var(--c-brand)]/30 reveal-child"
+        style="transition:border-color 250ms cubic-bezier(0.22,1,0.36,1)"
+      >
+        <summary
+          class="flex items-center justify-between gap-4 px-5 py-4
+                 cursor-pointer select-none list-none
+                 font-cairo font-bold text-sm text-ink
+                 hover:bg-stone-50 dark:hover:bg-white/5"
+          style="transition:background 150ms cubic-bezier(0.22,1,0.36,1)"
+        >
+          <span>{q}</span>
+          <svg class="faq-chevron w-4 h-4 flex-shrink-0 text-muted"
+               viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M4 6l4 4 4-4" stroke="currentColor"
+                  stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </summary>
+        <div class="px-5 pb-4 pt-1 font-cairo text-sm text-muted leading-relaxed">
+          {a}
+        </div>
+      </details>
+    ))}
+  </div>
+
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     COMMUNITY — social proof closer
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section
+  class="relative overflow-hidden grain-overlay
+         bg-[#1e1814] dark:bg-[#0e0b07]
+         py-16 sm:py-20 reveal-section"
+  aria-label="مجتمع هفار"
+>
+  <!-- Brass glow -->
+  <div class="absolute inset-0 pointer-events-none" aria-hidden="true"
+       style="background:radial-gradient(ellipse 80% 70% at 50% 110%,hsl(32 55% 51% / 0.30) 0%,transparent 70%)">
+  </div>
+  <!-- Red ember -->
+  <div class="absolute inset-0 pointer-events-none" aria-hidden="true"
+       style="background:radial-gradient(ellipse 40% 30% at 10% 10%,hsl(1 64% 51% / 0.18) 0%,transparent 60%)">
+  </div>
+
+  <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+
+    <p class="font-cairo font-semibold text-brass text-sm mb-4 tracking-widest uppercase">
+      عيلة هفار على فيسبوك
+    </p>
+
+    <p class="stat-num mb-2">١٤٧ ألف</p>
+
+    <p class="font-cairo text-base text-[#a8a29e] max-w-sm mx-auto mb-8 leading-relaxed">
+      بيتشاركوا وصفات وتجارب حقيقية مع منتجات هفار كل يوم. تعالي كوني جزء من الحكاية.
+    </p>
+
+    <a
+      href="https://facebook.com/hvarstore"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-flex items-center gap-3
+             px-8 py-4 rounded-xl min-h-[52px]
+             bg-[#1877f2] hover:bg-[#0d6efd]
+             text-white font-cairo font-bold text-base
+             focus-visible:outline-2 focus-visible:outline-white"
+      style="transition:background 250ms cubic-bezier(0.22,1,0.36,1)"
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+      </svg>
+      انضمي للعيلة
+    </a>
+
+    <p class="font-cairo text-xs text-[#8a7f78] mt-6">
+      هفار ... اسم يُعتمد عليه
+    </p>
+
+  </div>
+</section>
 
 </Base>

@@ -1,0 +1,162 @@
+---
+/*
+ * InnerHero — Shared page header for account/utility/service inner pages.
+ *
+ * Replaces the bare <h1> + breadcrumb pattern that lived on every inner page.
+ * Three variants:
+ *   utility — light surface, P3 dot grid. For: orders, account, checkout.
+ *   service — same but adds a 3px brand-red→brass→brand-red top accent bar.
+ *             For: support, maintenance, service pages.
+ *   brand   — dark forced canvas, P2 grain + P4 red mesh. For future use.
+ *
+ * Wilson classes used:
+ *   .grid-dot  (P3) — repeating-radial dot pattern, uses --c-border
+ *   .grain     (P2) — subtle film grain overlay (brand variant only)
+ *   .mesh-red  (P4) — red ambient glow from top
+ *   .reveal-section / .reveal-child (P7) — IntersectionObserver-driven reveal
+ *     The observer is set up globally in Base.astro — just apply the classes.
+ */
+
+interface Props {
+  /** Brass pre-heading above the title, e.g. "الدعم والصيانة" */
+  label?: string
+  /** Main h1 heading — required */
+  title: string
+  /** Muted subline below the title */
+  subtitle?: string
+  /**
+   * utility: light surface + P3 dot grid — orders, account pages
+   * service: utility + 3px brand accent bar at top
+   * brand:   dark canvas + P2 grain + P4 red mesh — future use
+   */
+  variant?: 'utility' | 'service' | 'brand'
+  /** Optional right-side CTA button */
+  cta?: { label: string; href: string }
+}
+
+const { label, title, subtitle, variant = 'utility', cta } = Astro.props
+
+const isBrand   = variant === 'brand'
+const isService = variant === 'service'
+---
+
+<header
+  class:list={[
+    'relative overflow-hidden',
+    isBrand && 'grain'
+  ]}
+  style={
+    isBrand
+      ? 'background-color:var(--c-bg);border-bottom:1px solid var(--c-border)'
+      : 'background-color:var(--c-surface);border-bottom:1px solid var(--c-border)'
+  }
+>
+
+  {/* Service variant — 3px gradient top accent bar */}
+  {isService && (
+    <div
+      class="absolute top-0 inset-x-0 h-[3px] pointer-events-none"
+      style="background:linear-gradient(90deg,var(--c-brand) 0%,var(--c-brass) 50%,var(--c-brand) 100%)"
+      aria-hidden="true"
+    />
+  )}
+
+  {/* P3 dot grid — utility and service only */}
+  {!isBrand && (
+    <div
+      class="grid-dot absolute inset-0 pointer-events-none"
+      aria-hidden="true"
+    />
+  )}
+
+  {/* P4 red mesh glow — brand variant only */}
+  {isBrand && (
+    <div
+      class="mesh-red absolute inset-0 pointer-events-none"
+      aria-hidden="true"
+    />
+  )}
+
+  {/* Content wrapper
+      Service variant gets pt-3 so content clears the 3px accent bar visually */}
+  <div
+    class:list={[
+      'relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10',
+      isService && 'pt-11 sm:pt-[3.25rem]'
+    ]}
+  >
+    <div class="reveal-section flex items-start justify-between gap-4">
+
+      <div>
+
+        {/* Brass pre-heading label */}
+        {label && (
+          <p
+            class="reveal-child font-cairo font-semibold text-[10px] uppercase tracking-[0.14em] mb-2"
+            style={
+              isBrand
+                ? 'color:var(--c-brass)'
+                : isService
+                  ? 'color:var(--c-brand)'
+                  : 'color:var(--c-brass)'
+            }
+          >
+            {label}
+          </p>
+        )}
+
+        {/* Main heading */}
+        <h1
+          class="reveal-child font-cairo font-black leading-tight"
+          style={[
+            'font-size:clamp(1.5rem,4vw,2.25rem)',
+            isBrand ? 'color:var(--c-ink)' : 'color:var(--c-ink)',
+          ].join(';')}
+        >
+          {title}
+        </h1>
+
+        {/* Subtitle */}
+        {subtitle && (
+          <p
+            class="reveal-child font-cairo text-sm mt-1.5 leading-relaxed"
+            style="color:var(--c-ink-muted)"
+          >
+            {subtitle}
+          </p>
+        )}
+
+      </div>
+
+      {/* Optional CTA button — right side */}
+      {cta && (
+        <a
+          href={cta.href}
+          class="reveal-child flex-shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-cairo font-bold text-sm text-white"
+          style="background-color:var(--c-brand);transition:all 0.25s cubic-bezier(0.22,1,0.36,1)"
+          onmouseover="this.style.background='var(--c-brand-hover)';this.style.transform='translateY(-1px)'"
+          onmouseout="this.style.background='var(--c-brand)';this.style.transform=''"
+        >
+          {cta.label}
+          {/* Arrow icon — direction-neutral, respects RTL via logical layout */}
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 16 16"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M4 8h8M8 4l4 4-4 4"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </a>
+      )}
+
+    </div>
+  </div>
+</header>

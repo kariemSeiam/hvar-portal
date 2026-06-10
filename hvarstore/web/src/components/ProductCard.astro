@@ -1,153 +1,566 @@
 ---
 import type { ProductCard as ProductCardType } from '../lib/api'
+import { getEnrichment, getWarrantyText } from '../lib/enrichment'
 
 interface Props {
   product: ProductCardType
+  /** Horizontal-scroll contexts (related products, mobile carousels) get a fixed min width. */
+  carousel?: boolean
+  /** Priority image (above-the-fold rows) skip lazy-loading. */
+  eager?: boolean
 }
 
-const { product } = Astro.props
+const { product, carousel = false, eager = false } = Astro.props
+
 const hasDiscount = product.comparePrice !== null && product.comparePrice > product.price
 const discountPct = hasDiscount
   ? Math.round(((product.comparePrice! - product.price) / product.comparePrice!) * 100)
   : 0
 const isLowStock = product.stock > 0 && product.stock <= 3
 const outOfStock = product.stock === 0
+
+const enrichment = getEnrichment(product.sku)
+const warrantyText = getWarrantyText(product.sku)
+const nickname = enrichment?.nickname
+const monthly = product.price >= 1000 ? Math.round(product.price / 12) : null
+const installmentShort = monthly ? `قسّطها من ${monthly.toLocaleString('ar-EG')} ج.م/شهر` : null
+
+const href = `/products/${product.slug}`
+const addPayload = JSON.stringify({
+  productId: product.id,
+  variationId: product.variationId,
+  slug: product.slug,
+  sku: product.sku,
+  name: product.name,
+  image: product.image,
+  price: product.price,
+})
 ---
 
-<article class="card-shine group relative rounded-2xl overflow-hidden transition-all" style="background-color:var(--c-surface);border:1px solid var(--c-border);box-shadow:var(--c-shadow-card);transition:transform 0.3s cubic-bezier(0.22,1,0.36,1),box-shadow 0.3s cubic-bezier(0.22,1,0.36,1),border-color 0.2s;will-change:transform" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='var(--c-shadow-hover)';this.style.borderColor='var(--c-border-strong)'" onmouseleave="this.style.transform='translateY(0)';this.style.boxShadow='var(--c-shadow-card)';this.style.borderColor='var(--c-border)'">
+<div class:list={['pc-wrap', carousel && 'pc-wrap--carousel']}>
+  <article class="pc card-shine" data-oos={outOfStock ? '' : undefined}>
+    <!-- ── Media ──────────────────────────────────────────────── -->
+    <div class="pc-media">
+      <a class:list={['pc-frame', !product.image && 'pc-frame--ph']} href={href} aria-label={product.name}>
+        <span class="pc-spot" aria-hidden="true"></span>
 
-  <!-- Image -->
-  <a href={`/products/${product.slug}`} class="block relative overflow-hidden" style="aspect-ratio:1/1">
-    {product.image ? (
-      <img
-        src={product.image}
-        alt={product.name}
-        width="400"
-        height="400"
-        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-        loading="lazy"
-        decoding="async"
-      />
-    ) : (
-      <!-- Branded placeholder -->
-      <div class="product-placeholder w-full h-full flex items-center justify-center">
-        <!-- Subtle appliance doodle rings -->
-        <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none" aria-hidden="true">
-          <svg width="100%" height="100%" viewBox="0 0 200 200" fill="none" opacity="0.06">
-            <circle cx="100" cy="100" r="70" stroke="var(--c-brand)" stroke-width="1" stroke-dasharray="4 6"/>
-            <circle cx="100" cy="100" r="50" stroke="var(--c-brand)" stroke-width="0.8"/>
-            <circle cx="100" cy="100" r="30" stroke="var(--c-brand)" stroke-width="0.6" stroke-dasharray="2 4"/>
-          </svg>
-        </div>
-        <!-- هـ brand monogram -->
-        <span class="relative z-10 font-cairo font-black select-none" style="font-size:3.5rem;line-height:1;color:var(--c-brand);opacity:0.18">هـ</span>
-      </div>
-    )}
+        {product.image ? (
+          <img
+            class="pc-img"
+            src={product.image}
+            alt={product.name}
+            width="600"
+            height="600"
+            loading={eager ? 'eager' : 'lazy'}
+            decoding="async"
+          />
+        ) : (
+          <span class="pc-ph" aria-hidden="true">
+            <svg class="pc-ph-rings" viewBox="0 0 200 200" fill="none">
+              <circle cx="100" cy="100" r="70" stroke="var(--c-brand)" stroke-width="1" stroke-dasharray="4 6" />
+              <circle cx="100" cy="100" r="50" stroke="var(--c-brand)" stroke-width="0.8" />
+              <circle cx="100" cy="100" r="30" stroke="var(--c-brand)" stroke-width="0.6" stroke-dasharray="2 4" />
+            </svg>
+            <span class="pc-ph-mono font-cairo">هـ</span>
+          </span>
+        )}
 
-    <!-- Discount badge -->
-    {hasDiscount && (
-      <span class="absolute top-3 end-3 px-2 py-0.5 rounded-lg font-inter font-bold text-[11px] leading-tight text-white" style="background-color:var(--c-brand)">
-        -{discountPct}%
-      </span>
-    )}
+        <span class="pc-grain" aria-hidden="true"></span>
 
-    <!-- Out of stock overlay -->
-    {outOfStock && (
-      <div class="absolute inset-0 flex items-center justify-center" style="background:rgba(var(--c-bg-rgb,251,247,241),0.75)">
-        <span class="font-cairo font-bold text-sm px-3 py-1.5 rounded-xl shadow-sm" style="background-color:var(--c-surface);color:var(--c-ink-muted);border:1px solid var(--c-border)">
-          نفذت الكمية
-        </span>
-      </div>
-    )}
-  </a>
+        {hasDiscount && !outOfStock && (
+          <span class="pc-badge pc-badge--sale font-inter">-{discountPct}%</span>
+        )}
 
-  <!-- Info -->
-  <div class="p-4">
-    <!-- Category -->
-    {product.categoryName && (
-      <span class="font-cairo font-semibold text-[10px] uppercase tracking-wide mb-1.5 block" style="color:var(--c-ink-faint)">
-        {product.categoryName}
-      </span>
-    )}
+        {outOfStock && (
+          <span class="pc-oos">
+            <span class="pc-oos-chip font-cairo">غير متاح حالياً</span>
+          </span>
+        )}
+      </a>
 
-    <a href={`/products/${product.slug}`} class="block mb-3">
-      <h3 class="font-cairo font-semibold text-sm leading-snug line-clamp-2 transition-colors" style="color:var(--c-ink)" onmouseenter="this.style.color='var(--c-brand)'" onmouseleave="this.style.color='var(--c-ink)'">
-        {product.name}
-      </h3>
-    </a>
+      <!-- Wishlist heart -->
+      <button
+        type="button"
+        class="pc-wish"
+        data-pid={product.id}
+        aria-label={`إضافة ${product.name} للمفضلة`}
+      >
+        <svg class="pc-wish-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+      </button>
 
-    <!-- Price row -->
-    <div class="flex items-baseline gap-2 mb-1.5">
-      <span class="font-inter font-bold text-base tabular-nums" style="color:var(--c-brand)">
-        {product.price.toLocaleString('ar-EG')} ج.م
-      </span>
-      {hasDiscount && (
-        <span class="font-inter text-xs line-through tabular-nums" style="color:var(--c-ink-faint)">
-          {product.comparePrice!.toLocaleString('ar-EG')}
-        </span>
-      )}
     </div>
 
-    <!-- Low stock -->
-    {isLowStock && (
-      <p class="flex items-center gap-1 text-[11px] font-cairo mb-2 text-amber-600 dark:text-amber-400">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M10.3 3.3L2 20h20L13.7 3.3a2 2 0 0 0-3.4 0Z"/>
-          <line x1="12" y1="9" x2="12" y2="13"/>
-          <line x1="12" y1="17" x2="12.01" y2="17"/>
-        </svg>
-        {product.stock} قطع متبقية
-      </p>
-    )}
+    <!-- ── Body ───────────────────────────────────────────────── -->
+    <div class="pc-body">
+      {product.categoryName && <span class="pc-cat font-cairo">{product.categoryName}</span>}
+      {nickname && <span class="pc-nick font-cairo">{nickname}</span>}
 
-    <!-- Add to cart -->
-    <button
-      class:list={[
-        'add-to-cart w-full py-2.5 rounded-xl text-sm font-cairo font-bold transition-all duration-300',
-        outOfStock ? 'cursor-not-allowed' : '',
-      ]}
-      style={outOfStock
-        ? 'background-color:var(--c-border);color:var(--c-ink-muted)'
-        : 'background-color:var(--c-brand);color:#ffffff'
-      }
-      disabled={outOfStock}
-      data-product={JSON.stringify({
-        productId: product.id,
-        variationId: product.variationId,
-        slug: product.slug,
-        name: product.name,
-        image: product.image,
-        price: product.price,
-      })}
-      onmouseenter={!outOfStock ? "this.style.backgroundColor='var(--c-brand-hover)'" : undefined}
-      onmouseleave={!outOfStock ? "this.style.backgroundColor='var(--c-brand)'" : undefined}
-    >
-      {outOfStock ? 'نفذت الكمية' : 'أضف للسلة'}
-    </button>
-  </div>
-</article>
+      <a class="pc-name-link" href={href}>
+        <h3 class="pc-name font-cairo">{product.name}</h3>
+      </a>
+
+      <div class="pc-foot">
+        <div class="pc-price-row">
+          <div class="pc-price">
+            <span class="pc-price-amt font-inter">{product.price.toLocaleString('ar-EG')}</span>
+            <span class="pc-price-cur font-cairo">ج.م</span>
+            {hasDiscount && (
+              <span class="pc-price-old font-inter">{product.comparePrice!.toLocaleString('ar-EG')}</span>
+            )}
+          </div>
+
+          {!outOfStock && (
+            <button class="pc-add add-to-cart" aria-label={`أضيفي ${product.name} للسلة`} data-product={addPayload}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            </button>
+          )}
+        </div>
+
+        <p class="pc-trust font-cairo">{warrantyText} · شحن مجاني</p>
+
+        {installmentShort && <p class="pc-inst font-cairo">{installmentShort}</p>}
+
+        {isLowStock && (
+          <p class="pc-low font-cairo">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.3 3.3L2 20h20L13.7 3.3a2 2 0 0 0-3.4 0Z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            {product.stock} قطع متبقية
+          </p>
+        )}
+      </div>
+    </div>
+  </article>
+</div>
+
+<style>
+  /* Each card adapts to ITS OWN width (container query), not the viewport —
+     so it looks right in 4-col catalog, featured grid, related, and carousels alike. */
+  .pc-wrap {
+    container-type: inline-size;
+    height: 100%;
+  }
+  .pc-wrap--carousel {
+    min-width: 15rem;
+  }
+
+  .pc {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--c-shadow-card);
+    overflow: hidden;
+    transition:
+      transform 0.35s var(--ease-spring),
+      box-shadow 0.35s var(--ease-spring),
+      border-color 0.25s var(--ease-spring);
+  }
+  @media (hover: hover) {
+    .pc:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--c-shadow-hover);
+      border-color: var(--c-border-strong);
+    }
+  }
+
+  /* ── Media ── */
+  .pc-media {
+    position: relative;
+  }
+  .pc-frame {
+    position: relative;
+    display: block;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    /* Product photos are studio shots (often white-bg); a warm near-white tile in BOTH
+       themes blends the photo and never crops the appliance. Intentional: not theme-bound. */
+    background: linear-gradient(160deg, #ffffff 0%, #faf6f0 100%);
+  }
+  /* Branded placeholder (no real photo) follows the theme so it isn't a bright tile in dark mode. */
+  .pc-frame--ph {
+    background: var(--c-surface-2);
+  }
+  .pc-spot {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 42%, rgba(212, 53, 51, 0.06) 0%, transparent 58%);
+  }
+  .pc-img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: clamp(0.6rem, 7cqi, 1.6rem);
+    transition: transform 0.5s var(--ease-spring);
+  }
+  @media (hover: hover) {
+    .pc:hover .pc-img {
+      transform: scale(1.06);
+    }
+  }
+  .pc-grain {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+  }
+
+  /* Placeholder (no image) */
+  .pc-ph {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pc-ph-rings {
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    opacity: 0.08;
+  }
+  .pc-ph-mono {
+    position: relative;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--c-brand);
+    opacity: 0.16;
+    font-size: clamp(2.5rem, 26cqi, 4rem);
+  }
+
+  /* Badges */
+  .pc-badge {
+    position: absolute;
+    z-index: 3;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .pc-badge--sale {
+    inset-block-start: 0.6rem;
+    inset-inline-start: 0.6rem;
+    color: #fff;
+    background: var(--c-brand);
+    font-size: clamp(0.62rem, 3.4cqi, 0.72rem);
+    padding: 0.25rem 0.45rem;
+    border-radius: 0.55rem;
+    box-shadow: 0 2px 8px var(--c-brand-glow);
+  }
+
+  /* Out of stock */
+  .pc-oos {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, #faf6f0 68%, transparent);
+  }
+  .pc-oos-chip {
+    font-weight: 700;
+    font-size: 0.78rem;
+    color: var(--c-ink-muted);
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.75rem;
+  }
+  .pc[data-oos] .pc-img {
+    opacity: 0.55;
+  }
+
+  /* ── Price row + inline add button ── */
+  .pc-price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem;
+  }
+  .pc-add {
+    position: relative;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    color: #fff;
+    background: var(--c-brand);
+    box-shadow: 0 2px 8px var(--c-brand-glow);
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      transform 0.2s var(--ease-spring),
+      background-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  /* Expand touch target to 44px without enlarging the visual circle */
+  .pc-add::before {
+    content: '';
+    position: absolute;
+    inset: -0.375rem;
+    border-radius: inherit;
+  }
+  @media (hover: hover) {
+    .pc-add:hover {
+      background: var(--c-brand-hover);
+      transform: scale(1.1);
+      box-shadow: 0 4px 14px var(--c-brand-glow);
+    }
+  }
+  .pc-add:active {
+    transform: scale(0.92);
+  }
+  .pc-add:focus-visible {
+    outline: 2px solid var(--c-brand);
+    outline-offset: 2px;
+  }
+  .pc-add.added {
+    background: var(--c-trust) !important;
+    box-shadow: 0 2px 8px rgba(22, 163, 74, 0.28) !important;
+  }
+
+  /* ── Wishlist heart ── */
+  .pc-wish {
+    position: absolute;
+    z-index: 5;
+    inset-block-start: clamp(0.5rem, 4cqi, 0.75rem);
+    inset-inline-end: clamp(0.5rem, 4cqi, 0.75rem);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--c-surface) 82%, transparent);
+    border: 1px solid var(--c-border);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    color: var(--c-ink-faint);
+    cursor: pointer;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.2s ease, transform 0.25s var(--ease-spring), color 0.2s ease, background 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pc:hover .pc-wish,
+  .pc-wish.pc-wish--on {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .pc-wish.pc-wish--on {
+    color: var(--c-brand);
+    background: var(--c-brand-tint);
+    border-color: color-mix(in srgb, var(--c-brand) 30%, transparent);
+  }
+  .pc-wish.pc-wish--on .pc-wish-ico {
+    fill: var(--c-brand);
+    stroke: var(--c-brand);
+  }
+  .pc-wish:active { transform: scale(0.88); }
+  .pc-wish-ico {
+    width: 1rem;
+    height: 1rem;
+    pointer-events: none;
+    transition: fill 0.2s ease, stroke 0.2s ease;
+  }
+
+  /* ── Body ── */
+  .pc-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: clamp(0.7rem, 5cqi, 1rem);
+  }
+  .pc-cat {
+    font-size: clamp(0.62rem, 3cqi, 0.72rem);
+    color: var(--c-ink-faint);
+    margin-block-end: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pc-nick {
+    font-weight: 700;
+    font-size: clamp(0.74rem, 3.4cqi, 0.84rem);
+    color: var(--c-brass);
+    line-height: 1.2;
+    margin-block-end: 0.1rem;
+  }
+  .pc-name-link {
+    display: block;
+  }
+  .pc-name {
+    font-weight: 600;
+    font-size: clamp(0.8rem, 3.6cqi, 0.92rem);
+    line-height: 1.45;
+    color: var(--c-ink);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color 0.2s var(--ease-spring);
+  }
+  @media (hover: hover) {
+    .pc:hover .pc-name {
+      color: var(--c-brand);
+    }
+  }
+  .pc-foot {
+    margin-block-start: auto;
+    padding-block-start: 0.6rem;
+  }
+  .pc-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .pc-price-amt {
+    font-weight: 700;
+    font-size: clamp(1rem, 4.6cqi, 1.18rem);
+    color: var(--c-brand);
+    line-height: 1;
+  }
+  .pc-price-cur {
+    font-size: clamp(0.66rem, 3cqi, 0.78rem);
+    color: var(--c-brand);
+  }
+  .pc-price-old {
+    font-size: clamp(0.66rem, 3cqi, 0.78rem);
+    color: var(--c-ink-faint);
+    text-decoration: line-through;
+  }
+  .pc-trust {
+    font-size: clamp(0.64rem, 3cqi, 0.72rem);
+    color: var(--c-ink-muted);
+    margin-block-start: 0.4rem;
+  }
+  .pc-inst {
+    font-size: clamp(0.6rem, 2.8cqi, 0.68rem);
+    color: var(--c-brass);
+    margin-block-start: 0.15rem;
+  }
+  .pc-low {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: clamp(0.64rem, 3cqi, 0.72rem);
+    color: #d97706;
+    margin-block-start: 0.4rem;
+  }
+  :global(.dark) .pc-low {
+    color: #fbbf24;
+  }
+
+  /* Compact mode for very narrow cards (dense 2-col on small phones) — drop category label. */
+  @container (max-width: 10.5rem) {
+    .pc-cat {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pc,
+    .pc-img,
+    .pc-add,
+    .pc-name {
+      transition: background 0.3s ease, color 0.2s ease;
+    }
+    .pc:hover,
+    .pc:hover .pc-img,
+    .pc-add:hover {
+      transform: none;
+    }
+  }
+</style>
 
 <script>
-  if (!(window as Window & { __cartBtnsInit?: boolean }).__cartBtnsInit) {
-    ;(window as Window & { __cartBtnsInit?: boolean }).__cartBtnsInit = true
+  interface CartWindow extends Window {
+    __cartBtnsInit?: boolean
+  }
+  if (!(window as CartWindow).__cartBtnsInit) {
+    ;(window as CartWindow).__cartBtnsInit = true
+
+    const CHECK =
+      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>'
 
     document.addEventListener('click', async (e) => {
       const btn = (e.target as Element).closest('.add-to-cart') as HTMLButtonElement | null
-      if (!btn || btn.disabled) return
+      if (!btn || btn.dataset.busy === '1') return
 
       const product = JSON.parse(btn.dataset.product ?? '{}')
       const { addToCart } = await import('../stores/cart')
       addToCart(product)
 
-      const original = btn.textContent
-      const originalBg = btn.style.backgroundColor
-      btn.textContent = 'تمت الإضافة ✓'
-      btn.style.backgroundColor = '#16a34a'
+      const original = btn.innerHTML
+      const label = btn.getAttribute('aria-label')
+      btn.dataset.busy = '1'
+      btn.innerHTML = CHECK
+      btn.classList.add('added')
+      btn.setAttribute('aria-label', 'تمت الإضافة للسلة')
 
       setTimeout(() => {
-        btn.textContent = original
-        btn.style.backgroundColor = originalBg
+        btn.innerHTML = original
+        btn.classList.remove('added')
+        if (label) btn.setAttribute('aria-label', label)
+        btn.dataset.busy = '0'
       }, 1500)
+    })
+  }
+
+  interface WishWindow extends Window {
+    __wishBtnsInit?: boolean
+  }
+  if (!(window as WishWindow).__wishBtnsInit) {
+    ;(window as WishWindow).__wishBtnsInit = true
+
+    function getWishlist(): number[] {
+      try { return JSON.parse(localStorage.getItem('hvar-wishlist') ?? '[]') } catch { return [] }
+    }
+    function saveWishlist(ids: number[]) {
+      localStorage.setItem('hvar-wishlist', JSON.stringify(ids))
+    }
+
+    // Initialise all hearts on the page
+    function syncHearts() {
+      const ids = getWishlist()
+      document.querySelectorAll<HTMLButtonElement>('.pc-wish[data-pid]').forEach((btn) => {
+        const pid = Number(btn.dataset.pid)
+        btn.classList.toggle('pc-wish--on', ids.includes(pid))
+      })
+    }
+    syncHearts()
+
+    document.addEventListener('click', (e) => {
+      const btn = (e.target as Element).closest('.pc-wish') as HTMLButtonElement | null
+      if (!btn) return
+      const pid = Number(btn.dataset.pid)
+      if (!pid) return
+      const ids = getWishlist()
+      const isOn = ids.includes(pid)
+      const next = isOn ? ids.filter((id) => id !== pid) : [...ids, pid]
+      saveWishlist(next)
+      syncHearts()
     })
   }
 </script>

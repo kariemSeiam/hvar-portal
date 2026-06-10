@@ -1,24 +1,19 @@
 ---
 import Base from '../../layouts/Base.astro'
 import OrderDetail from '../../components/orders/OrderDetail'
+import InnerHero from '../../components/InnerHero.astro'
 ---
 
 <Base title="تفاصيل الطلب | هفار">
 
+  <InnerHero
+    title="تفاصيل الطلب"
+    subtitle="متابعة حالة وتفاصيل طلبك"
+    variant="utility"
+  />
+
   <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-    <nav class="mb-6" aria-label="مسار التنقل">
-      <ol class="flex items-center gap-2 text-xs font-cairo text-[#57534e] dark:text-[#a8a29e]">
-        <li><a href="/" class="hover:text-[#d43533] transition-colors">البيت</a></li>
-        <li class="opacity-40">›</li>
-        <li><a href="/orders" class="hover:text-[#d43533] transition-colors">طلباتي</a></li>
-        <li class="opacity-40">›</li>
-        <li class="text-[#1c1917] dark:text-[#f5f5f4] font-semibold">تفاصيل الطلب</li>
-      </ol>
-    </nav>
-
     <OrderDetail client:load />
-
   </div>
 
 </Base>

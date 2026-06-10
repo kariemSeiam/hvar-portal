@@ -1,0 +1,99 @@
+---
+import type { ProductEnrichment } from '../../lib/enrichment'
+import { getWarrantyText } from '../../lib/enrichment'
+
+interface Props {
+  sku: string
+  weight?: string | null
+  enrichment: ProductEnrichment | null
+}
+
+const { sku, weight, enrichment: e } = Astro.props
+
+const rows: Array<{ label: string; value: string; mono?: boolean }> = []
+
+if (e?.wattage)             rows.push({ label: "القدرة",        value: e.wattageDisplay ?? `${e.wattage} وات` })
+if (e?.capacity)            rows.push({ label: "السعة",          value: e.capacity })
+if (e?.speeds)              rows.push({ label: "عدد السرعات",   value: String(e.speeds) })
+if (e?.motorMaterial)       rows.push({ label: "الماتور",        value: e.motorMaterial })
+if (e?.accessories?.length) rows.push({ label: "عدد الملحقات", value: `${e.accessories.length} قطعة` })
+rows.push({ label: "ضمان الجهاز",  value: getWarrantyText(sku) })
+if (e?.bowlWarrantyYears)   rows.push({ label: "ضمان الوعاء",  value: `${e.bowlWarrantyYears} سنة` })
+if (weight)                 rows.push({ label: "الوزن",          value: `${weight} كجم` })
+rows.push({ label: "كود المنتج",   value: sku, mono: true })
+---
+
+<div class="sp-card">
+  <h3 class="sp-title">المواصفات</h3>
+  <table class="sp-table" aria-label={`مواصفات ${sku}`}>
+    <tbody>
+      {rows.map((row, i) => (
+        <tr class={`sp-row${i === rows.length - 1 ? ' sp-row--last' : ''}`}>
+          <td class="sp-key">{row.label}</td>
+          <td class={`sp-val${row.mono ? ' sp-val--mono' : ''}`}>{row.value}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .sp-card {
+    border: 1px solid var(--c-border);
+    border-radius: 1rem;
+    background: var(--c-surface);
+    overflow: hidden;
+  }
+
+  .sp-title {
+    font-family: "Cairo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: var(--c-ink);
+    padding: 1rem 1.25rem 0.75rem;
+    border-block-end: 1px solid var(--c-hairline);
+  }
+
+  .sp-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .sp-row {
+    border-block-end: 1px solid var(--c-hairline);
+  }
+
+  .sp-row--last {
+    border-block-end: none;
+  }
+
+  .sp-key {
+    font-family: "Cairo", system-ui, sans-serif;
+    font-size: 0.875rem;
+    color: var(--c-ink-muted);
+    padding: 0.75rem 1.25rem;
+    white-space: nowrap;
+    vertical-align: middle;
+    width: 40%;
+  }
+
+  .sp-val {
+    font-family: "Cairo", system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--c-ink);
+    padding: 0.75rem 1.25rem;
+    text-align: end;
+    vertical-align: middle;
+  }
+
+  .sp-val--mono {
+    font-family: "Roboto Mono", "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.75rem;
+    color: var(--c-brand);
+    background: rgba(var(--c-brand-rgb), 0.06);
+    border-radius: 0.25rem;
+    padding-inline: 0.375rem;
+    /* Keeps the cell layout but adds pill feel on the value */
+  }
+</style>

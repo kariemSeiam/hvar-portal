@@ -1,50 +1,105 @@
 ---
 import type { Category } from '../lib/api'
-import ApplianceIcon from './icons/ApplianceIcon.astro'
 
 interface Props {
   categories: Category[]
+  activeSlug?: string
 }
 
-const { categories } = Astro.props
-const visible = categories.filter((c) => c.productCount > 0).slice(0, 10)
+const { categories, activeSlug = '' } = Astro.props
+const visible = categories.filter((c) => c.productCount > 0)
+
+// Slug-keyed SVG paths — distinctive at 18-20px, designed for each appliance family
+const ICONS: Record<string, string> = {
+  chopper:
+    `<path d="M9 3h6l1 7H8L9 3Z"/><path d="M8 10v5h8v-5"/><rect x="9" y="15" width="6" height="3" rx="1"/><line x1="12" y1="18" x2="12" y2="21"/>`,
+  blender:
+    `<path d="M7 4h10l-2 10H9L7 4Z"/><path d="M9 14v3h6v-3"/><line x1="8" y1="18" x2="16" y2="18"/><line x1="12" y1="18" x2="12" y2="21"/>`,
+  hand_blender:
+    `<line x1="12" y1="2" x2="12" y2="10"/><path d="M9 10h6v4a3 3 0 0 1-6 0v-4Z"/><path d="M10 18v3m4-3v3M9 21h6"/>`,
+  stand_mixer:
+    `<path d="M5 8a7 7 0 0 1 14 0c0 4-2.5 7-7 9-4.5-2-7-5-7-9Z"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="9" y1="21" x2="15" y2="21"/>`,
+  hand_beater:
+    `<line x1="9" y1="3" x2="9" y2="12"/><line x1="15" y1="3" x2="15" y2="12"/><path d="M6 12a6 6 0 0 0 12 0"/><line x1="9" y1="3" x2="15" y2="3"/>`,
+  air_fryer:
+    `<rect x="5" y="4" width="14" height="14" rx="3"/><circle cx="12" cy="11" r="3"/><path d="M12 5v1m0 9v1M5 11h1m12 0h1"/><line x1="9" y1="2" x2="15" y2="2"/>`,
+  iron:
+    `<path d="M3 16.5c0 1.5 1.5 2.5 4 2.5h10c2.5 0 4-1 4-2.5V14c0-1.5-1-2.5-2.5-2.5H7L5 9H3v7.5Z"/><circle cx="12" cy="4" r="1"/><line x1="12" y1="5" x2="12" y2="9"/>`,
+  vacuum:
+    `<circle cx="8" cy="16" r="4"/><path d="M12 16h3a5 5 0 0 0 0-10H8"/><line x1="8" y1="6" x2="8" y2="12"/>`,
+  oven:
+    `<rect x="3" y="3" width="18" height="18" rx="2"/><rect x="6" y="9" width="12" height="9" rx="1"/><circle cx="8" cy="6" r="1"/><circle cx="12" cy="6" r="1"/><circle cx="16" cy="6" r="1"/>`,
+  spice_grinder:
+    `<path d="M9 3h6l1 5H8L9 3Z"/><path d="M8 8v9a4 4 0 0 0 8 0V8"/>`,
+  kettle:
+    `<path d="M6 8h12l-1.5 9A2 2 0 0 1 14.5 19h-5a2 2 0 0 1-2-1.8L6 8Z"/><path d="M18 8c1.5 0 3 .5 3 2s-1.5 2-3 2"/><line x1="7" y1="5" x2="17" y2="5"/><line x1="12" y1="3" x2="12" y2="5"/>`,
+}
+
+const ALL_ICON = `<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>`
+
+function icon(slug: string): string {
+  return ICONS[slug] ?? `<path d="M13 2L4.5 13H11l-1 9L21 11H14l1-9Z"/>`
+}
+
+// كبة البلدوزر is the brand hero — visual emphasis
+const heroSlug = 'chopper'
+const totalCount = visible.reduce((s, c) => s + c.productCount, 0)
 ---
 
 {visible.length > 0 && (
-  <section class="py-10 reveal-section">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <section class="cs-section reveal-section">
+    <div class="cs-inner">
 
-      <h2 class="font-cairo font-bold text-base text-[#57534e] dark:text-[#a8a29e] mb-5 uppercase tracking-wide text-xs">
-        تسوق حسب التصنيف
-      </h2>
+      <div class="cs-header">
+        <h2 class="cs-heading">تسوق حسب التصنيف</h2>
+        <span class="cs-total">{totalCount} منتج</span>
+      </div>
 
-      <div class="flex items-stretch gap-3 overflow-x-auto pb-2 snap-x snap-mandatory" style="-ms-overflow-style:none;scrollbar-width:none">
+      <div class="cs-strip" role="list" aria-label="فئات المنتجات">
 
-        <!-- All -->
+        <!-- الكل -->
         <a
           href="/products"
-          class="flex-shrink-0 snap-start flex flex-col items-center gap-2.5 px-4 py-4 rounded-2xl bg-[#d43533] text-white font-cairo font-bold text-xs transition-all hover:bg-[#b91c1c] hover:shadow-[0_4px_16px_rgba(212,53,51,0.3)]"
-          style="min-width:76px"
+          role="listitem"
+          class={`cs-chip${!activeSlug ? ' cs-chip--active' : ''}`}
+          aria-current={!activeSlug ? 'page' : undefined}
         >
-          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="7" rx="1"/>
-            <rect x="14" y="3" width="7" height="7" rx="1"/>
-            <rect x="3" y="14" width="7" height="7" rx="1"/>
-            <rect x="14" y="14" width="7" height="7" rx="1"/>
-          </svg>
-          <span>الكل</span>
+          <span class="cs-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ALL_ICON} />
+          </span>
+          <span class="cs-label">الكل</span>
+          <span class="cs-count">{totalCount}</span>
+          <span class="cs-shine" aria-hidden="true"></span>
         </a>
 
-        {visible.map((cat) => (
-          <a
-            href={`/products?category=${cat.id}`}
-            class="flex-shrink-0 snap-start flex flex-col items-center gap-2.5 px-4 py-4 rounded-2xl font-cairo font-bold text-xs transition-all hover:border-[--c-brand] hover:text-[--c-brand]"
-            style="min-width:76px;background-color:var(--c-surface);border:1px solid var(--c-border);color:var(--c-ink-muted)"
-          >
-            <ApplianceIcon name={cat.name} class="w-6 h-6" />
-            <span class="text-center leading-tight">{cat.name}</span>
-          </a>
-        ))}
+        {visible.map((cat) => {
+          const isHero   = cat.slug === heroSlug
+          const isActive = cat.slug === activeSlug
+          return (
+            <a
+              href={`/products?category=${cat.id}`}
+              role="listitem"
+              class={`cs-chip${isHero ? ' cs-chip--hero' : ''}${isActive ? ' cs-chip--active' : ''}`}
+              aria-current={isActive ? 'page' : undefined}
+            >
+              {isHero && !isActive && (
+                <span class="cs-star" aria-hidden="true">
+                  <svg width="9" height="9" viewBox="0 0 12 12" fill="currentColor">
+                    <path d="M6 1l1.3 3.5H11L8.2 7l1 3.5L6 8.5l-3.2 2L3.8 7 1 4.5h3.7z"/>
+                  </svg>
+                </span>
+              )}
+              <span class="cs-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={icon(cat.slug)} />
+              </span>
+              <span class="cs-label">{cat.name}</span>
+              {cat.productCount > 0 && (
+                <span class="cs-count">{cat.productCount}</span>
+              )}
+              <span class="cs-shine" aria-hidden="true"></span>
+            </a>
+          )
+        })}
 
       </div>
     </div>
@@ -52,5 +107,252 @@ const visible = categories.filter((c) => c.productCount > 0).slice(0, 10)
 )}
 
 <style>
-  div::-webkit-scrollbar { display: none; }
+  /* ── Section ── */
+  .cs-section {
+    padding-block: 2.5rem 2rem;
+  }
+
+  .cs-inner {
+    max-width: 80rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  @media (min-width: 640px)  { .cs-inner { padding-inline: 1.5rem; } }
+  @media (min-width: 1024px) { .cs-inner { padding-inline: 2rem;   } }
+
+  /* ── Header ── */
+  .cs-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-block-end: 1rem;
+  }
+
+  .cs-heading {
+    font-family: "Cairo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--c-ink-muted);
+  }
+
+  .cs-total {
+    font-family: "Cairo", system-ui, sans-serif;
+    font-size: 0.75rem;
+    color: var(--c-ink-muted);
+    opacity: 0.5;
+  }
+
+  /* ── Strip ──
+     Mobile:  horizontal scroll, edge-to-edge bleed
+     Desktop: flex-wrap, fills width naturally — no scroll
+  ── */
+  .cs-strip {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-block-end: 0.5rem;
+    margin-inline: -1rem;
+    padding-inline: 1rem;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .cs-strip::-webkit-scrollbar { display: none; }
+
+  @media (min-width: 640px) {
+    .cs-strip { margin-inline: -1.5rem; padding-inline: 1.5rem; }
+  }
+
+  @media (min-width: 1024px) {
+    .cs-strip {
+      flex-wrap: wrap;
+      overflow-x: visible;
+      margin-inline: 0;
+      padding-inline: 0;
+      padding-block-end: 0;
+      gap: 0.5rem;
+    }
+  }
+
+  /* ── Chip ── */
+  .cs-chip {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 0.875rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--c-border);
+    background: var(--c-surface);
+    color: var(--c-ink-muted);
+    text-decoration: none;
+    flex-shrink: 0;
+    min-width: 88px;
+    min-height: 44px;
+    overflow: hidden;
+    scroll-snap-align: start;
+    transition:
+      border-color 250ms var(--ease-spring),
+      box-shadow   250ms var(--ease-spring),
+      transform    250ms var(--ease-spring),
+      background   150ms ease,
+      color        150ms ease;
+  }
+
+  .cs-chip:hover {
+    border-color: rgba(var(--c-brand-rgb), 0.40);
+    color: var(--c-brand);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 20px rgba(var(--c-brand-rgb), 0.12);
+  }
+
+  /* Active / current page state */
+  .cs-chip--active {
+    background: var(--c-brand);
+    border-color: var(--c-brand);
+    color: #fff !important;
+    box-shadow: 0 4px 20px rgba(var(--c-brand-rgb), 0.32);
+  }
+
+  .cs-chip--active:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 28px rgba(var(--c-brand-rgb), 0.40);
+  }
+
+  /* Hero chip — كبة البلدوزر: warm brand tint at rest */
+  .cs-chip--hero:not(.cs-chip--active) {
+    border-color: rgba(var(--c-brass-rgb), 0.35);
+    background: rgba(var(--c-brand-rgb), 0.03);
+  }
+
+  .cs-chip--hero:not(.cs-chip--active) .cs-icon {
+    color: var(--c-brand);
+    background: rgba(var(--c-brand-rgb), 0.09);
+  }
+
+  /* Desktop: horizontal pill, hero wider for Arabic text */
+  @media (min-width: 1024px) {
+    .cs-chip {
+      flex-direction: row;
+      padding: 0.875rem 1.25rem;
+      min-width: 140px;
+      gap: 0.75rem;
+    }
+
+    .cs-chip--hero:not(.cs-chip--active) {
+      min-width: 156px;
+    }
+  }
+
+  /* ── Icon zone ── */
+  .cs-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.625rem;
+    background: rgba(var(--c-brand-rgb), 0.07);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: inherit;
+    transition:
+      background 150ms ease,
+      transform  250ms var(--ease-spring);
+  }
+
+  .cs-icon svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .cs-chip:hover .cs-icon {
+    background: rgba(var(--c-brand-rgb), 0.12);
+    transform: scale(1.1);
+  }
+
+  .cs-chip--active .cs-icon {
+    background: rgba(255, 255, 255, 0.20);
+    color: #fff;
+  }
+
+  /* ── Label ── */
+  .cs-label {
+    font-family: "Cairo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 0.875rem;
+    line-height: 1.3;
+    text-align: center;
+    white-space: nowrap;
+    color: inherit;
+  }
+
+  @media (min-width: 1024px) {
+    .cs-label { text-align: start; }
+  }
+
+  /* ── Count pill ── */
+  .cs-count {
+    font-family: "Cairo", system-ui, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.6;
+    padding-inline: 0.375rem;
+    border-radius: 9999px;
+    background: rgba(var(--c-brand-rgb), 0.08);
+    color: inherit;
+    opacity: 0.65;
+    transition: opacity 150ms ease, background 150ms ease;
+  }
+
+  .cs-chip--active .cs-count {
+    background: rgba(255, 255, 255, 0.22);
+    opacity: 0.9;
+  }
+
+  @media (min-width: 1024px) {
+    .cs-count { margin-inline-start: auto; }
+  }
+
+  /* ── Hero star badge ── */
+  .cs-star {
+    position: absolute;
+    top: 0.25rem;
+    inset-inline-start: 0.25rem;
+    color: var(--c-brass);
+    opacity: 0.85;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  /* ── P6 card shine sweep on hover ── */
+  .cs-shine {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      108deg,
+      transparent 22%,
+      rgba(255, 255, 255, 0.08) 50%,
+      transparent 78%
+    );
+    transform: translateX(-130%);
+    transition: transform 500ms var(--ease-spring);
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  .cs-chip:hover .cs-shine { transform: translateX(130%); }
+
+  /* ── Reduced motion ── */
+  @media (prefers-reduced-motion: reduce) {
+    .cs-chip,
+    .cs-icon,
+    .cs-shine { transition: none; }
+    .cs-chip:hover { transform: none; }
+    .cs-shine { display: none; }
+  }
 </style>

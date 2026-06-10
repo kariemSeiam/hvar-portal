@@ -1,0 +1,62 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+*.local
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+*.db-wal
+*.db-shm
+*.db-journal
+instance/
+
+# Legacy duplicate storefront (delete locally if present; never commit)
+wilson/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Testing
+coverage/
+playwright-report/
+test-results/
+.blob
+trace/
+
+# Windows reserved names
+nul
+CON
+PRN
+AUX
+
+# Nested repos / backup
+example-2/wa-front/
+.git.bak
+
+# Misc
+*.pem

@@ -91,6 +91,19 @@ Read: `brand/00_brand-nucleus.md` → `brand/01_visual-direction.md` → `brand/
 | `products/erp.md` | ERP data display standards, the five absolutes, integration patterns |
 | `products/mcrm.md` | mCRM design principles, ticket state machine, order flow, access control direction |
 | `products/pos.md` | POS integration points, naming conventions, what we control vs. what we don't |
+| `products/catalog.md` | Complete product catalog — all products, categories, parts, spec display rules, naming conventions |
+
+### Print
+
+| File | What it answers |
+|------|----------------|
+| `print/leaflets.md` | Leaflet types (product insert, promo, seasonal, digital), layout rules, RTL mandates, copy direction, production checklist |
+
+### Assets
+
+| File | What it answers |
+|------|----------------|
+| `assets/image-audit.md` | Full audit of hvarstore-assets library — logo confirmation, which hero banners are compass-fit, which product shot styles to use/reject, off-brand campaign graphics, missing asset gaps (food photography, chef content, COD icons, warm canvas product shots) |
 
 ### Portal
 
@@ -99,6 +112,7 @@ Read: `brand/00_brand-nucleus.md` → `brand/01_visual-direction.md` → `brand/
 | `portal/architecture.md` | Stack rationale, island architecture, two-database pattern, security, deployment |
 | `portal/design-system.md` | Token system, theme system, typography scale, Wilson patterns, ambient glow, accessibility |
 | `portal/ux-patterns.md` | Egyptian buyer journey, trust architecture, PDP pattern, cart, checkout, service tickets, mobile rules |
+| `portal/service-portal.md` | Customer service portal — service request form, tracking page, Arabic copy per type, UX rules, mCRM bridge |
 
 ---
 

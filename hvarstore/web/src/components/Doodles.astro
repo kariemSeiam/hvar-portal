@@ -1,0 +1,300 @@
+---
+/*
+ * Wilson P1 — Appliance Doodle Field (reusable)
+ * The single source of truth for Hvar's ambient doodle background.
+ *
+ * Drop into any `position:relative; overflow:hidden` section:
+ *   <Doodles />                          → rich hero scatter
+ *   <Doodles variant="band" />           → lighter strip (footers, CTA bands)
+ *   <Doodles variant="drawer" opacity={0.6} />  → narrow vertical (nav drawer)
+ *
+ * WHY a component, not inline SVG: doodles live on nearly every page. Inlining
+ * meant 5 divergent copies, hardcoded colors that ignored dark mode, and motifs
+ * colliding in one cramped viewBox. Here each motif is its own positioned SVG —
+ * theme-aware via tokens, individually animated, spaced with the center kept
+ * clear for content. Motion + color follow compass/portal/design-system.md.
+ */
+
+interface Props {
+  /** Layout preset. `hero` = full rich scatter, `band` = lighter strip, `drawer` = narrow vertical. */
+  variant?: 'hero' | 'band' | 'drawer'
+  /** Master opacity multiplier on the whole field (0–1). */
+  opacity?: number
+  class?: string
+}
+
+const { variant = 'hero', opacity = 1, class: className = '' } = Astro.props
+
+/* ── Motif library ─────────────────────────────────────────────────────────
+ * Every motif is authored in a normalized 0 0 48 48 viewBox.
+ * Strokes inherit `currentColor` from the parent <svg> (set by tone class).
+ * `.da` elements are brass accent dots regardless of tone. */
+const MOTIFS: Record<string, string> = {
+  blender: `
+    <path d="M16 8 L13 30 Q13 34 17 34 L31 34 Q35 34 35 30 L32 8 Z"/>
+    <path d="M16 8 Q24 5 32 8"/>
+    <line x1="24" y1="5" x2="24" y2="2"/>
+    <path d="M20 21 L28 17 M20 17 L28 21" stroke-width="1.6"/>
+    <rect x="13" y="34" width="22" height="7" rx="3"/>
+    <circle class="da" cx="18" cy="14" r="1.6"/>
+    <circle class="da" cx="29" cy="16" r="1.4"/>`,
+  airfryer: `
+    <path d="M10 18 Q9 8 24 7 Q39 8 38 18"/>
+    <rect x="8" y="18" width="32" height="22" rx="6"/>
+    <circle cx="30" cy="13" r="4.5"/>
+    <line x1="30" y1="8.5" x2="30" y2="10.5" stroke-width="1.6"/>
+    <circle class="da" cx="14" cy="27" r="1.7"/>
+    <circle class="da" cx="14" cy="33" r="1.7"/>
+    <circle class="da" cx="20" cy="27" r="1.7"/>`,
+  kettle: `
+    <path d="M12 20 Q8 20 8 28 Q8 38 24 39 Q40 38 40 28 Q40 20 36 20 Z"/>
+    <path d="M12 20 Q24 16 36 20"/>
+    <line x1="24" y1="16" x2="24" y2="12.5"/>
+    <circle cx="24" cy="11" r="1.6"/>
+    <path d="M40 23 Q46 23 46 29 Q46 35 40 35" stroke-width="2.2"/>
+    <path d="M16 11 Q14 6.5 16 3" stroke-width="1.5"/>
+    <path d="M21 9 Q19 4.5 21 1.5" stroke-width="1.5"/>
+    <ellipse cx="24" cy="40" rx="15" ry="2.4"/>`,
+  mixer: `
+    <path d="M10 16 Q10 7 22 7 Q34 7 34 16 L34 24 L10 24 Z"/>
+    <rect x="16" y="3" width="12" height="5" rx="2.5"/>
+    <path d="M34 19 Q44 19 44 28" stroke-width="2"/>
+    <path d="M16 24 Q12 26 14 38 Q15 44 22 44 L26 44 Q33 44 34 38 Q36 26 32 24"/>
+    <line x1="22" y1="25" x2="20" y2="36" stroke-width="1.4"/>
+    <line x1="26" y1="25" x2="28" y2="36" stroke-width="1.4"/>
+    <line x1="8" y1="44" x2="40" y2="44" stroke-width="2.2"/>`,
+  iron: `
+    <path d="M5 32 L27 32 L41 18 L41 10 L17 10 L17 18 Z"/>
+    <circle class="da" cx="11" cy="27" r="1.5"/>
+    <circle class="da" cx="18" cy="27" r="1.5"/>
+    <circle class="da" cx="14.5" cy="23" r="1.5"/>
+    <path d="M15 8 Q17 4 15 1.5" stroke-width="1.5"/>
+    <path d="M22 8 Q24 4 22 1.5" stroke-width="1.5"/>`,
+  whisk: `
+    <rect x="21" y="2" width="6" height="4" rx="2"/>
+    <line x1="24" y1="6" x2="24" y2="14"/>
+    <path d="M24 14 Q13 22 18 41"/>
+    <path d="M24 14 Q35 22 30 41"/>
+    <path d="M24 14 Q20 25 22 41"/>
+    <path d="M24 14 Q28 25 26 41"/>
+    <path d="M18 41 Q24 45 30 41"/>`,
+  pot: `
+    <path d="M9 22 L39 22 L36 40 Q36 42 33 42 L15 42 Q12 42 12 40 Z"/>
+    <line x1="6" y1="22" x2="42" y2="22" stroke-width="2.2"/>
+    <path d="M6 25 Q2 25 2 28" stroke-width="2"/>
+    <path d="M42 25 Q46 25 46 28" stroke-width="2"/>
+    <path d="M18 17 Q15 13 18 8" stroke-width="1.5"/>
+    <path d="M24 17 Q21 12 24 6" stroke-width="1.5"/>
+    <path d="M30 17 Q27 13 30 8" stroke-width="1.5"/>`,
+  kibbeh: `
+    <rect x="6" y="18" width="28" height="14" rx="7"/>
+    <path d="M16 18 L12 6 L26 6 L22 18"/>
+    <line x1="12" y1="6" x2="26" y2="6" stroke-width="1.5"/>
+    <path d="M10 22 Q14 25 10 28" stroke-width="1.2"/>
+    <path d="M18 22 Q22 25 18 28" stroke-width="1.2"/>
+    <path d="M26 22 Q30 25 26 28" stroke-width="1.2"/>
+    <circle cx="38" cy="25" r="7"/>
+    <circle class="da" cx="35" cy="22.5" r="1.3"/>
+    <circle class="da" cx="38" cy="21.5" r="1.3"/>
+    <circle class="da" cx="41" cy="22.5" r="1.3"/>
+    <circle class="da" cx="38" cy="25" r="1.3"/>
+    <circle class="da" cx="35" cy="27.5" r="1.3"/>
+    <circle class="da" cx="41" cy="27.5" r="1.3"/>
+    <line x1="6" y1="25" x2="2" y2="25" stroke-width="1.8"/>
+    <circle cx="2" cy="25" r="2.4"/>`,
+  flame: `
+    <path d="M24 44 Q12 36 17 24 Q20 16 24 8 Q28 18 33 24 Q39 33 30 42 Q27 45 24 44 Z"/>
+    <path d="M24 42 Q18 36 21 30 Q23 26 24 21 Q26 27 27 31 Q29 38 25 42"/>`,
+  snowflake: `
+    <line x1="24" y1="6" x2="24" y2="42"/>
+    <line x1="8.4" y1="15" x2="39.6" y2="33"/>
+    <line x1="8.4" y1="33" x2="39.6" y2="15"/>
+    <path d="M24 6 L20.5 9.5 M24 6 L27.5 9.5"/>
+    <path d="M24 42 L20.5 38.5 M24 42 L27.5 38.5"/>
+    <path d="M8.4 15 L9.6 19.6 M8.4 15 L13 13.8"/>
+    <path d="M39.6 33 L38.4 28.4 M39.6 33 L35 34.2"/>
+    <path d="M8.4 33 L13 34.2 M8.4 33 L9.6 28.4"/>
+    <path d="M39.6 15 L35 13.8 M39.6 15 L38.4 19.6"/>`,
+  droplet: `
+    <path d="M24 6 Q37 24 30 35 Q24 44 18 35 Q11 24 24 6 Z"/>
+    <path d="M21 33 Q21 37 24 38" stroke-width="1.4"/>`,
+  wheat: `
+    <line x1="24" y1="11" x2="24" y2="44"/>
+    <path d="M24 17 Q34 11 38 17 Q34 23 24 17"/>
+    <path d="M24 17 Q14 11 10 17 Q14 23 24 17"/>
+    <path d="M24 25 Q33 19 37 25 Q33 31 24 25"/>
+    <path d="M24 25 Q15 19 11 25 Q15 31 24 25"/>
+    <path d="M24 33 Q32 28 35 33 Q32 38 24 33"/>
+    <path d="M24 33 Q16 28 13 33 Q16 38 24 33"/>
+    <path d="M24 11 Q26 6 24 2"/>`,
+  star: `
+    <path d="M24 4 Q26.5 21.5 44 24 Q26.5 26.5 24 44 Q21.5 26.5 4 24 Q21.5 21.5 24 4 Z"/>`,
+  spark: `
+    <line x1="24" y1="11" x2="24" y2="37"/>
+    <line x1="11" y1="24" x2="37" y2="24"/>
+    <line x1="16" y1="16" x2="32" y2="32" stroke-width="1.3"/>
+    <line x1="32" y1="16" x2="16" y2="32" stroke-width="1.3"/>`,
+  home: `
+    <path d="M8 24 L24 9 L40 24"/>
+    <path d="M12 21 L12 40 L36 40 L36 21"/>
+    <rect x="20" y="30" width="8" height="10" rx="1"/>`,
+  heart: `
+    <path d="M24 40 Q9 29 9 18 Q9 10 16.5 10 Q22 10 24 16 Q26 10 31.5 10 Q39 10 39 18 Q39 29 24 40 Z"/>`,
+  dial: `
+    <circle cx="24" cy="24" r="20"/>
+    <circle cx="24" cy="24" r="13" stroke-width="1.4"/>
+    <circle cx="24" cy="24" r="6" stroke-width="1"/>
+    <line x1="24" y1="2" x2="24" y2="7"/>
+    <line x1="24" y1="41" x2="24" y2="46"/>
+    <line x1="2" y1="24" x2="7" y2="24"/>
+    <line x1="41" y1="24" x2="46" y2="24"/>`,
+  cup: `
+    <path d="M11 16 L33 16 L31 34 Q31 38 25 38 L19 38 Q13 38 13 34 Z"/>
+    <path d="M33 20 Q41 20 41 26 Q41 32 33 32" stroke-width="2"/>
+    <line x1="9" y1="42" x2="35" y2="42" stroke-width="2"/>
+    <path d="M19 12 Q17 8 19 4" stroke-width="1.4"/>
+    <path d="M26 12 Q24 8 26 4" stroke-width="1.4"/>`,
+}
+
+/* ── Layouts ───────────────────────────────────────────────────────────────
+ * Each placement: m=motif, x/y=position % (x is inline-start, RTL-aware),
+ * s=size px, r=rotation deg, t=tone (ink|red|brass), d=depth 1-3
+ * (foreground→far: brighter+faster → fainter+slower), sm=hide on mobile,
+ * k='spark' twinkles. Edges/corners are populated; the optical center is left
+ * clear so headlines and content read cleanly over the field. */
+type Spot = { m: string; x: number; y: number; s: number; r: number; t: 'ink' | 'red' | 'brass'; d: 1 | 2 | 3; sm?: boolean; k?: 'spark' }
+
+const LAYOUTS: Record<string, Spot[]> = {
+  hero: [
+    { m: 'kettle',    x: 4,  y: 10, s: 64, r: -8, t: 'ink',   d: 1 },
+    { m: 'mixer',     x: 6,  y: 54, s: 56, r: 6,  t: 'ink',   d: 2, sm: true },
+    { m: 'droplet',   x: 11, y: 80, s: 28, r: -6, t: 'brass', d: 3, sm: true },
+    { m: 'spark',     x: 15, y: 33, s: 22, r: 14, t: 'brass', d: 3, k: 'spark' },
+    { m: 'airfryer',  x: 86, y: 8,  s: 58, r: 10, t: 'ink',   d: 1 },
+    { m: 'iron',      x: 85, y: 70, s: 58, r: 16, t: 'ink',   d: 2, sm: true },
+    { m: 'flame',     x: 90, y: 40, s: 38, r: -5, t: 'red',   d: 2, sm: true },
+    { m: 'star',      x: 88, y: 90, s: 24, r: 0,  t: 'brass', d: 3, k: 'spark', sm: true },
+    { m: 'whisk',     x: 34, y: 6,  s: 40, r: -8, t: 'ink',   d: 2 },
+    { m: 'snowflake', x: 62, y: 5,  s: 32, r: 16, t: 'ink',   d: 3, sm: true },
+    { m: 'spark',     x: 50, y: 4,  s: 18, r: 0,  t: 'brass', d: 3, k: 'spark' },
+    { m: 'kibbeh',    x: 45, y: 85, s: 68, r: 0,  t: 'red',   d: 1 },
+    { m: 'pot',       x: 29, y: 82, s: 48, r: -6, t: 'ink',   d: 2, sm: true },
+    { m: 'home',      x: 67, y: 84, s: 38, r: 5,  t: 'ink',   d: 2, sm: true },
+    { m: 'heart',     x: 56, y: 92, s: 24, r: -8, t: 'brass', d: 3, k: 'spark' },
+    { m: 'wheat',     x: 21, y: 90, s: 36, r: 8,  t: 'ink',   d: 3, sm: true },
+    { m: 'cup',       x: 78, y: 56, s: 36, r: -10, t: 'ink',  d: 3, sm: true },
+  ],
+  band: [
+    { m: 'kettle',    x: 4,  y: 22, s: 50, r: -8, t: 'ink',   d: 2 },
+    { m: 'whisk',     x: 17, y: 62, s: 34, r: 8,  t: 'ink',   d: 3, sm: true },
+    { m: 'mixer',     x: 39, y: 16, s: 40, r: 6,  t: 'ink',   d: 3, sm: true },
+    { m: 'flame',     x: 60, y: 66, s: 32, r: -5, t: 'red',   d: 3, sm: true },
+    { m: 'airfryer',  x: 83, y: 22, s: 46, r: 10, t: 'ink',   d: 2 },
+    { m: 'wheat',     x: 92, y: 60, s: 32, r: 4,  t: 'brass', d: 3, sm: true },
+    { m: 'spark',     x: 30, y: 82, s: 18, r: 0,  t: 'brass', d: 3, k: 'spark' },
+    { m: 'star',      x: 71, y: 18, s: 22, r: 0,  t: 'brass', d: 3, k: 'spark', sm: true },
+  ],
+  drawer: [
+    { m: 'dial',   x: 52,  y: 4,  s: 120, r: 0, t: 'red',  d: 2 },
+    { m: 'dial',   x: -14, y: 60, s: 150, r: 0, t: 'red',  d: 3 },
+    { m: 'kibbeh', x: 30,  y: 80, s: 96,  r: 0, t: 'red',  d: 1 },
+    { m: 'whisk',  x: 60,  y: 40, s: 50,  r: 8, t: 'ink',  d: 3 },
+    { m: 'kettle', x: 8,   y: 26, s: 56,  r: -8, t: 'ink', d: 3 },
+  ],
+}
+
+const items = LAYOUTS[variant] ?? LAYOUTS.hero
+---
+
+<div class={`doodle-field ${className}`} style={`opacity:${opacity}`} aria-hidden="true">
+  {items.map((it, i) => (
+    <svg
+      class:list={['dood', `dood--${it.t}`, `dood--d${it.d}`, { 'dood--sm-hide': it.sm, 'dood--spark': it.k === 'spark' }]}
+      style={`--x:${it.x}%;--y:${it.y}%;--s:${it.s}px;--r:${it.r}deg;--i:${i}`}
+      viewBox="0 0 48 48"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <Fragment set:html={MOTIFS[it.m]} />
+    </svg>
+  ))}
+</div>
+
+<style>
+  /* ── Field ─────────────────────────────────────────────────────────────── */
+  .doodle-field {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    user-select: none;
+    /* Warm brown ink in light; ivory in dark — the third tone alongside red + brass */
+    --doodle-ink: #5a3a2c;
+  }
+  :global(html.dark) .doodle-field { --doodle-ink: #efe7db; }
+
+  /* ── Motif ─────────────────────────────────────────────────────────────── */
+  .dood {
+    position: absolute;
+    inset-block-start: var(--y);
+    inset-inline-start: var(--x);
+    width: var(--s);
+    height: var(--s);
+    transform: rotate(var(--r));
+  }
+
+  /* Tone — all theme-aware tokens, never hardcoded */
+  .dood--ink   { color: var(--doodle-ink); }
+  .dood--red   { color: var(--c-brand); }
+  .dood--brass { color: var(--c-brass); }
+
+  /* Brass accent dots, regardless of motif tone */
+  .dood :global(.da) { fill: var(--c-brass); stroke: none; }
+
+  /* Depth — spatial layering via opacity */
+  .dood--d1 { opacity: 0.22; }
+  .dood--d2 { opacity: 0.16; }
+  .dood--d3 { opacity: 0.11; }
+  :global(html.dark) .doodle-field .dood--d1 { opacity: 0.26; }
+  :global(html.dark) .doodle-field .dood--d2 { opacity: 0.19; }
+  :global(html.dark) .doodle-field .dood--d3 { opacity: 0.13; }
+  .dood--spark { opacity: 0.20; }
+
+  /* ── Motion — gentle native drift + sparkle twinkle ────────────────────── */
+  @media (prefers-reduced-motion: no-preference) {
+    .dood {
+      will-change: transform;
+      animation: dood-drift var(--dur, 30s) ease-in-out infinite alternate;
+      animation-delay: calc(var(--i, 0) * -2.7s);
+    }
+    /* Depth drives speed + travel — far motifs drift slower and less */
+    .dood--d1 { --dur: 26s; --dy: -16px; --dr: 3deg; }
+    .dood--d2 { --dur: 32s; --dy: -12px; --dr: -4deg; }
+    .dood--d3 { --dur: 38s; --dy: -9px;  --dr: 5deg; }
+
+    .dood--spark {
+      animation:
+        dood-drift var(--dur, 38s) ease-in-out infinite alternate,
+        dood-twinkle 6s ease-in-out infinite;
+      animation-delay: calc(var(--i, 0) * -2.7s), calc(var(--i, 0) * -1.3s);
+    }
+  }
+
+  @keyframes dood-drift {
+    from { transform: translate3d(0, 0, 0) rotate(var(--r)); }
+    to   { transform: translate3d(var(--dx, 0px), var(--dy, -12px), 0) rotate(calc(var(--r) + var(--dr, 4deg))); }
+  }
+  @keyframes dood-twinkle {
+    0%, 100% { opacity: 0.10; }
+    50%      { opacity: 0.28; }
+  }
+
+  /* ── Mobile declutter — drop the dense edge/far motifs ─────────────────── */
+  @media (max-width: 640px) {
+    .dood--sm-hide { display: none; }
+  }
+</style>

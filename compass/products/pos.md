@@ -1,137 +1,351 @@
 # POS Direction — هفار
 
-> Direction for the physical POS terminal and its integration with the Hvar ecosystem. Note the naming clarification below — this is important context for the entire document.
+> What you need to KNOW before touching the checkout. This is direction, not a developer reference.
 
 ---
 
 ## Naming Clarification
 
-The `pos/` directory in the repository is the customer portal (hvarstore.com). The actual POS terminal — the physical in-store/warehouse point-of-sale interface — is **Ultimate POS**, a separate third-party application. When this document says "POS," it means the Ultimate POS terminal and its integration layer. When it says "hvarstore.com" or "the portal," it means the customer-facing web application.
+The `pos/` directory is the customer portal (hvarstore.com), not a POS terminal. The actual in-store POS terminal is **Ultimate POS**, a separate third-party application. When this document says "POS terminal," it means the Ultimate POS. When it says "hvarstore.com," "the portal," or "the site," it means what we build.
 
-This naming conflict exists because the project was initially scoped around POS functionality and the directory name reflects that origin. The customer portal absorbed that scope, but the directory name didn't change. Keep this mental model clear.
-
----
-
-## POS's Role in the Hvar Ecosystem
-
-The POS terminal handles:
-- **Walk-in customers** at physical locations (store, showroom, warehouse)
-- **Cash and card payments** (Kashier POS terminal, distinct from the Kashier HPP used online)
-- **Stock deduction** at point of sale — this is where stock physically leaves the system
-- **Warranty registration** for in-store purchases (contact created in ERP at sale)
-- **Return and exchange processing** for in-store customers
-
-The POS integrates directly with `hvar_erp` — it IS the Ultimate POS interface writing to that database. Every sale through the POS terminal directly modifies `variation_location_details.qty_available`. This is why our hvarstore.com must always re-read stock from the ERP rather than caching it: the POS terminal may have sold items between our page load and our order creation.
+This naming conflict exists because the project was initially scoped around POS functionality. The directory name reflects that origin. Keep the distinction clear.
 
 ---
 
-## What the Compass Controls Here
+## The Portal's Checkout Layer
 
-We do not build the POS UI — it is Ultimate POS. The compass controls:
+The checkout/payment system in hvarstore.com handles:
 
-1. **How hvarstore.com orders arrive and appear in the POS context** — when a customer places an order online, the ERP webhook creates a `transactions` record that an agent sees in the POS/mCRM interface
-2. **How POS stock deductions affect hvarstore.com** — the system does not notify us; we re-read on next request
-3. **Naming conventions that bridge both systems** — the same entity has different names in our system vs. the POS
-4. **Data assumptions we make that depend on POS behavior** — things we must not assume because the POS behaves unexpectedly
+- **Cart to order** — building the order record, validating stock, computing totals
+- **Payment initiation** — routing to Kashier (cards, installments, wallets), or recording COD
+- **Payment confirmation** — receiving the Kashier callback, validating it, finalizing the order
+- **ERP sync** — firing the webhook to the ERP so the draft transaction is created
+- **Order tracking** — reading `bill_code` from the ERP and surfacing Bosta tracking to the customer
+
+Everything downstream of checkout (stock deduction, Bosta shipment, MCRM confirmation) is delegated: to the ERP, to Kashier, to Bosta. The portal triggers and tracks. It does not own those processes.
 
 ---
 
-## Critical Integration Points
+## Payment Methods
 
-### Order Webhook Flow (hvarstore.com → POS/ERP)
+Three categories, all routed through the checkout:
 
-When a customer places an order on hvarstore.com and it is confirmed (COD placed or Kashier payment verified):
+| Method | Mechanism | Portal role |
+|--------|-----------|-------------|
+| Card (debit/credit) | Kashier HPP | Initiate redirect, validate callback |
+| Bank installments (aqsat / ValU / Souhoola / Aman) | Kashier HPP (installments mode) | Same as card — different `allowedMethods` param |
+| Mobile wallets (Vodafone Cash, Fawry, etc.) | Kashier HPP (wallet mode) | Same as card — different `allowedMethods` param |
+| Cash on Delivery | No external gateway | Record order immediately, `payment_status = 'unpaid'` |
 
-1. hvarstore.com API fires `POST /websiteintegration/webHooksyncOrdersGet` to the ERP
-2. Ultimate POS creates a `transactions` record in `hvar_erp`:
-   - `status = 'draft'`
-   - `website_order_id = [our internal order ID]`
-   - `type = 'sell'`
-3. The mCRM agent (or POS terminal agent) sees this draft transaction
-4. Agent confirms → `status = 'final'` → stock is deducted → Bosta shipment created
+Kashier is the only external payment gateway used. The site ships with 20+ gateway controllers inherited from Active eCommerce CMS, but only Kashier is configured and live.
 
-**The link is `transactions.website_order_id`:** this is how we associate an ERP transaction with our order. This field must be stored in both systems. When querying an order's ERP status, look up `transactions WHERE website_order_id = ?`.
+---
 
-### Stock Read Flow (POS → hvarstore.com)
+## Kashier Integration — The Correct Model
 
-The POS terminal does not notify hvarstore.com when stock changes. There is no event or webhook. The flow is:
+### What Kashier Is
 
-1. POS agent completes a sale → ERP deducts from `variation_location_details.qty_available` immediately
-2. Next time hvarstore.com reads stock for that product → correct quantity is returned
-3. Orders in-flight on hvarstore.com that have not yet re-validated stock may be based on stale data
+Kashier (kashier.io) is an Egyptian payment gateway operating as a **Hosted Payment Page (HPP)**. The customer leaves our site, pays on Kashier's servers, and Kashier redirects them back. We never handle raw card data.
 
-**Design implication:** never trust the stock quantity from a page load to be valid at checkout time. The `SELECT ... FOR UPDATE` at order creation is the only authoritative stock check. The stock display on the product page is advisory.
+**Credentials** — never commit live values; load from `.env` (gitignored):
+```
+KASHIER_MERCHANT_ID=MID-XXXXX-XXX
+KASHIER_SECRET_KEY=<from-secret-store>
+KASHIER_MODE=live
+KASHIER_CURRENCY=EGP
+```
 
-### Contact Sync (POS ↔ hvarstore.com)
+In development: `KASHIER_MODE=test`, test card `5123450000000008`.
 
-Both systems write to `hvar_erp.contacts`. The POS creates contacts when a walk-in customer makes a purchase. hvarstore.com creates contacts when a customer registers or places an order. Phone is the primary key for deduplication.
+### The Full Flow
 
-**The deduplication rule:** before writing a new contact, check for an existing contact with the same normalized phone number. If it exists, update name if the existing name is blank; otherwise preserve the existing contact record. Do not create two contacts for the same phone.
+```
+Customer clicks "Pay"
+        │
+        ▼
+Backend generates:
+  - orderId  (UUID format, see below)
+  - HMAC-SHA256 hash
+  - HPP redirect URL
+        │
+        ▼
+Redirect to Kashier HPP
+https://checkout.kashier.io?merchantId=...&orderId=...&amount=...&hash=...
+        │
+        ├── Customer pays ──────► Kashier redirects to:
+        │                         /api/payments/kashier/callback?ref={orderId}
+        │                         Header: x-kashier-signature: {signature}
+        │
+        └── Customer cancels ───► Redirect home, flash error
+```
 
-**POS contact format:** the POS may store phone numbers in different formats depending on how the cashier enters them. When syncing or looking up contacts that originated in the POS, normalize before lookup.
+### orderId Strategy
+
+**Never use `last_id + 1` as the orderId.** The current implementation does this and causes race conditions when two orders are placed concurrently. The correct approach:
+
+Generate a UUID-based orderId before redirecting:
+
+```python
+payment_order_id = f"HVAR-{uuid.uuid4().hex[:12].upper()}"
+# e.g. "HVAR-A3F7C291E8B4"
+```
+
+Write a `pending_payments` row with this ID before the redirect. This row is the bridge between the Kashier session and our internal order. The callback looks up by `payment_order_id`, not by session.
+
+**Why the HVAR- prefix:** Kashier's dashboard shows the orderId. The prefix identifies the merchant in Kashier's multi-tenant system.
+
+### The `pending_payments` Table
+
+This table must exist before any Kashier traffic is processed:
+
+```sql
+CREATE TABLE pending_payments (
+    id                 INT AUTO_INCREMENT PRIMARY KEY,
+    payment_order_id   VARCHAR(64) NOT NULL UNIQUE,
+    internal_order_id  INT NOT NULL,
+    amount             DECIMAL(10,2) NOT NULL,
+    payment_method     VARCHAR(32),
+    created_at         DATETIME NOT NULL,
+    expires_at         DATETIME NOT NULL,
+    processed_at       DATETIME NULL,
+    kashier_reference  VARCHAR(128) NULL,
+    INDEX (payment_order_id),
+    INDEX (internal_order_id),
+    INDEX (expires_at)
+);
+```
+
+`processed_at` is the idempotency gate. NULL = not yet confirmed. Non-null = already processed. If Kashier fires the callback twice (network retry), the second call finds a non-null `processed_at` and exits without creating a duplicate order.
+
+### Hash Generation (Outbound)
+
+The hash proves to Kashier that the redirect came from a legitimate merchant. Build it this way:
+
+```python
+import hmac, hashlib
+
+def generate_kashier_hash(merchant_id, order_id, amount, secret_key):
+    # amount must be a 2-decimal string: "1250.00"
+    path = f"/?payment={merchant_id}.{order_id}.{amount}.EGP"
+    return hmac.new(
+        secret_key.encode('utf-8'),
+        path.encode('utf-8'),
+        hashlib.sha256
+    ).hexdigest()
+```
+
+**Amount formatting:** always use exactly 2 decimal places. `1250` → `"1250.00"`. `99.9` → `"99.90"`. A decimal mismatch between the hash and the displayed amount causes Kashier to reject the payment.
+
+### Signature Validation (Inbound)
+
+The callback carries `x-kashier-signature` in the HTTP header. This is how we know the request actually came from Kashier and is not an attacker POSTing fake success callbacks.
+
+**Validation must be the first thing that runs in the callback handler.** If validation fails, return 403 and log the attempt. Do not process the payment.
+
+```python
+import hmac, hashlib
+from urllib.parse import quote
+
+def validate_kashier_signature(data, signature_keys, secret_key, received_signature):
+    sorted_keys = sorted(signature_keys)
+    parts = []
+    for key in sorted_keys:
+        parts.append(f"{key}={quote(str(data[key]), safe='')}")
+    query_string = "&".join(parts)
+
+    expected = hmac.new(
+        secret_key.encode('utf-8'),
+        query_string.encode('utf-8'),
+        hashlib.sha256
+    ).hexdigest()
+
+    return hmac.compare_digest(expected, received_signature)
+```
+
+### The Correct Callback Handler — Step by Step
+
+```
+1. Extract x-kashier-signature from headers
+2. Extract data and data.signatureKeys from body
+3. VALIDATE SIGNATURE → fail: return 403, log, stop
+4. Check paymentStatus:
+   - "SUCCESS" → continue
+   - anything else → return 200, set order status = failed, stop
+5. Extract payment_order_id from ?ref= query param
+6. Look up pending_payments WHERE payment_order_id = :ref
+   - NOT FOUND → return 409, log "unknown orderId"
+   - EXPIRED → return 409, log "payment received for expired session"
+   - processed_at IS NOT NULL → return 200, log "duplicate callback — idempotent", stop
+7. Mark payment processed: UPDATE pending_payments SET processed_at = NOW()
+8. Finalize order:
+   - Update order.payment_status = 'paid'
+   - Store Kashier reference in pending_payments.kashier_reference
+9. Fire order-confirmed event (email, ERP webhook)
+10. Redirect customer to order confirmation page
+```
+
+### HPP URL Construction
+
+```python
+from urllib.parse import urlencode
+
+def build_kashier_url(payment_order_id, hash_value, order):
+    params = {
+        'merchantId': KASHIER_MERCHANT_ID,
+        'orderId': payment_order_id,
+        'amount': format_amount(order['total']),
+        'currency': 'EGP',
+        'hash': hash_value,
+        'mode': KASHIER_MODE,
+        'merchantRedirect': f"{APP_URL}/api/payments/kashier/callback?ref={payment_order_id}",
+        'display': 'ar',
+        'allowedMethods': get_allowed_methods(order['payment_method']),
+    }
+    return f"https://checkout.kashier.io?{urlencode(params)}"
+
+def get_allowed_methods(method):
+    return {
+        'kashier_card': 'card',
+        'kashier_installments': 'installments',
+        'kashier_wallets': 'wallet',
+    }.get(method, 'card')
+```
+
+**The callback URL carries only `ref`.** The shipping info is already in the database. Do not embed it as query params — the current implementation does this and it is a bug (session state leakage, URL length issues, and fragility if the session dies between redirect and callback).
+
+---
+
+## The Five Bugs in the Current Implementation
+
+These exist in the inherited Active eCommerce / Kashier controller. Do not replicate them.
+
+| # | Bug | Effect |
+|---|-----|--------|
+| 1 | Signature validation commented out | Any HTTP POST to the callback endpoint creates an order — no Kashier verification |
+| 2 | `orderId = max(id) + 1` | Concurrent orders get the same orderId — race condition |
+| 3 | State stored in PHP session | Session expiry between HPP redirect and callback → orphaned payment |
+| 4 | No idempotency check | Callback fired twice (network retry) → two orders created |
+| 5 | Order created inside the callback | Payment confirmed but order write fails silently |
+
+All five must not exist in the new implementation. The `pending_payments` table and the callback handler spec above fix all five.
+
+---
+
+## COD vs Online Payment — Key Divergence
+
+COD and card payments diverge at checkout and converge only at delivery:
+
+| Aspect | COD | Card / Installments / Wallet |
+|--------|-----|------------------------------|
+| Payment timing | On delivery | Before order confirmation |
+| `payment_status` initial value | `unpaid` | `paid` (after callback) |
+| Order creation timing | Immediate at checkout | After callback confirmation |
+| Cancellation risk | Order can be cancelled before delivery | Refund must be initiated |
+| ERP draft created | Yes, same webhook | Yes, same webhook |
+| Bosta shipment | Created when MCRM confirms | Created when MCRM confirms |
+
+COD orders are the majority of Hvar's volume. The COD path must be as fast and simple as possible — no redirects, no external dependencies. Validate stock, create order, fire ERP webhook, show confirmation.
+
+---
+
+## Bosta Shipping — What the Portal Controls
+
+Bosta integration lives in the ERP, not the portal. The portal's role is minimal:
+
+1. **Read `bill_code`** from `transactions WHERE website_order_id = our_order_id`
+2. **Surface the tracking link** when `bill_code` is non-null:
+   ```
+   https://bosta.co/ar-eg/tracking-shipments?shipment-number={bill_code}
+   ```
+3. **Before `bill_code` exists**, show: `طلبك قيد التأكيد` — order being prepared
+
+The portal does not call the Bosta API. It does not create shipments. It does not track statuses. It reads a single field that the ERP writes after MCRM confirms the order.
+
+**Do not assume `bill_code` is populated immediately after the ERP transaction moves to `status='final'`**. The Bosta shipment creation is a subsequent step. Poll or refresh.
+
+---
+
+## ERP Sync — Order Webhook
+
+When an order is confirmed (COD placed, or Kashier callback processed):
+
+```
+POST /websiteintegration/webHooksyncOrdersGet
+```
+
+The ERP creates `transactions` row: `type='sell'`, `status='draft'`, `website_order_id=our_id`.
+
+The MCRM call center confirms → `status='final'` → stock deducted → Bosta auto-created.
+
+When cancelling:
+```
+1. Set our order: status='cancelled', cancelled_at=NOW()
+2. POST /websiteintegration/webHooksyncOrdersDelete { order_id: our_id }
+3. ERP removes the draft transaction
+```
+
+Fire the cancel webhook BEFORE soft-deleting our record. Never rely on reading a cancelled status back from the ERP — the ERP hard-deletes cancelled drafts in some scenarios. Our `orders` table is the authority for order history.
+
+---
+
+## Security Rules for Checkout
+
+These are non-negotiable:
+
+1. **Kashier signature validation on every callback** — no exceptions, no environment bypass
+2. **HTTPS only** — Kashier will not send callbacks to HTTP endpoints; the `APP_URL` must be HTTPS in production
+3. **Idempotency via `processed_at`** — before processing any payment, check this field
+4. **UUID orderId** — never sequential, never guessable
+5. **No state in session** — all payment state lives in `pending_payments`, not PHP/Flask session
+6. **Secret key in environment variable only** — never hardcoded, never in source control
+7. **Amount match** — the amount in the hash, the amount displayed, and the amount in the callback must all match. Kashier rejects mismatches. Never recompute the amount from a different source in the callback.
+
+---
+
+## Key Gotchas
+
+**Webhook replay.** Kashier will retry the callback if they do not receive a 200 response. Design the callback handler to be idempotent. If you return a 500 on the first callback due to a bug, Kashier will retry — potentially after you fix the bug — and the handler will run again on an already-processed payment. The `processed_at` check must be in the DB, not in memory.
+
+**Currency.** Kashier is EGP-only for this merchant. Do not pass any other currency. The hash embeds `EGP` as a constant — if you ever try to use a different currency, the hash will fail.
+
+**COD vs online divergence in ERP.** COD orders arrive in the ERP as drafts with `payment_status='unpaid'`. Online orders arrive as drafts with `payment_status='paid'`. The MCRM agent sees the difference and processes them accordingly. Make sure the ERP webhook payload includes the payment method so the ERP can set this correctly.
+
+**Session death between redirect and callback.** The current implementation stores `combined_order_id` in the PHP session. If the customer's session expires (e.g., 30-minute idle) while on the Kashier HPP, the callback fires but the session is gone. The new implementation must store all needed state in `pending_payments` before the redirect. The session is irrelevant to the callback.
+
+**Installments.** ValU, Souhoola, and Aman are bank installment programs available through Kashier's `installments` mode. They do not require separate credentials or APIs — they appear as options on the Kashier HPP when `allowedMethods=installments`. The portal just sets the right `allowedMethods` param and Kashier presents the available installment plans to the customer.
+
+**Amount decimal precision.** The hash is computed from a string. `format_amount(1250)` must produce `"1250.00"`, not `"1250"`. If the hash was computed with `"1250.00"` and the callback reports `"1250"`, validation will fail. Use `f"{amount:.2f}"` consistently in every place the amount appears in a Kashier context.
+
+---
+
+## Stock and Concurrency
+
+The POS terminal does not notify the portal when stock changes. There is no webhook, no event. The POS agent completes a sale → ERP deducts from `variation_location_details.qty_available` → the next portal read returns the new number.
+
+**Never trust a stock quantity read at page load to be valid at checkout time.** Stock displayed on the product page is advisory. The `SELECT ... FOR UPDATE` at order creation is the only authoritative check.
 
 ---
 
 ## POS-Specific Naming Conventions
 
-The POS (Ultimate POS) uses different terminology for the same concepts. This table is the translation layer.
-
-| Our term | POS/ERP term | Notes |
+| Our term | ERP/POS term | Notes |
 |----------|-------------|-------|
 | Order | Transaction | `hvar_erp.transactions`, `type='sell'` |
-| Order ID | `transactions.id` + `website_order_id` | We store our ID as `website_order_id` in the ERP |
+| Order ID | `website_order_id` | We store our UUID-format ID as this field in the ERP |
 | Customer | Contact | `hvar_erp.contacts`, `type='customer'` |
-| Product page | — | POS doesn't have a product page; catalog is browse/search within the POS UI |
-| Service ticket | — | Service tickets are in `mcrm_hvar_hub`, not the POS |
-| Governorate | City | In `hvar_erp.cities`, each row is a governorate |
-| District / city | District | In `hvar_erp.districts`, each row is what Egyptians call a city or neighborhood |
+| Governorate | City | `hvar_erp.cities` — each row is a governorate |
+| District / neighborhood | District | `hvar_erp.districts` — each row is what Egyptians call a city or neighborhood |
 | Stock | `qty_available` | In `variation_location_details`, not `product_stocks` |
-| In-store order | — | No special term; same `transactions` table, but without a `website_order_id` value |
-
-### Our Order ID Format
-
-hvarstore.com order IDs follow the format `HVAR-{UUID4[:12].toUpperCase()}` — e.g., `HVAR-3F4A9B2C1E7D`. This format:
-- Is never sequential (no `last_id+1`) — prevents order count inference
-- Is stored in `pending_payments` before the HPP redirect
-- Is stored in `hvar_erp.transactions.website_order_id` after webhook
-- Is shown to the customer in order confirmation and tracking
-
-The ERP's own `transactions.id` is a sequential integer that we store internally but do not expose to customers in URLs or communications — it would reveal order volume to competitors.
+| In-store order | — | Same `transactions` table, no `website_order_id` |
 
 ---
 
 ## What Never to Assume
 
-### Assumption 1: Deleted POS Transactions Were Soft-Deleted
+**POS transactions are soft-deleted.** They are not. The ERP hard-deletes cancelled drafts in some scenarios. A missing `transactions` row does not mean `status='cancelled'` — it means gone. Our `orders` table is the history of record.
 
-The POS hard-deletes cancelled transactions in some scenarios. A transaction that existed when we last queried and does not exist in the next query was not soft-deleted — it was hard-deleted. Our code cannot assume that a missing `transaction` row means `status='cancelled'`. It means the record is gone.
+**`bill_code` is populated immediately after `status='final'`.** It is not. Bosta creation is a subsequent async step.
 
-**Design implication:** do not build logic that depends on reading the ERP transaction's final state after cancellation. Store the order status in our own `hvar_site.orders` table. The ERP is the authority for active orders; our table is the authority for the history of what happened.
+**A `website_order_id` in the ERP always has a valid portal order behind it.** Failed webhooks, test orders, and deleted-order scenarios can leave orphaned `website_order_id` values. Handle the missing ERP transaction gracefully — show what we know from our `orders` table, note that ERP sync is pending.
 
-**The soft-delete is our responsibility:** when we want to cancel an order, we fire the cancel webhook first, then soft-delete in our DB. We never rely on reading a "cancelled" status back from the ERP — we control the cancellation and record it ourselves.
-
-### Assumption 2: POS Stock Updates Are Synchronous
-
-Stock deduction by the POS is synchronous within that transaction, but our read of the updated stock quantity might arrive before or after depending on MySQL replication lag (if any), connection pool behavior, or query timing.
-
-**Design implication:** at order creation on hvarstore.com, use `SELECT qty_available FROM variation_location_details WHERE ... FOR UPDATE` within a transaction. This lock ensures we read and check stock with exclusive access during the critical window. Do not assume that a stock quantity read 5 minutes before order creation is still accurate.
-
-### Assumption 3: POS and hvarstore.com Phone Formats Are Consistent
-
-The POS terminal accepts phone numbers typed in by cashiers. Cashier entry is not normalized. A contact entered via the POS may have a phone stored as `+2001012345678`, `01012345678`, `1012345678`, or any other variant the cashier typed.
-
-**Design implication:** every phone lookup normalizes first. The normalization function runs regardless of where the phone number came from.
-
-### Assumption 4: A `website_order_id` Always Corresponds to a Valid hvarstore.com Order
-
-It is possible for a `website_order_id` to exist in the ERP from a failed webhook, a test order, or a deleted-order scenario. When fetching an order's ERP transaction:
-
-1. Look up `transactions WHERE website_order_id = [our_id] AND type = 'sell'`
-2. If no row found: the transaction may have been hard-deleted (see assumption 1), or the webhook may have failed. Handle this gracefully — it does not mean the customer's order doesn't exist.
-3. Do not fail the entire order display because the ERP transaction is missing. Show what we know from our own `hvar_site.orders` table; note that ERP sync is pending.
-
-### Assumption 5: Bosta Shipment Creation Is Immediate After Final
-
-When the agent confirms an order and the transaction moves to `status='final'`, the Bosta shipment is typically created shortly after — but not always immediately. The timing depends on the mCRM/POS integration. Do not assume `bill_code` is populated immediately after `status='final'`. Poll or refresh the transaction to get the `bill_code` once it is available.
-
-**Design implication:** the "track your order" link in hvarstore.com shows only when `bill_code` is non-null in the corresponding transaction. Before then, show "order confirmed — shipment being prepared" without a tracking link.
+**Phone formats are normalized in the POS.** They are not. Cashier entry is freeform. Normalize before every phone lookup, regardless of origin.

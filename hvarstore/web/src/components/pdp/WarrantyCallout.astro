@@ -1,0 +1,150 @@
+---
+interface Props {
+  warrantyMonths: number;
+  bowlWarrantyYears?: number;
+}
+const { warrantyMonths, bowlWarrantyYears } = Astro.props;
+const warrantyText =
+  warrantyMonths >= 24
+    ? `ضمان ${Math.floor(warrantyMonths / 12)} سنة`
+    : `ضمان ${warrantyMonths} شهر`;
+---
+
+<div class="wc-card" role="region" aria-label="مزايا هفار لهذا المنتج">
+  <div class="wc-row">
+
+    <!-- Warranty -->
+    <div class="wc-item">
+      <span class="wc-icon wc-icon--brass">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <polyline points="9 12 11 14 15 10"/>
+        </svg>
+      </span>
+      <span class="wc-text">
+        <span class="wc-label">{warrantyText}</span>
+        {bowlWarrantyYears && (
+          <span class="wc-sub">الوعاء {bowlWarrantyYears} سنة</span>
+        )}
+      </span>
+    </div>
+
+    <span class="wc-sep" aria-hidden="true"></span>
+
+    <!-- Free shipping -->
+    <div class="wc-item">
+      <span class="wc-icon wc-icon--green">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="9" width="11" height="8" rx="1"/>
+          <path d="M14 11h4l3 5H14"/>
+          <circle cx="7.5" cy="18.5" r="1.5"/>
+          <circle cx="17.5" cy="18.5" r="1.5"/>
+        </svg>
+      </span>
+      <span class="wc-label">شحن مجاني</span>
+    </div>
+
+    <span class="wc-sep" aria-hidden="true"></span>
+
+    <!-- COD -->
+    <div class="wc-item">
+      <span class="wc-icon wc-icon--brand">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="2" y="6" width="20" height="12" rx="2"/>
+          <circle cx="12" cy="12" r="2.5"/>
+        </svg>
+      </span>
+      <span class="wc-label">ادفع لما يوصل</span>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .wc-card {
+    border: 1px solid rgba(var(--c-brass-rgb), 0.30);
+    border-inline-start: 3px solid var(--c-brass);
+    border-radius: var(--radius-xl);
+    background: rgba(var(--c-brass-rgb), 0.04);
+    padding: 1rem;
+    margin-block: 0.25rem;
+  }
+
+  .wc-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .wc-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-inline: 0.5rem;
+  }
+
+  .wc-item:first-child { padding-inline-start: 0; }
+  .wc-item:last-child  { padding-inline-end: 0;   }
+
+  .wc-sep {
+    width: 1px;
+    height: 2rem;
+    background: rgba(var(--c-brass-rgb), 0.20);
+    flex-shrink: 0;
+  }
+
+  .wc-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .wc-icon--brass {
+    background: rgba(var(--c-brass-rgb), 0.12);
+    color: var(--c-brass);
+  }
+
+  .wc-icon--green {
+    background: rgba(22, 163, 74, 0.10);
+    color: var(--c-trust);
+  }
+
+  .wc-icon--brand {
+    background: rgba(var(--c-brand-rgb), 0.08);
+    color: var(--c-brand);
+  }
+
+  .wc-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.0625rem;
+  }
+
+  .wc-label {
+    font-family: "Cairo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: var(--c-ink);
+    white-space: nowrap;
+    line-height: 1.3;
+  }
+
+  .wc-sub {
+    font-family: "Cairo", system-ui, sans-serif;
+    font-size: 0.75rem;
+    color: var(--c-ink-muted);
+    white-space: nowrap;
+  }
+
+  /* On very narrow screens, icon hides to save space */
+  @media (max-width: 380px) {
+    .wc-icon { display: none; }
+    .wc-item { gap: 0; }
+    .wc-label { font-size: 0.75rem; }
+  }
+</style>

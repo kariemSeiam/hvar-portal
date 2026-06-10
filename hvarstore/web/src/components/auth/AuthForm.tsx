@@ -31,7 +31,7 @@ export default function AuthForm() {
 	}
 
 	return (
-		<div className="rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] p-6 space-y-5">
+		<div className="rounded-2xl bg-surface border border-hvar p-6 space-y-5">
 			{/* Mode tabs */}
 			<div className="flex rounded-xl bg-stone-100 dark:bg-stone-900 p-1">
 				<button
@@ -41,7 +41,7 @@ export default function AuthForm() {
 					}}
 					className={`flex-1 py-2 rounded-lg text-sm font-cairo font-bold transition-all ${
 						mode === "login"
-							? "bg-white dark:bg-[#1c1917] text-[#d43533] shadow-sm"
+							? "bg-surface text-brand shadow-sm"
 							: "text-stone-500 hover:text-stone-700 dark:hover:text-stone-300"
 					}`}
 				>
@@ -54,7 +54,7 @@ export default function AuthForm() {
 					}}
 					className={`flex-1 py-2 rounded-lg text-sm font-cairo font-bold transition-all ${
 						mode === "register"
-							? "bg-white dark:bg-[#1c1917] text-[#d43533] shadow-sm"
+							? "bg-surface text-brand shadow-sm"
 							: "text-stone-500 hover:text-stone-700 dark:hover:text-stone-300"
 					}`}
 				>
@@ -71,7 +71,7 @@ export default function AuthForm() {
 			<form onSubmit={handleSubmit} className="space-y-4">
 				{/* Phone */}
 				<div>
-					<label className="block font-cairo text-sm font-semibold text-[#1c1917] dark:text-[#f5f5f4] mb-1.5">
+					<label className="block font-cairo text-sm font-semibold text-ink mb-1.5">
 						رقم الموبايل
 					</label>
 					<input
@@ -81,14 +81,14 @@ export default function AuthForm() {
 						onChange={(e) => setPhone(e.target.value)}
 						placeholder="01xxxxxxxxx"
 						required
-						className="w-full px-4 py-3 rounded-xl border border-[#e7e0d6] dark:border-[#2c2825] bg-[#fbf7f1] dark:bg-[#12110f] text-[#1c1917] dark:text-[#f5f5f4] font-inter text-sm text-left focus:outline-none focus:border-[#d43533] focus:ring-1 focus:ring-[#d43533]/30 transition-colors"
+						className="hvar-input w-full px-4 py-3 rounded-xl font-inter text-sm text-left transition-colors"
 					/>
 				</div>
 
 				{/* Name — register only */}
 				{mode === "register" && (
 					<div>
-						<label className="block font-cairo text-sm font-semibold text-[#1c1917] dark:text-[#f5f5f4] mb-1.5">
+						<label className="block font-cairo text-sm font-semibold text-ink mb-1.5">
 							الاسم
 						</label>
 						<input
@@ -97,14 +97,14 @@ export default function AuthForm() {
 							onChange={(e) => setName(e.target.value)}
 							placeholder="الاسم الكامل"
 							required
-							className="w-full px-4 py-3 rounded-xl border border-[#e7e0d6] dark:border-[#2c2825] bg-[#fbf7f1] dark:bg-[#12110f] text-[#1c1917] dark:text-[#f5f5f4] font-cairo text-sm focus:outline-none focus:border-[#d43533] focus:ring-1 focus:ring-[#d43533]/30 transition-colors"
+							className="hvar-input w-full px-4 py-3 rounded-xl font-cairo text-sm transition-colors"
 						/>
 					</div>
 				)}
 
 				{/* Password */}
 				<div>
-					<label className="block font-cairo text-sm font-semibold text-[#1c1917] dark:text-[#f5f5f4] mb-1.5">
+					<label className="block font-cairo text-sm font-semibold text-ink mb-1.5">
 						كلمة المرور
 					</label>
 					<input
@@ -115,14 +115,14 @@ export default function AuthForm() {
 						placeholder="••••••"
 						required
 						minLength={6}
-						className="w-full px-4 py-3 rounded-xl border border-[#e7e0d6] dark:border-[#2c2825] bg-[#fbf7f1] dark:bg-[#12110f] text-[#1c1917] dark:text-[#f5f5f4] font-inter text-sm text-left focus:outline-none focus:border-[#d43533] focus:ring-1 focus:ring-[#d43533]/30 transition-colors"
+						className="hvar-input w-full px-4 py-3 rounded-xl font-inter text-sm text-left transition-colors"
 					/>
 				</div>
 
 				<button
 					type="submit"
 					disabled={loading}
-					className="w-full py-3.5 rounded-xl bg-[#d43533] hover:bg-[#b91c1c] disabled:bg-stone-300 disabled:dark:bg-stone-700 text-white font-cairo font-bold text-base transition-all hover:shadow-[0_6px_20px_rgba(212,53,51,0.3)]"
+					className="w-full py-3.5 rounded-xl bg-brand hover:bg-[var(--c-brand-hover)] disabled:bg-stone-300 disabled:dark:bg-stone-700 text-white font-cairo font-bold text-base transition-all hover:shadow-[0_6px_20px_rgba(var(--c-brand-rgb),0.3)]"
 					style={{ transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)" }}
 				>
 					{loading
@@ -134,13 +134,13 @@ export default function AuthForm() {
 			</form>
 
 			{mode === "login" && (
-				<p className="text-center text-xs font-cairo text-[#a8a29e]">
+				<p className="text-center text-xs font-cairo text-muted">
 					نسيت كلمة المرور؟{" "}
 					<a
 						href="https://wa.me/201XXXXXXXXX?text=نسيت كلمة المرور — رقمي:"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="text-[#d43533] hover:underline"
+						className="text-brand hover:underline"
 					>
 						تواصل معنا
 					</a>

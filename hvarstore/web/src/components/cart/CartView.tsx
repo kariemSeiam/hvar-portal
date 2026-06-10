@@ -1,180 +1,534 @@
+import { useState, useEffect, useRef } from "react";
 import { useStore } from "@nanostores/react";
-import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from "lucide-react";
 import {
 	cartItems,
-	cartCount,
 	cartTotal,
 	updateQuantity,
 	removeFromCart,
 } from "../../stores/cart";
+import { getEnrichment } from "../../lib/enrichment";
 
+// ─── Arabic-Indic display ─────────────────────────────────────────────────────
+function ar(n: number): string {
+	return String(Math.round(n)).replace(/[0-9]/g, (d) => "٠١٢٣٤٥٦٧٨٩"[+d]);
+}
+
+function arMoney(n: number): string {
+	return n.toLocaleString("ar-EG");
+}
+
+// ─── Smooth count-up hook ─────────────────────────────────────────────────────
+function useCountUp(target: number, duration = 750): number {
+	const [display, setDisplay] = useState(target);
+	const prevRef = useRef(target);
+	const rafRef = useRef<number>(0);
+
+	useEffect(() => {
+		const start = prevRef.current;
+		if (start === target) return;
+		const diff = target - start;
+		const t0 = performance.now();
+
+		const tick = (now: number) => {
+			const t = Math.min((now - t0) / duration, 1);
+			const eased = 1 - Math.pow(1 - t, 3);
+			setDisplay(Math.round(start + diff * eased));
+			if (t < 1) rafRef.current = requestAnimationFrame(tick);
+			else prevRef.current = target;
+		};
+
+		cancelAnimationFrame(rafRef.current);
+		rafRef.current = requestAnimationFrame(tick);
+		return () => cancelAnimationFrame(rafRef.current);
+	}, [target, duration]);
+
+	return display;
+}
+
+// ─── Power tier ───────────────────────────────────────────────────────────────
+function getPowerTier(watts: number): { label: string; sub: string } | null {
+	if (watts >= 4200) return { label: "ترسانة هفار كاملة", sub: "مطبخك معاه كل حاجة" };
+	if (watts >= 2200) return { label: "مطبخ في المستوى ده", sub: "اختيار المحترفين" };
+	if (watts >= 2000) return { label: "قوة البلدوزر", sub: "أقوى كبة في مصر" };
+	if (watts >= 800)  return { label: "مطبخك بيتحرك", sub: "زيد من القوة" };
+	return { label: "أول خطوة", sub: "مطبخك بيكمل" };
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
 export default function CartView() {
 	const items = useStore(cartItems);
-	const count = useStore(cartCount);
 	const total = useStore(cartTotal);
 
+	// Wattage total — sum enrichment data across all items
+	const rawWatts = items.reduce((sum, item) => {
+		const e = item.sku ? getEnrichment(item.sku) : null;
+		return sum + (e?.wattage ?? 0) * item.quantity;
+	}, 0);
+
+	const animatedWatts = useCountUp(rawWatts);
+	const animatedTotal = useCountUp(total, 500);
+	const tier = rawWatts > 0 ? getPowerTier(rawWatts) : null;
+
+	const installmentMonthly = total >= 1000 ? Math.round(total / 12) : null;
+
+	// ─── Empty state ──────────────────────────────────────────────────────────
 	if (items.length === 0) {
 		return (
-			<div className="text-center py-20">
-				<div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-2xl bg-stone-100 dark:bg-stone-800 text-[#a8a29e]">
-					<ShoppingBag size={28} />
-				</div>
-				<p className="font-cairo text-lg text-[#57534e] dark:text-[#a8a29e] mb-2">
-					السلة فاضية
+			<div
+				className="flex flex-col items-center justify-center text-center px-4"
+				style={{ background: "#130F0C", minHeight: "calc(100vh - 56px)" }}
+			>
+				{/* Ghosted zero */}
+				<p
+					className="font-cairo font-black select-none pointer-events-none leading-none"
+					style={{
+						fontSize: "clamp(7rem,28vw,16rem)",
+						color: "var(--c-brand)",
+						opacity: 0.10,
+						letterSpacing: "-0.04em",
+					}}
+				>
+					٠
 				</p>
-				<p className="font-cairo text-sm text-[#a8a29e] dark:text-[#57534e] mb-6">
-					ابدأ التسوق وأضف منتجات للسلة
+
+				<p
+					className="font-cairo font-black text-2xl sm:text-3xl -mt-6"
+					style={{ color: "#F5EFE6" }}
+				>
+					مطبخك يستاهل أكتر
 				</p>
+				<p
+					className="font-cairo text-sm mt-2 mb-10"
+					style={{ color: "rgba(245,239,230,0.38)" }}
+				>
+					السلة فاضية — البلدوزر بيستنّاك
+				</p>
+
 				<a
 					href="/products"
-					className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#d43533] hover:bg-[#b91c1c] text-white font-cairo font-bold text-sm transition-all"
+					className="inline-flex items-center gap-2.5 px-8 py-4 rounded-xl font-cairo font-bold text-base text-white"
+					style={{
+						background: "var(--c-brand)",
+						transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)",
+					}}
+					onMouseEnter={(e) => {
+						(e.currentTarget as HTMLAnchorElement).style.background = "var(--c-brand-hover)";
+						(e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-2px)";
+					}}
+					onMouseLeave={(e) => {
+						(e.currentTarget as HTMLAnchorElement).style.background = "var(--c-brand)";
+						(e.currentTarget as HTMLAnchorElement).style.transform = "";
+					}}
 				>
-					تصفح المنتجات
+					شوف القوة
+					<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+						<path d="M4 8h8M8 4l4 4-4 4" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+					</svg>
 				</a>
 			</div>
 		);
 	}
 
+	// ─── Filled state ─────────────────────────────────────────────────────────
 	return (
-		<div className="space-y-6">
-			{/* Items */}
-			<div className="space-y-3">
-				{items.map((item) => (
-					<div
-						key={item.variationId}
-						className="flex gap-4 p-4 rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825]"
-					>
-						{/* Image */}
-						<a
-							href={`/products/${item.slug}`}
-							className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-stone-50 dark:bg-stone-900"
-						>
-							{item.image ? (
-								<img
-									src={item.image}
-									alt={item.name}
-									className="w-full h-full object-cover"
-								/>
-							) : (
-								<div className="w-full h-full flex items-center justify-center">
-									<ShoppingBag
-										size={20}
-										className="text-stone-300 dark:text-stone-600"
-									/>
-								</div>
-							)}
-						</a>
+		<div style={{ minHeight: "calc(100vh - 56px)" }}>
 
-						{/* Info */}
-						<div className="flex-1 min-w-0">
-							<a
-								href={`/products/${item.slug}`}
-								className="font-cairo font-semibold text-sm text-[#1c1917] dark:text-[#f5f5f4] hover:text-[#d43533] transition-colors line-clamp-2"
+			{/* ── Power Header ─────────────────────────────────────────────── */}
+			<div
+				className="relative overflow-hidden"
+				style={{ background: "#130F0C" }}
+			>
+				{/* Ember glow */}
+				<div
+					className="absolute inset-0 pointer-events-none"
+					style={{
+						background:
+							"radial-gradient(ellipse 70% 120% at 15% 50%, rgba(var(--c-brand-rgb),0.13) 0%, transparent 70%)",
+					}}
+				/>
+				{/* Grain */}
+				<div
+					className="absolute inset-0 pointer-events-none"
+					style={{
+						opacity: 0.05,
+						mixBlendMode: "overlay",
+						backgroundImage:
+							"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+					}}
+				/>
+
+				<div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+					<div className="flex items-end justify-between gap-4">
+
+						{/* Left: wattage + labels */}
+						<div>
+							<p
+								className="font-cairo text-xs mb-2"
+								style={{ color: "rgba(245,239,230,0.35)", letterSpacing: "0.06em" }}
 							>
-								{item.name}
-							</a>
-
-							<p className="font-inter font-bold text-[#d43533] text-sm mt-1">
-								{item.price.toLocaleString("ar-EG")} ج.م
+								سلتك
 							</p>
 
-							{/* Qty controls */}
-							<div className="flex items-center justify-between mt-3">
-								<div className="flex items-center rounded-lg border border-[#e7e0d6] dark:border-[#2c2825] overflow-hidden">
-									<button
-										onClick={() =>
-											updateQuantity(item.variationId, item.quantity - 1)
-										}
-										className="w-8 h-8 flex items-center justify-center text-stone-500 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors"
-										aria-label="تقليل"
-									>
-										<Minus size={13} />
-									</button>
-									<span className="w-8 text-center font-inter font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">
-										{item.quantity}
+							{/* The number — wattage when available, otherwise EGP total */}
+							<div className="flex items-baseline gap-2">
+								<span
+									className="font-cairo font-black leading-none tabular-nums"
+									style={{
+										fontSize: "clamp(3rem,10vw,5.5rem)",
+										color: "var(--c-brand)",
+										letterSpacing: "-0.03em",
+									}}
+								>
+									{rawWatts > 0 ? ar(animatedWatts) : arMoney(animatedTotal)}
+								</span>
+								<span
+									className="font-cairo font-bold text-lg"
+									style={{ color: "var(--c-brand)", opacity: 0.7 }}
+								>
+									{rawWatts > 0 ? "وات" : "ج.م"}
+								</span>
+							</div>
+
+							{/* Tier label (wattage mode) or brand promise (price mode) */}
+							{tier ? (
+								<div className="mt-2 flex items-center gap-2">
+									<span className="font-cairo font-bold text-sm" style={{ color: "var(--c-brass)" }}>
+										{tier.label}
 									</span>
-									<button
-										onClick={() =>
-											updateQuantity(item.variationId, item.quantity + 1)
-										}
-										className="w-8 h-8 flex items-center justify-center text-stone-500 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors"
-										aria-label="زيادة"
+									<span className="font-cairo text-xs" style={{ color: "rgba(245,239,230,0.30)" }}>·</span>
+									<span className="font-cairo text-xs" style={{ color: "rgba(245,239,230,0.30)" }}>
+										{tier.sub}
+									</span>
+								</div>
+							) : (
+								<p className="font-cairo text-sm mt-2" style={{ color: "rgba(245,239,230,0.35)" }}>
+									بيتك دايما جاهز مع هفار
+								</p>
+							)}
+						</div>
+
+						{/* Right: decorative wattage ghost (desktop only) */}
+						{rawWatts > 0 && (
+							<p
+								className="hidden sm:block font-cairo font-black select-none pointer-events-none leading-none flex-shrink-0"
+								style={{
+									fontSize: "clamp(4rem,12vw,8rem)",
+									color: "var(--c-brand)",
+									opacity: 0.06,
+									letterSpacing: "-0.04em",
+								}}
+							>
+								{ar(rawWatts)}
+							</p>
+						)}
+					</div>
+				</div>
+			</div>
+
+			{/* ── Content ───────────────────────────────────────────────────── */}
+			<div
+				className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8"
+				style={{ color: "var(--c-ink)" }}
+			>
+				<div className="grid lg:grid-cols-[1fr_360px] gap-8 items-start">
+
+					{/* ── Items list ─────────────────────────────────────────── */}
+					<div className="space-y-2">
+						{items.map((item) => {
+							const e = item.sku ? getEnrichment(item.sku) : null;
+							const wattDisplay = e?.wattageDisplay ?? (e?.wattage ? `${ar(e.wattage)} وات` : null);
+
+							return (
+								<div
+									key={item.variationId}
+									className="group flex gap-4 p-4 rounded-2xl transition-all"
+									style={{
+										background: "var(--c-surface)",
+										border: "1px solid var(--c-border)",
+										transition: "border-color 0.2s ease",
+									}}
+									onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--c-ink-faint)")}
+									onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--c-border)")}
+								>
+									{/* Image */}
+									<a
+										href={`/products/${item.slug}`}
+										className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden"
+										style={{ background: "var(--c-surface-2)" }}
 									>
-										<Plus size={13} />
-									</button>
+										{item.image ? (
+											<img
+												src={item.image}
+												alt={item.name}
+												className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+											/>
+										) : (
+											<div className="w-full h-full flex items-center justify-center">
+												<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--c-ink-faint)" }}>
+													<rect x="3" y="3" width="18" height="18" rx="3" />
+													<circle cx="8.5" cy="8.5" r="1.5" />
+													<polyline points="21 15 16 10 5 21" />
+												</svg>
+											</div>
+										)}
+									</a>
+
+									{/* Info */}
+									<div className="flex-1 min-w-0">
+										{/* Name */}
+										<a
+											href={`/products/${item.slug}`}
+											className="font-cairo font-semibold text-sm leading-snug line-clamp-2 transition-colors"
+											style={{ color: "var(--c-ink)" }}
+											onMouseEnter={(e) => (e.currentTarget.style.color = "var(--c-brand)")}
+											onMouseLeave={(e) => (e.currentTarget.style.color = "var(--c-ink)")}
+										>
+											{item.name}
+										</a>
+
+										{/* Wattage badge */}
+										{wattDisplay && (
+											<span
+												className="inline-block font-cairo font-bold text-[10px] px-1.5 py-0.5 rounded mt-1"
+												style={{
+													color: "var(--c-brass)",
+													background: "rgba(var(--c-brass-rgb),0.1)",
+												}}
+											>
+												{wattDisplay}
+											</span>
+										)}
+
+										{/* Unit price */}
+										<p
+											className="font-inter font-bold text-sm mt-1.5"
+											style={{ color: "var(--c-brand)" }}
+										>
+											{arMoney(item.price)} ج.م
+										</p>
+
+										{/* Qty + remove row */}
+										<div className="flex items-center justify-between mt-3">
+											{/* Qty controls */}
+											<div
+												className="flex items-center rounded-lg overflow-hidden"
+												style={{ border: "1px solid var(--c-border)" }}
+											>
+												<button
+													onClick={() => updateQuantity(item.variationId, item.quantity - 1)}
+													className="w-9 h-9 flex items-center justify-center transition-colors"
+													style={{ color: "var(--c-ink-muted)" }}
+													onMouseEnter={(e) => (e.currentTarget.style.background = "var(--c-surface-2)")}
+													onMouseLeave={(e) => (e.currentTarget.style.background = "")}
+													aria-label="تقليل"
+												>
+													<svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+														<path d="M2 6h8" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+													</svg>
+												</button>
+												<span
+													className="w-9 text-center font-inter font-bold text-sm"
+													style={{ color: "var(--c-ink)" }}
+												>
+													{item.quantity}
+												</span>
+												<button
+													onClick={() => updateQuantity(item.variationId, item.quantity + 1)}
+													className="w-9 h-9 flex items-center justify-center transition-colors"
+													style={{ color: "var(--c-ink-muted)" }}
+													onMouseEnter={(e) => (e.currentTarget.style.background = "var(--c-surface-2)")}
+													onMouseLeave={(e) => (e.currentTarget.style.background = "")}
+													aria-label="زيادة"
+												>
+													<svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+														<path d="M6 2v8M2 6h8" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+													</svg>
+												</button>
+											</div>
+
+											{/* Remove */}
+											<button
+												onClick={() => removeFromCart(item.variationId)}
+												className="flex items-center gap-1 font-cairo text-xs transition-colors"
+												style={{ color: "var(--c-ink-muted)" }}
+												onMouseEnter={(e) => (e.currentTarget.style.color = "#ef4444")}
+												onMouseLeave={(e) => (e.currentTarget.style.color = "var(--c-ink-muted)")}
+											>
+												<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+													<polyline points="3 6 5 6 21 6" />
+													<path d="M19 6l-1 14H6L5 6" />
+													<path d="M10 11v6M14 11v6" />
+													<path d="M9 6V4h6v2" />
+												</svg>
+												حذف
+											</button>
+										</div>
+									</div>
+
+									{/* Line total */}
+									<div className="flex-shrink-0 text-end self-start pt-1">
+										<p className="font-inter font-black text-sm" style={{ color: "var(--c-ink)" }}>
+											{arMoney(item.price * item.quantity)} ج.م
+										</p>
+									</div>
+								</div>
+							);
+						})}
+					</div>
+
+					{/* ── Summary ────────────────────────────────────────────── */}
+					<div className="lg:sticky lg:top-20">
+						<div
+							className="rounded-2xl overflow-hidden"
+							style={{ border: "1px solid var(--c-border)" }}
+						>
+							{/* Summary header */}
+							<div className="px-5 py-4" style={{ background: "var(--c-surface)", borderBottom: "1px solid var(--c-border)" }}>
+								<p className="font-cairo font-bold text-sm" style={{ color: "var(--c-ink)" }}>
+									ملخص الطلب
+								</p>
+							</div>
+
+							<div className="px-5 py-4 space-y-3" style={{ background: "var(--c-surface)" }}>
+								{/* Subtotal */}
+								<div className="flex items-center justify-between">
+									<span className="font-cairo text-sm" style={{ color: "var(--c-ink-muted)" }}>
+										المنتجات
+									</span>
+									<span className="font-inter font-semibold text-sm" style={{ color: "var(--c-ink)" }}>
+										{arMoney(total)} ج.م
+									</span>
 								</div>
 
-								<button
-									onClick={() => removeFromCart(item.variationId)}
-									className="flex items-center gap-1 text-xs font-cairo text-stone-400 hover:text-red-500 transition-colors"
+								{/* Shipping */}
+								<div className="flex items-center justify-between">
+									<span className="font-cairo text-sm" style={{ color: "var(--c-ink-muted)" }}>
+										الشحن
+									</span>
+									<span className="font-cairo font-semibold text-sm" style={{ color: "#22c55e" }}>
+										مجاني
+									</span>
+								</div>
+
+								{/* Divider */}
+								<div style={{ borderTop: "1px solid var(--c-border)" }} />
+
+								{/* Total */}
+								<div className="flex items-baseline justify-between pt-1">
+									<span className="font-cairo font-bold" style={{ color: "var(--c-ink)" }}>
+										الإجمالي
+									</span>
+									<span
+										className="font-inter font-black tabular-nums"
+										style={{
+											fontSize: "clamp(1.5rem,4vw,2rem)",
+											color: "var(--c-brand)",
+											letterSpacing: "-0.02em",
+										}}
+									>
+										{arMoney(animatedTotal)} ج.م
+									</span>
+								</div>
+
+								{/* Installment hint */}
+								{installmentMonthly && (
+									<p className="font-cairo text-[11px] text-end" style={{ color: "var(--c-brass)" }}>
+										أو ~ {arMoney(installmentMonthly)} ج.م/شهر مع فاليو · سهولة · أمان
+									</p>
+								)}
+							</div>
+
+							{/* CTA */}
+							<div className="px-5 pb-5 pt-1 space-y-2.5" style={{ background: "var(--c-surface)" }}>
+								<a
+									href="/checkout"
+									className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-cairo font-bold text-base text-white transition-all"
+									style={{
+										background: "var(--c-brand)",
+										transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)",
+									}}
+									onMouseEnter={(e) => {
+										(e.currentTarget as HTMLAnchorElement).style.background = "var(--c-brand-hover)";
+										(e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 8px 24px rgba(var(--c-brand-rgb),0.32)";
+										(e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-1px)";
+									}}
+									onMouseLeave={(e) => {
+										(e.currentTarget as HTMLAnchorElement).style.background = "var(--c-brand)";
+										(e.currentTarget as HTMLAnchorElement).style.boxShadow = "";
+										(e.currentTarget as HTMLAnchorElement).style.transform = "";
+									}}
 								>
-									<Trash2 size={13} />
-									حذف
-								</button>
+									إتمام الشراء
+									<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+										<path d="M4 8h8M8 4l4 4-4 4" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+									</svg>
+								</a>
+
+								<a
+									href="/products"
+									className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-cairo font-semibold text-sm transition-all"
+									style={{
+										border: "1px solid var(--c-border)",
+										color: "var(--c-ink-muted)",
+										transition: "all 0.2s ease",
+									}}
+									onMouseEnter={(e) => {
+										(e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--c-brand)";
+										(e.currentTarget as HTMLAnchorElement).style.color = "var(--c-brand)";
+									}}
+									onMouseLeave={(e) => {
+										(e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--c-border)";
+										(e.currentTarget as HTMLAnchorElement).style.color = "var(--c-ink-muted)";
+									}}
+								>
+									متابعة التسوق
+								</a>
 							</div>
 						</div>
 
-						{/* Line total */}
-						<div className="flex-shrink-0 text-end">
-							<p className="font-inter font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">
-								{(item.price * item.quantity).toLocaleString("ar-EG")} ج.م
-							</p>
+						{/* Trust row */}
+						<div className="mt-4 grid grid-cols-3 gap-2">
+							{[
+								{
+									svg: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />,
+									text: "ضمان أصلي",
+								},
+								{
+									svg: <><path d="M5 12h14" /><path d="M12 5l7 7-7 7" /></>,
+									text: "شحن مجاني",
+								},
+								{
+									svg: <><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>,
+									text: "ادفع لما يوصل",
+								},
+							].map((t, i) => (
+								<div
+									key={i}
+									className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl text-center"
+									style={{ background: "var(--c-surface-2)", border: "1px solid var(--c-border)" }}
+								>
+									<svg
+										width="18"
+										height="18"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth={1.5}
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										style={{ color: "var(--c-brand)" }}
+									>
+										{t.svg}
+									</svg>
+									<span className="font-cairo font-semibold text-[10px]" style={{ color: "var(--c-ink-muted)" }}>
+										{t.text}
+									</span>
+								</div>
+							))}
 						</div>
 					</div>
-				))}
-			</div>
 
-			{/* Summary */}
-			<div className="rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] p-5 space-y-4">
-				<div className="flex items-center justify-between">
-					<span className="font-cairo text-sm text-[#57534e] dark:text-[#a8a29e]">
-						المنتجات ({count})
-					</span>
-					<span className="font-inter font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">
-						{total.toLocaleString("ar-EG")} ج.م
-					</span>
 				</div>
-				<div className="flex items-center justify-between">
-					<span className="font-cairo text-sm text-[#57534e] dark:text-[#a8a29e]">
-						الشحن
-					</span>
-					<span className="font-cairo text-sm text-[#22c55e] font-semibold">
-						مجاني
-					</span>
-				</div>
-				<div className="border-t border-[#e7e0d6] dark:border-[#2c2825] pt-4 flex items-center justify-between">
-					<span className="font-cairo font-bold text-[#1c1917] dark:text-[#f5f5f4]">
-						الإجمالي
-					</span>
-					<span className="font-inter font-black text-xl text-[#d43533]">
-						{total.toLocaleString("ar-EG")} ج.م
-					</span>
-				</div>
-			</div>
-
-			{/* Actions */}
-			<div className="flex flex-col sm:flex-row gap-3">
-				<a
-					href="/checkout"
-					className="flex-1 flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-[#d43533] hover:bg-[#b91c1c] text-white font-cairo font-bold text-base transition-all hover:shadow-[0_6px_20px_rgba(212,53,51,0.3)]"
-					style={{ transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)" }}
-				>
-					إتمام الشراء
-					<ArrowLeft size={16} />
-				</a>
-				<a
-					href="/products"
-					className="flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl border border-[#e7e0d6] dark:border-[#2c2825] text-[#1c1917] dark:text-[#f5f5f4] font-cairo font-semibold text-sm hover:border-[#d43533] hover:text-[#d43533] transition-all"
-				>
-					متابعة التسوق
-				</a>
-			</div>
-
-			{/* Trust line */}
-			<div className="trust-line justify-center">
-				<span>ضمان سنتين</span>
-				<span>شحن مجاني</span>
-				<span>افحص قبل الدفع</span>
 			</div>
 		</div>
 	);

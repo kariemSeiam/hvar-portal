@@ -3,7 +3,14 @@ import Base from '../../layouts/Base.astro'
 import CtaActionBar from '../../components/pdp/CtaActionBar'
 import StickyMobileCta from '../../components/pdp/StickyMobileCta'
 import ProductCard from '../../components/ProductCard.astro'
+import WarrantyCallout from '../../components/pdp/WarrantyCallout.astro'
+import ChefSection from '../../components/pdp/ChefSection.astro'
+import FaqSection from '../../components/pdp/FaqSection.astro'
+import SpecsSection from '../../components/pdp/SpecsSection.astro'
+import AccessoriesGrid from '../../components/pdp/AccessoriesGrid.astro'
+import ComparisonNudge from '../../components/pdp/ComparisonNudge.astro'
 import { api } from '../../lib/api'
+import { getEnrichment, getWarrantyText } from '../../lib/enrichment'
 
 const { slug } = Astro.params
 
@@ -37,6 +44,10 @@ const discountPct = hasDiscount
 
 const descriptionFallback = `منتج هفار — جودة مُعتمدة وضمان أصلي. شحن لجميع المحافظات مجاناً.`
 const displayDescription = product.description || descriptionFallback
+
+const enrichment = getEnrichment(product.sku)
+const comparisonGroupKey = enrichment?.comparisonGroup ?? null
+const warrantyText = getWarrantyText(product.sku)
 
 /* ── JSON-LD ── */
 const productJsonld = JSON.stringify({
@@ -109,32 +120,31 @@ const breadcrumbJsonld = JSON.stringify({
   </nav>
 
   <!-- PDP body -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <main class="pdp-root max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
 
-      <!-- Gallery (Wilson P8 breath + P2 grain) -->
+      <!-- Gallery -->
       <div class="relative">
         <div class="sticky top-[68px]">
 
-          <!-- Image frame with grain overlay (Wilson P2) -->
-          <div
-            class="grain relative aspect-square rounded-2xl overflow-hidden"
-            style="background-color:var(--c-bg);border:1px solid var(--c-border)"
-          >
+          <!-- Image frame -->
+          <div class="pdp-frame grain-overlay">
+            <!-- P4 red mesh glow -->
+            <div class="pdp-mesh" aria-hidden="true"></div>
+
             {product.image ? (
               <img
                 src={product.image}
                 alt={product.name}
-                class="w-full h-full object-cover pdp-breath"
+                class="pdp-img"
                 loading="eager"
                 decoding="async"
                 width="800"
                 height="800"
               />
             ) : (
-              <!-- P1 doodle placeholder — Hvar appliance rings -->
               <div
-                class="w-full h-full flex items-center justify-center"
+                class="w-full h-full flex items-center justify-center relative"
                 style="background:linear-gradient(135deg,var(--c-brand-tint),var(--c-bg))"
               >
                 <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none" aria-hidden="true">
@@ -151,20 +161,38 @@ const breadcrumbJsonld = JSON.stringify({
 
             <!-- Discount badge -->
             {hasDiscount && (
-              <span
-                class="absolute top-4 end-4 px-3 py-1 rounded-xl text-white text-sm font-bold font-inter shadow-lg"
-                style="background-color:var(--c-brand)"
-              >
-                -{discountPct}%
-              </span>
+              <span class="pdp-discount">-{discountPct}%</span>
             )}
 
-            <!-- Red ember glow at top (Wilson P4 variant) -->
-            <div
-              class="absolute inset-0 pointer-events-none"
-              aria-hidden="true"
-              style="background:radial-gradient(ellipse 70% 40% at 50% 0%,var(--c-brand-glow) 0%,transparent 70%)"
-            ></div>
+            <!-- Bottom trust strip overlaid on image -->
+            <div class="pdp-trust-strip">
+              <span class="pdp-trust-chip">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <polyline points="9 12 11 14 15 10"/>
+                </svg>
+                {warrantyText}
+              </span>
+              <span class="pdp-trust-div" aria-hidden="true"></span>
+              <span class="pdp-trust-chip">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="1" y="3" width="15" height="13" rx="1"/>
+                  <path d="M16 8h4l3 5v3h-7V8z"/>
+                  <circle cx="5.5" cy="18.5" r="2.5"/>
+                  <circle cx="18.5" cy="18.5" r="2.5"/>
+                </svg>
+                شحن مجاني
+              </span>
+              <span class="pdp-trust-div" aria-hidden="true"></span>
+              <span class="pdp-trust-chip">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="2" y="5" width="20" height="14" rx="2"/>
+                  <line x1="2" y1="10" x2="22" y2="10"/>
+                  <path d="M7 15h2m6 0h2"/>
+                </svg>
+                ادفع لما يوصل
+              </span>
+            </div>
           </div>
 
           <!-- Share + SKU row -->
@@ -187,81 +215,96 @@ const breadcrumbJsonld = JSON.stringify({
       </div>
 
       <!-- Product info -->
-      <div class="space-y-6">
+      <div class="pdp-info-col">
 
-        <!-- Category pill -->
+        <!-- a. Category pill -->
         {product.categoryName && product.categoryId != null && (
           <a
             href={`/products?category=${product.categoryId}`}
-            class="inline-block text-xs font-cairo font-semibold px-3 py-1 rounded-full transition-colors"
-            style="color:var(--c-brand);background-color:var(--c-brand-tint)"
+            class="pdp-cat-pill"
           >
             {product.categoryName}
           </a>
         )}
 
-        <h1 class="font-cairo font-black text-2xl sm:text-3xl leading-snug" style="color:var(--c-ink)">
-          {product.name}
-        </h1>
+        <!-- b. Nickname + H1 -->
+        {enrichment?.nickname && (
+          <p class="pdp-nickname">{enrichment.nickname}</p>
+        )}
+        <h1 class="pdp-h1">{product.name}</h1>
 
-        <!-- CTA action bar (React island) -->
+        <!-- c. Wattage statement -->
+        {enrichment?.wattage && (
+          <div>
+            <p class="pdp-wattage">
+              {enrichment.wattageDisplay ?? enrichment.wattage + " وات"}
+            </p>
+            {enrichment.keyClaim && (
+              <p class="pdp-key-claim">{enrichment.keyClaim}</p>
+            )}
+          </div>
+        )}
+
+        <!-- d. CTA action bar (React island) -->
         <CtaActionBar product={product} client:load />
 
-        <!-- Description accordion (always visible — fallback if no real desc) -->
-        <details class="group rounded-2xl overflow-hidden" style="border:1px solid var(--c-border)">
-          <summary
-            class="flex items-center justify-between px-5 py-4 cursor-pointer font-cairo font-bold text-sm select-none list-none transition-colors"
-            style="color:var(--c-ink)"
-          >
-            <span>وصف المنتج</span>
-            <svg class="w-4 h-4 transition-transform group-open:rotate-180" viewBox="0 0 16 16" fill="none" style="color:var(--c-ink-faint)">
-              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </summary>
-          <div class="px-5 pb-5 pt-2 font-cairo text-sm leading-relaxed" style="color:var(--c-ink-muted)">
-            {displayDescription}
-          </div>
-        </details>
+        <!-- e. Warranty callout -->
+        <WarrantyCallout warrantyMonths={enrichment?.warrantyMonths ?? 12} bowlWarrantyYears={enrichment?.bowlWarrantyYears} />
 
-        <!-- Specs accordion (weight from ERP when available) -->
-        {product.weight && (
-          <details class="group rounded-2xl overflow-hidden" style="border:1px solid var(--c-border)">
-            <summary
-              class="flex items-center justify-between px-5 py-4 cursor-pointer font-cairo font-bold text-sm select-none list-none transition-colors"
-              style="color:var(--c-ink)"
-            >
-              <span>المواصفات</span>
-              <svg class="w-4 h-4 transition-transform group-open:rotate-180" viewBox="0 0 16 16" fill="none" style="color:var(--c-ink-faint)">
-                <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </summary>
-            <div class="px-5 pb-5 pt-2">
-              <table class="w-full text-sm font-cairo">
-                <tr style="border-bottom:1px solid var(--c-border)">
-                  <td class="py-2" style="color:var(--c-ink-muted)">الوزن</td>
-                  <td class="py-2 font-semibold text-end" style="color:var(--c-ink)">{product.weight} كجم</td>
-                </tr>
-                <tr>
-                  <td class="py-2" style="color:var(--c-ink-muted)">كود المنتج</td>
-                  <td class="py-2 font-mono text-xs text-end" style="color:var(--c-ink)">{product.sku}</td>
-                </tr>
-              </table>
-            </div>
-          </details>
+        <!-- f. Key features list -->
+        {enrichment?.keyFeatures && enrichment.keyFeatures.length > 0 && (
+          <ul class="pdp-features">
+            {enrichment.keyFeatures.map(f => (
+              <li class="pdp-feature-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                     stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5" style="color:var(--c-brand)" aria-hidden="true">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                {f}
+              </li>
+            ))}
+          </ul>
         )}
+
+        <!-- g. Accessories grid -->
+        <AccessoriesGrid accessories={enrichment?.accessories ?? []} />
+
+        <!-- h. Specs section -->
+        <SpecsSection sku={product.sku} weight={product.weight} enrichment={enrichment} />
+
+        <!-- i. Description — plain visible text, not accordion -->
+        {displayDescription && (
+          <div>
+            <h2 class="pdp-desc-label">وصف المنتج</h2>
+            <p class="pdp-desc-text">{displayDescription}</p>
+          </div>
+        )}
+
+        <!-- j. Chef section -->
+        <ChefSection chefs={enrichment?.chefs ?? []} />
+
+        <!-- k. FAQ section -->
+        <FaqSection faq={enrichment?.faq ?? []} />
 
       </div>
     </div>
 
-    <!-- Related products (Wilson P7 reveal) -->
+    <!-- ComparisonNudge — below 2-col grid, before related products -->
+    {comparisonGroupKey && (
+      <div class="mt-10">
+        <ComparisonNudge currentSku={product.sku} groupKey={comparisonGroupKey} />
+      </div>
+    )}
+
+    <!-- Related products -->
     {related.length > 0 && (
       <section class="mt-16 reveal-section">
         <h2 class="font-cairo font-bold text-lg mb-6" style="color:var(--c-ink)">
-          منتجات مشابهة
+          من نفس التشكيلة
         </h2>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div class="pdp-related-scroll">
           {related.map((p) => (
-            <div class="reveal-child">
+            <div class="pdp-related-card reveal-child">
               <ProductCard product={p} />
             </div>
           ))}
@@ -269,7 +312,7 @@ const breadcrumbJsonld = JSON.stringify({
       </section>
     )}
 
-  </div>
+  </main>
 
   <!-- Sticky mobile CTA (slides in when inline bar scrolls out of view) -->
   <StickyMobileCta product={product} client:load />
@@ -277,20 +320,54 @@ const breadcrumbJsonld = JSON.stringify({
 </Base>
 
 <style>
-  /* Wilson P8: 20s breath on gallery image */
-  @keyframes pdp-breath {
-    0%, 100% { transform: scale(1); }
-    50%       { transform: scale(1.018); }
+  /* page padding accounts for sticky mobile CTA */
+  main.pdp-root { padding-bottom: 5rem; }
+  @media (min-width: 768px) { main.pdp-root { padding-bottom: 2rem; } }
+
+  /* gallery */
+  .pdp-frame { position: relative; aspect-ratio: 1/1; border-radius: var(--radius-lg); overflow: hidden; background: var(--c-bg); border: 1px solid var(--c-border); }
+  .pdp-mesh { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(var(--c-brand-rgb),0.10) 0%, transparent 65%); }
+  .dark .pdp-mesh { background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(var(--c-brand-rgb),0.16) 0%, transparent 65%); }
+  .pdp-img { width:100%; height:100%; object-fit:cover; display:block; position:relative; z-index:0; }
+  @media (prefers-reduced-motion: no-preference) { .pdp-img { animation: pdp-breath 20s ease-in-out infinite; transform-origin: center; } }
+  @keyframes pdp-breath { 0%,100%{transform:scale(1)} 50%{transform:scale(1.018)} }
+
+  /* discount badge */
+  .pdp-discount { position:absolute; top:0.875rem; inset-inline-end:0.875rem; z-index:4; padding:0.25rem 0.625rem; border-radius:var(--radius-sm); background:var(--c-brand); color:#fff; font-family:'Inter',sans-serif; font-weight:700; font-size:0.8125rem; line-height:1; box-shadow:0 2px 8px rgba(var(--c-brand-rgb),0.35); }
+
+  /* trust strip at bottom of image */
+  .pdp-trust-strip { position:absolute; bottom:0; inset-inline:0; z-index:4; display:flex; align-items:center; justify-content:center; padding:1.25rem 1rem 0.875rem; background:linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.58) 100%); }
+  .pdp-trust-chip { display:flex; align-items:center; gap:0.3rem; font-family:'Cairo',sans-serif; font-weight:600; font-size:0.6875rem; color:rgba(255,255,255,0.93); white-space:nowrap; flex:1; justify-content:center; }
+  .pdp-trust-div { width:1px; height:1rem; background:rgba(255,255,255,0.22); flex-shrink:0; }
+
+  /* info col layout */
+  .pdp-info-col { display:flex; flex-direction:column; gap:1.25rem; }
+  .pdp-nickname { font-family:'Cairo',sans-serif; font-weight:700; font-size:1rem; color:var(--c-brass); line-height:1; }
+  .pdp-h1 { font-family:'Cairo',sans-serif; font-weight:900; font-size:clamp(1.375rem,4vw,1.875rem); line-height:1.25; color:var(--c-ink); margin:0; }
+  .pdp-wattage { font-family:'Cairo',sans-serif; font-weight:900; font-size:clamp(2rem,5.5vw,3.5rem); line-height:1; color:var(--c-brand); letter-spacing:-0.02em; }
+  .pdp-key-claim { font-family:'Cairo',sans-serif; font-size:0.8125rem; color:var(--c-ink-muted); margin:0.125rem 0 0; }
+  .pdp-cat-pill { display:inline-block; font-family:'Cairo',sans-serif; font-weight:600; font-size:0.75rem; padding:0.25rem 0.75rem; border-radius:9999px; color:var(--c-brand); background:var(--c-brand-tint); text-decoration:none; transition:background 0.2s; }
+  .pdp-cat-pill:hover { background:rgba(var(--c-brand-rgb),0.14); }
+
+  /* features grid */
+  .pdp-features { list-style:none; padding:0; margin:0; display:grid; grid-template-columns:1fr 1fr; gap:0.625rem; }
+  .pdp-feature-item { display:flex; align-items:flex-start; gap:0.5rem; font-family:'Cairo',sans-serif; font-size:0.8125rem; font-weight:600; color:var(--c-ink); line-height:1.4; }
+
+  /* description */
+  .pdp-desc-label { font-family:'Cairo',sans-serif; font-weight:700; font-size:0.875rem; color:var(--c-ink-secondary); margin:0 0 0.5rem; }
+  .pdp-desc-text { font-family:'Cairo',sans-serif; font-size:0.875rem; line-height:1.85; color:var(--c-ink-muted); margin:0; }
+
+  /* related scroll */
+  @media (max-width:639px) {
+    .pdp-related-scroll { display:flex; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; gap:0.875rem; padding-bottom:0.5rem; }
+    .pdp-related-scroll::-webkit-scrollbar { display:none; }
+    .pdp-related-card { min-width:160px; flex-shrink:0; }
   }
-  .pdp-breath {
-    animation: pdp-breath 20s ease-in-out infinite;
-    transform-origin: center center;
-  }
-  /* Share button hover */
-  #share-btn:hover { color: var(--c-brand); }
-  @media (prefers-reduced-motion: reduce) {
-    .pdp-breath { animation: none; }
-  }
+  @media (min-width:640px) { .pdp-related-scroll { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; } }
+  @media (min-width:1024px) { .pdp-related-scroll { grid-template-columns:repeat(4,1fr); } }
+
+  #share-btn:hover { color:var(--c-brand); }
+  @media (prefers-reduced-motion:reduce) { .pdp-img { animation:none; } }
 </style>
 
 <script>

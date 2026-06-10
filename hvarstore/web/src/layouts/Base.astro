@@ -11,6 +11,7 @@ import "@fontsource/jetbrains-mono/500.css"
 import Navbar from "../components/Navbar.astro"
 import Footer from "../components/Footer.astro"
 import CartFab from "../components/cart/CartFab"
+import CartDrawer from "../components/cart/CartDrawer"
 
 
 interface Props {
@@ -131,6 +132,7 @@ const websiteJsonld = ld({
     </main>
 
     <CartFab client:load />
+    <CartDrawer client:load />
 
     {!noFooter && <Footer />}
 

@@ -29,7 +29,7 @@ const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.va
   <CategoriesStrip categories={categories} />
 
   <!-- Featured products -->
-  <section class="py-12 reveal-section">
+  <section class="py-16 sm:py-20 reveal-section">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
       <div class="flex items-center justify-between mb-7">
@@ -39,7 +39,7 @@ const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.va
         {featured.length > 0 && (
           <a
             href="/products"
-            class="font-cairo text-sm text-[#d43533] hover:text-[#b91c1c] font-semibold transition-colors flex items-center gap-1"
+            class="font-cairo text-sm text-brand hover:text-[var(--c-brand-hover)] font-semibold transition-colors flex items-center gap-1"
           >
             عرض الكل
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
@@ -53,12 +53,12 @@ const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.va
         {featured.length === 0 ? (
           /* Skeleton shimmer while loading */
           Array.from({ length: 4 }).map(() => (
-            <div class="rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] overflow-hidden shimmer-skel">
-              <div class="aspect-square bg-[#fbf7f1] dark:bg-[#12110f]"></div>
+            <div class="rounded-2xl bg-surface border border-hvar overflow-hidden shimmer-skel">
+              <div class="aspect-square" style="background-color:var(--c-border)"></div>
               <div class="p-4 space-y-3">
-                <div class="h-2.5 w-1/3 rounded-full bg-[#fbf7f1] dark:bg-[#12110f]"></div>
-                <div class="h-3 w-3/4 rounded-full bg-[#fbf7f1] dark:bg-[#12110f]"></div>
-                <div class="h-3 w-1/2 rounded-full bg-[#fbf7f1] dark:bg-[#12110f]"></div>
+                <div class="h-2.5 w-1/3 rounded-full" style="background-color:var(--c-border)"></div>
+                <div class="h-3 w-3/4 rounded-full" style="background-color:var(--c-border)"></div>
+                <div class="h-3 w-1/2 rounded-full" style="background-color:var(--c-border)"></div>
               </div>
             </div>
           ))
@@ -77,9 +77,9 @@ const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.va
   <ChefStrip />
 
   <!-- Service section -->
-  <section class="py-14 reveal-section">
+  <section class="py-16 sm:py-20 reveal-section">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h2 class="font-cairo font-bold text-xl text-[#1c1917] dark:text-[#f5f5f4] mb-7 text-center">
+      <h2 class="font-cairo font-bold text-xl text-ink mb-7 text-center">
         خدمة ما بعد البيع
       </h2>
 
@@ -112,14 +112,14 @@ const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.va
         ] as const).map(({ svg, label, desc, href }) => (
           <a
             href={href}
-            class="reveal-child group flex flex-col items-center text-center gap-3 p-5 rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] hover:border-[#d43533] dark:hover:border-[#d43533] hover:shadow-[0_4px_20px_rgba(212,53,51,0.08)] transition-all duration-300"
+            class="reveal-child group flex flex-col items-center text-center gap-3 p-5 rounded-2xl bg-surface border border-hvar hover:border-[var(--c-brand)] hover:shadow-[0_4px_20px_rgba(var(--c-brand-rgb),0.08)] transition-all duration-300"
           >
-            <div class="w-11 h-11 flex items-center justify-center rounded-xl bg-red-50 dark:bg-red-950/20 text-[#d43533] group-hover:bg-[#d43533] group-hover:text-white transition-all duration-300">
+            <div class="w-11 h-11 flex items-center justify-center rounded-xl bg-red-50 dark:bg-red-950/20 text-brand group-hover:bg-brand group-hover:text-white transition-all duration-300">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" set:html={svg} />
             </div>
             <div>
-              <p class="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">{label}</p>
-              <p class="font-cairo text-xs text-[#57534e] dark:text-[#a8a29e] mt-0.5">{desc}</p>
+              <p class="font-cairo font-bold text-sm text-ink">{label}</p>
+              <p class="font-cairo text-xs text-muted mt-0.5">{desc}</p>
             </div>
           </a>
         ))}

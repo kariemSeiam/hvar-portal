@@ -135,7 +135,7 @@ export default function OrderDetail() {
 	if (loading) {
 		return (
 			<div className="flex items-center justify-center py-20">
-				<Loader2 size={24} className="animate-spin text-[#d43533]" />
+				<Loader2 size={24} className="animate-spin text-brand" />
 			</div>
 		);
 	}
@@ -143,12 +143,12 @@ export default function OrderDetail() {
 	if (error || !order) {
 		return (
 			<div className="text-center py-20">
-				<p className="font-cairo text-lg text-[#57534e] dark:text-[#a8a29e]">
+				<p className="font-cairo text-lg text-muted">
 					{error ?? "الطلب غير موجود"}
 				</p>
 				<a
 					href="/orders"
-					className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#d43533] hover:bg-[#b91c1c] text-white font-cairo font-bold text-sm transition-all mt-4"
+					className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand hover:bg-[var(--c-brand-hover)] text-white font-cairo font-bold text-sm transition-all mt-4"
 				>
 					العودة لطلباتي
 				</a>
@@ -189,7 +189,7 @@ export default function OrderDetail() {
 			<div className="flex items-center justify-between flex-wrap gap-3">
 				<div>
 					<div className="flex items-center gap-3">
-						<h2 className="font-mono font-bold text-lg text-[#1c1917] dark:text-[#f5f5f4]">
+						<h2 className="font-mono font-bold text-lg text-ink">
 							#{order.id}
 						</h2>
 						<span
@@ -200,7 +200,7 @@ export default function OrderDetail() {
 							{STATUS_LABELS[order.status] ?? order.status}
 						</span>
 					</div>
-					<p className="font-cairo text-xs text-[#57534e] dark:text-[#a8a29e] mt-1">
+					<p className="font-cairo text-xs text-muted mt-1">
 						{new Date(order.createdAt).toLocaleDateString("ar-EG", {
 							weekday: "long",
 							year: "numeric",
@@ -241,10 +241,10 @@ export default function OrderDetail() {
 			</div>
 
 			{/* Items */}
-			<section className="rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] p-5">
+			<section className="rounded-2xl bg-surface border border-hvar p-5">
 				<div className="flex items-center gap-2 mb-4">
-					<Package size={16} className="text-[#d43533]" />
-					<h3 className="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">
+					<Package size={16} className="text-brand" />
+					<h3 className="font-cairo font-bold text-sm text-ink">
 						المنتجات
 					</h3>
 				</div>
@@ -255,22 +255,22 @@ export default function OrderDetail() {
 							className="flex items-center justify-between py-2 border-b border-stone-100 dark:border-stone-800 last:border-0"
 						>
 							<div className="flex-1 min-w-0">
-								<p className="font-cairo text-sm text-[#1c1917] dark:text-[#f5f5f4]">
+								<p className="font-cairo text-sm text-ink">
 									{item.name}
 								</p>
 								<p className="font-cairo text-xs text-[#a8a29e]">
 									{item.quantity} x {item.unitPrice.toLocaleString("ar-EG")} ج.م
 								</p>
 							</div>
-							<p className="font-inter font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4] mr-4">
+							<p className="font-inter font-bold text-sm text-ink mr-4">
 								{item.subtotal.toLocaleString("ar-EG")} ج.م
 							</p>
 						</div>
 					))}
 				</div>
-				<div className="border-t border-[#e7e0d6] dark:border-[#2c2825] pt-3 mt-3 space-y-2">
+				<div className="border-t border-hvar pt-3 mt-3 space-y-2">
 					<div className="flex justify-between text-sm">
-						<span className="font-cairo text-[#57534e] dark:text-[#a8a29e]">
+						<span className="font-cairo text-muted">
 							المنتجات
 						</span>
 						<span className="font-inter font-bold">
@@ -278,7 +278,7 @@ export default function OrderDetail() {
 						</span>
 					</div>
 					<div className="flex justify-between text-sm">
-						<span className="font-cairo text-[#57534e] dark:text-[#a8a29e]">
+						<span className="font-cairo text-muted">
 							الشحن
 						</span>
 						<span className="font-cairo text-green-600 font-semibold">
@@ -287,11 +287,11 @@ export default function OrderDetail() {
 								: `${order.shippingFee.toLocaleString("ar-EG")} ج.م`}
 						</span>
 					</div>
-					<div className="flex justify-between pt-2 border-t border-[#e7e0d6] dark:border-[#2c2825]">
-						<span className="font-cairo font-bold text-[#1c1917] dark:text-[#f5f5f4]">
+					<div className="flex justify-between pt-2 border-t border-hvar">
+						<span className="font-cairo font-bold text-ink">
 							الإجمالي
 						</span>
-						<span className="font-inter font-black text-lg text-[#d43533]">
+						<span className="font-inter font-black text-lg text-brand">
 							{order.total.toLocaleString("ar-EG")} ج.م
 						</span>
 					</div>
@@ -299,14 +299,14 @@ export default function OrderDetail() {
 			</section>
 
 			{/* Address */}
-			<section className="rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] p-5">
+			<section className="rounded-2xl bg-surface border border-hvar p-5">
 				<div className="flex items-center gap-2 mb-3">
-					<MapPin size={16} className="text-[#d43533]" />
-					<h3 className="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">
+					<MapPin size={16} className="text-brand" />
+					<h3 className="font-cairo font-bold text-sm text-ink">
 						عنوان التوصيل
 					</h3>
 				</div>
-				<div className="font-cairo text-sm text-[#57534e] dark:text-[#a8a29e] space-y-1">
+				<div className="font-cairo text-sm text-muted space-y-1">
 					<p>
 						{order.address.building}، {order.address.street}
 					</p>
@@ -330,11 +330,11 @@ export default function OrderDetail() {
 			</section>
 
 			{/* Payment info */}
-			<section className="rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] p-5">
-				<h3 className="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4] mb-2">
+			<section className="rounded-2xl bg-surface border border-hvar p-5">
+				<h3 className="font-cairo font-bold text-sm text-ink mb-2">
 					طريقة الدفع
 				</h3>
-				<p className="font-cairo text-sm text-[#57534e] dark:text-[#a8a29e]">
+				<p className="font-cairo text-sm text-muted">
 					{PAYMENT_LABELS[order.paymentMethod] ?? order.paymentMethod}
 				</p>
 			</section>

@@ -1,0 +1,60 @@
+---
+import { COMPARISON_GROUPS } from '../../lib/enrichment'
+
+interface Props {
+  currentSku: string
+  groupKey: string
+}
+
+const { currentSku, groupKey } = Astro.props
+const group = COMPARISON_GROUPS[groupKey]
+---
+
+{group && (
+  <section>
+    <h3 class="font-cairo font-bold text-sm mb-3" style="color:var(--c-ink-secondary)">
+      {group.groupTitle}
+    </h3>
+    <div class="flex gap-3 overflow-x-auto pb-1 scrollbar-none">
+      {group.products.map(p => {
+        const isCurrent = p.sku === currentSku
+        return (
+          <a
+            href={isCurrent ? "#" : `/products?q=${encodeURIComponent(p.sku)}`}
+            class="flex-shrink-0 rounded-xl p-3 min-w-[140px] transition-all"
+            style={isCurrent
+              ? "background-color:var(--c-brand-tint);border:2px solid var(--c-brand);cursor:default;pointer-events:none"
+              : "background-color:var(--c-surface);border:1px solid var(--c-border)"}
+            aria-current={isCurrent ? "page" : undefined}
+            tabindex={isCurrent ? -1 : undefined}
+          >
+            <p class="font-cairo font-bold text-sm" style="color:var(--c-ink)">
+              {p.nameAr}
+            </p>
+            <p class="font-cairo text-xs mt-0.5" style="color:var(--c-ink-muted)">
+              {p.wattage && `${p.wattage} وات`}{p.wattage && p.capacity && " · "}{p.capacity}
+            </p>
+            <p class="font-cairo text-xs mt-1" style="color:var(--c-ink-muted);font-style:italic">
+              {p.useCase}
+            </p>
+            {!isCurrent && (
+              <p class="font-cairo text-xs font-semibold mt-2" style="color:var(--c-brand)">
+                تفاصيل &larr;
+              </p>
+            )}
+            {isCurrent && (
+              <p class="font-cairo text-xs font-semibold mt-2" style="color:var(--c-brand)">
+                هذا المنتج
+              </p>
+            )}
+          </a>
+        )
+      })}
+    </div>
+  </section>
+)}
+
+<style>
+  .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none }
+  .scrollbar-none::-webkit-scrollbar { display: none }
+</style>

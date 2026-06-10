@@ -23,3 +23,15 @@ Thumbs.db
 # Generated / scraped assets
 hvarstore-assets/
 task-b-result
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Scratch / temp
+temp/
+/hvar-design-system.html
+/stage-and-commit.html
+
+# Separate embedded project (own repo / own .env — not part of this repo)
+hvarstore-main/

@@ -1,0 +1,52 @@
+---
+// Exact-dimension placeholder for ProductCard — same shape, no layout shift on load.
+interface Props {
+  carousel?: boolean
+}
+const { carousel = false } = Astro.props
+---
+
+<div class:list={['pcs-wrap', carousel && 'pcs-wrap--carousel']}>
+  <div class="pcs shimmer-skel" aria-hidden="true">
+    <div class="pcs-media"></div>
+    <div class="pcs-body">
+      <span class="pcs-bar" style="width:40%;height:0.6rem"></span>
+      <span class="pcs-bar" style="width:90%;height:0.85rem;margin-block-start:0.6rem"></span>
+      <span class="pcs-bar" style="width:65%;height:0.85rem;margin-block-start:0.35rem"></span>
+      <span class="pcs-bar" style="width:50%;height:1rem;margin-block-start:0.9rem"></span>
+      <span class="pcs-bar" style="width:70%;height:0.6rem;margin-block-start:0.5rem"></span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .pcs-wrap {
+    height: 100%;
+  }
+  .pcs-wrap--carousel {
+    min-width: 15rem;
+  }
+  .pcs {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+  }
+  .pcs-media {
+    aspect-ratio: 1 / 1;
+    background: var(--c-surface-2);
+  }
+  .pcs-body {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(0.7rem, 5cqi, 1rem);
+  }
+  .pcs-bar {
+    display: block;
+    border-radius: 0.4rem;
+    background: var(--c-surface-2);
+  }
+</style>

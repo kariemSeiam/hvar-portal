@@ -1,6 +1,8 @@
 ---
 import ThemeToggle from './ThemeToggle'
 import NavAuthLink from './NavAuthLink'
+import CartBadge from './cart/CartBadge'
+import Doodles from './Doodles.astro'
 
 const path = Astro.url.pathname
 
@@ -67,7 +69,7 @@ const isActive = (href: string) =>
       <a href="/" class="flex items-center justify-center gap-2 select-none">
         <div
           class="brand-mark w-8 h-8 rounded-[9px] relative flex items-center justify-center overflow-hidden flex-shrink-0"
-          style="background:linear-gradient(150deg,var(--c-brand),var(--c-brand-hover));box-shadow:0 3px 10px rgba(212,53,51,0.28)"
+          style="background:linear-gradient(150deg,var(--c-brand),var(--c-brand-hover));box-shadow:0 3px 10px rgba(var(--c-brand-rgb),0.28)"
         >
           <div
             class="brand-glow absolute rounded-full"
@@ -105,7 +107,7 @@ const isActive = (href: string) =>
       <a href="/" class="flex items-center gap-2.5 select-none flex-shrink-0">
         <div
           class="brand-mark w-9 h-9 rounded-[10px] relative flex items-center justify-center overflow-hidden"
-          style="background:linear-gradient(150deg,var(--c-brand),var(--c-brand-hover));box-shadow:0 4px 14px rgba(212,53,51,0.28)"
+          style="background:linear-gradient(150deg,var(--c-brand),var(--c-brand-hover));box-shadow:0 4px 14px rgba(var(--c-brand-rgb),0.28)"
         >
           <div
             class="brand-glow absolute rounded-full"
@@ -180,19 +182,11 @@ const isActive = (href: string) =>
   <div
     class="absolute inset-0 pointer-events-none select-none"
     aria-hidden="true"
-    style="background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\");opacity:0.035;mix-blend-mode:overlay"
+    style="background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E&quot;);opacity:0.035;mix-blend-mode:overlay"
   ></div>
 
-  <!-- Decorative doodle rings -->
-  <div class="absolute inset-0 pointer-events-none overflow-hidden select-none" aria-hidden="true" style="opacity:0.045">
-    <svg width="100%" height="100%" viewBox="0 0 320 640" fill="none">
-      <circle cx="266" cy="96"  r="72" stroke="#d43533" stroke-width="1"/>
-      <circle cx="266" cy="96"  r="48" stroke="#d43533" stroke-width="0.6"/>
-      <circle cx="54"  cy="468" r="94" stroke="#d43533" stroke-width="1"/>
-      <circle cx="54"  cy="468" r="60" stroke="#d43533" stroke-width="0.6"/>
-      <line x1="160" y1="0" x2="160" y2="640" stroke="#d43533" stroke-width="0.5" stroke-dasharray="5 10"/>
-    </svg>
-  </div>
+  <!-- Decorative doodle field — shared, theme-aware, animated -->
+  <Doodles variant="drawer" opacity={0.6} />
 
   <!-- ── Drawer header ── -->
   <div
@@ -240,7 +234,7 @@ const isActive = (href: string) =>
           <!-- Icon slot -->
           <span
             class="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-lg transition-colors"
-            style={`background:${on ? 'rgba(212,53,51,0.12)' : 'var(--c-surface-2)'};color:${on ? 'var(--c-brand)' : 'var(--c-ink-faint)'}`}
+            style={`background:${on ? 'rgba(var(--c-brand-rgb),0.12)' : 'var(--c-surface-2)'};color:${on ? 'var(--c-brand)' : 'var(--c-ink-faint)'}`}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <path d={d}/>

@@ -1,36 +1,21 @@
 ---
 import Base from '../../layouts/Base.astro'
 import TicketsList from '../../components/service/TicketsList'
+import InnerHero from '../../components/InnerHero.astro'
 ---
 
 <Base title="الصيانة والاستبدال | هفار">
 
+  <InnerHero
+    label="هفار للدعم"
+    title="الدعم والصيانة"
+    subtitle="بعد البيع يبدأ الاهتمام الحقيقي"
+    variant="service"
+    cta={{ label: "طلب جديد", href: "/service/new" }}
+  />
+
   <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-    <nav class="mb-6" aria-label="مسار التنقل">
-      <ol class="flex items-center gap-2 text-xs font-cairo text-[#57534e] dark:text-[#a8a29e]">
-        <li><a href="/" class="hover:text-[#d43533] transition-colors">البيت</a></li>
-        <li class="opacity-40">›</li>
-        <li><a href="/account" class="hover:text-[#d43533] transition-colors">حسابي</a></li>
-        <li class="opacity-40">›</li>
-        <li class="text-[#1c1917] dark:text-[#f5f5f4] font-semibold">الدعم والصيانة</li>
-      </ol>
-    </nav>
-
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="font-cairo font-black text-2xl text-[#1c1917] dark:text-[#f5f5f4]">
-        الدعم والصيانة
-      </h1>
-      <a
-        href="/service/new"
-        class="px-4 py-2 rounded-xl bg-[#d43533] hover:bg-[#b91c1c] text-white font-cairo font-bold text-sm transition-all"
-      >
-        طلب جديد
-      </a>
-    </div>
-
     <TicketsList client:load />
-
   </div>
 
 </Base>

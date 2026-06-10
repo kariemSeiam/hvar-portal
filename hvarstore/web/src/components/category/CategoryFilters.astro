@@ -1,0 +1,156 @@
+---
+interface Props {
+  currentUrl: URL
+  categoryName?: string
+  inStock: boolean
+  sortBy?: string
+  priceRange?: string
+}
+const { currentUrl, categoryName, inStock, sortBy, priceRange } = Astro.props
+
+// Detect category-specific filter type
+const filterType =
+  categoryName === "كبة"          ? "wattage"     :
+  categoryName === "خلاط"         ? "accessories" :
+  categoryName === "قلاية هوائية" ? "capacity"    : null
+
+const currentWattage    = currentUrl.searchParams.get('wattage')     ?? ''
+const currentAccessories = currentUrl.searchParams.get('accessories') ?? ''
+const currentCapacity   = currentUrl.searchParams.get('capacity')    ?? ''
+const currentPriceRange = priceRange ?? ''
+const currentSort       = sortBy     ?? ''
+
+// Carry-through params for hidden inputs
+const categoryId = currentUrl.searchParams.get('category') ?? ''
+const q          = currentUrl.searchParams.get('q')        ?? ''
+---
+
+<div class="border-b" style="background-color:var(--c-bg);border-color:var(--c-border)">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
+    <form method="GET" action="/products" class="flex flex-wrap items-center gap-2">
+
+      <!-- Carry-through params -->
+      {categoryId && <input type="hidden" name="category" value={categoryId} />}
+      {q          && <input type="hidden" name="q"        value={q} />}
+      {inStock    && <input type="hidden" name="in_stock" value="1" />}
+
+      <!-- Sort -->
+      <select
+        name="sort"
+        onchange="this.form.submit()"
+        class="h-8 rounded-lg border ps-2 pe-6 text-xs font-cairo font-semibold cursor-pointer appearance-none"
+        style="background-color:var(--c-surface);border-color:var(--c-border);color:var(--c-ink)"
+      >
+        <option value=""       selected={!currentSort}>ترتيب: الأحدث</option>
+        <option value="price_asc"  selected={currentSort === "price_asc"}>السعر: الأقل</option>
+        <option value="price_desc" selected={currentSort === "price_desc"}>السعر: الأعلى</option>
+      </select>
+
+      <!-- Category-specific filters -->
+      {filterType === "wattage" && (
+        <div class="flex items-center gap-1.5">
+          {[
+            { v: "",     l: "كل القدرات" },
+            { v: "800",  l: "٨٠٠ وات"   },
+            { v: "1000", l: "١٠٠٠ وات"  },
+            { v: "1500", l: "١٥٠٠ وات"  },
+            { v: "2000", l: "٢٠٠٠ وات"  },
+          ].map(opt => (
+            <button
+              type="submit"
+              name="wattage"
+              value={opt.v}
+              class="flex-shrink-0 px-3 h-8 rounded-full text-xs font-cairo font-semibold transition-colors"
+              style={currentWattage === opt.v
+                ? "background-color:var(--c-brand);color:#ffffff"
+                : "background-color:var(--c-surface);border:1px solid var(--c-border);color:var(--c-ink)"}
+            >
+              {opt.l}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {filterType === "accessories" && (
+        <div class="flex items-center gap-1.5">
+          {[
+            { v: "",  l: "كل الملحقات" },
+            { v: "2", l: "٢×١"         },
+            { v: "3", l: "٣×١"         },
+            { v: "7", l: "٧×١"         },
+          ].map(opt => (
+            <button
+              type="submit"
+              name="accessories"
+              value={opt.v}
+              class="flex-shrink-0 px-3 h-8 rounded-full text-xs font-cairo font-semibold transition-colors"
+              style={currentAccessories === opt.v
+                ? "background-color:var(--c-brand);color:#ffffff"
+                : "background-color:var(--c-surface);border:1px solid var(--c-border);color:var(--c-ink)"}
+            >
+              {opt.l}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {filterType === "capacity" && (
+        <div class="flex items-center gap-1.5">
+          {[
+            { v: "",    l: "كل الأحجام" },
+            { v: "6.5", l: "٦.٥ لتر"   },
+            { v: "9",   l: "٩ لتر"      },
+          ].map(opt => (
+            <button
+              type="submit"
+              name="capacity"
+              value={opt.v}
+              class="flex-shrink-0 px-3 h-8 rounded-full text-xs font-cairo font-semibold transition-colors"
+              style={currentCapacity === opt.v
+                ? "background-color:var(--c-brand);color:#ffffff"
+                : "background-color:var(--c-surface);border:1px solid var(--c-border);color:var(--c-ink)"}
+            >
+              {opt.l}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <!-- Price range -->
+      <div class="flex items-center gap-1.5">
+        {[
+          { v: "",         l: "كل الأسعار" },
+          { v: "0-1000",   l: "حتى ١٠٠٠"  },
+          { v: "1000-2500", l: "١٠٠٠–٢٥٠٠" },
+          { v: "2500+",    l: "٢٥٠٠+"      },
+        ].map(opt => (
+          <button
+            type="submit"
+            name="price_range"
+            value={opt.v}
+            class="flex-shrink-0 px-3 h-8 rounded-full text-xs font-cairo font-semibold transition-colors"
+            style={currentPriceRange === opt.v
+              ? "background-color:var(--c-brand);color:#ffffff"
+              : "background-color:var(--c-surface);border:1px solid var(--c-border);color:var(--c-ink)"}
+          >
+            {opt.l}
+          </button>
+        ))}
+      </div>
+
+      <!-- In-stock toggle -->
+      <label class="flex items-center gap-2 cursor-pointer select-none ms-1">
+        <input
+          type="checkbox"
+          name="in_stock"
+          value="1"
+          checked={inStock}
+          onchange="this.form.submit()"
+          class="w-4 h-4 rounded accent-[var(--c-brand)]"
+        />
+        <span class="font-cairo text-xs font-semibold" style="color:var(--c-ink-muted)">متاح فقط</span>
+      </label>
+
+    </form>
+  </div>
+</div>

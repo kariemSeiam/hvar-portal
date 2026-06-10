@@ -1,7 +1,9 @@
 # hvarstore.com — Context
 
-> **Last absorbed:** 2026-06-06 (all 7 phases complete; code audit against actual source files)
-> **Source:** live source tree (`hvarstore/` monorepo) + git history + 7 dev spec files + design system CSS + schema files
+> **Last absorbed:** 2026-06-07 (compass knowledge base + current site enrichment layer)
+> **Source:** `compass/` (canonical brand/UX/product/architecture) + live source tree (`hvarstore/` monorepo) + git history + 7 dev spec files + design system CSS + schema files
+>
+> **Canonical source = `compass/`** (absorbed 2026-06-07). Brand/visual/tone/UX/product/ERP decisions live there and override assumptions — read the relevant `compass/**.md` before designing or building. Locks: red `#d43533`, brass `#C8893B`, ivory `#FBF7F1`, Wilson curve `cubic-bezier(0.22,1,0.36,1)` (no bounce), Cairo+Inter+JetBrains, **feminine Egyptian Arabic tone** (`أضيفي`), no emojis, 44px targets, 10% brand rule, red never flat without ambient glow.
 
 ---
 
@@ -258,9 +260,11 @@ All patterns: `prefers-reduced-motion` respected. All CSS variables — no hardc
 - CartFAB shows item count badge, no price shown (per design)
 
 ### 🔄 In-flight (uncommitted working tree)
-- `web/src/components/pdp/CtaActionBar.tsx` — modified (EDGE review fixes)
-- `web/src/components/pdp/StickyMobileCta.tsx` — modified (EDGE review fixes)
-- `scripts/scrape_hvarstore.py` — modified (scraper updates)
+- `web/src/components/ProductCard.astro` — **redesigned 2026-06-07**: circular FAB add-to-cart docked in image bottom-end corner (replaces full-width bar), `.hvar-card .card-shine`, bottom-aligned commercial block, feminine aria-label. See [[product-card-pattern]].
+- `web/src/styles/global.css` — added missing `--c-ink-secondary` + `--c-hairline` tokens (were referenced but undefined by new PDP sections; broke heading color + FAQ dividers)
+- New enrichment layer (committed earlier): `web/src/lib/enrichment.ts` (SKU-keyed content), `Doodles.astro`, `InnerHero.astro`, `category/*`, `pdp/{AccessoriesGrid,ChefSection,ComparisonNudge,FaqSection,SpecsSection,WarrantyCallout}.astro`
+- `web/src/components/pdp/CtaActionBar.tsx` / `StickyMobileCta.tsx` — EDGE review fixes
+- **Known site debt:** `products/index.astro` + `index.astro` still use hardcoded hex + Tailwind `dark:` variants (pre-token); CategoryFilters wattage/accessories/capacity params are inert (not read server-side); `getInstallmentText` unused; TODO telephone in `Base.astro` org JSON-LD.
 
 ---
 

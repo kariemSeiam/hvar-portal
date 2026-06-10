@@ -82,31 +82,7 @@ const TYPE_LABELS: Record<string, string> = {
 	T: "مرتجع",
 };
 
-const STEP_COLORS: Record<string, string> = {
-	PENDING: "bg-stone-400",
-	HUB_RECEIVED: "bg-blue-500",
-	IN_WORKSHOP: "bg-amber-500",
-	DISPATCHED: "bg-purple-500",
-	INSPECTED: "bg-blue-500",
-	READY: "bg-green-500",
-	REFUNDED: "bg-green-500",
-	CLOSED: "bg-emerald-500",
-	CANCELLED: "bg-red-500",
-	FAILED: "bg-red-500",
-};
-
-const STEP_BORDER: Record<string, string> = {
-	PENDING: "border-stone-300 dark:border-stone-600",
-	HUB_RECEIVED: "border-blue-300 dark:border-blue-700",
-	IN_WORKSHOP: "border-amber-300 dark:border-amber-700",
-	DISPATCHED: "border-purple-300 dark:border-purple-700",
-	INSPECTED: "border-blue-300 dark:border-blue-700",
-	READY: "border-green-300 dark:border-green-700",
-	REFUNDED: "border-green-300 dark:border-green-700",
-	CLOSED: "border-emerald-300 dark:border-emerald-700",
-	CANCELLED: "border-red-300 dark:border-red-700",
-	FAILED: "border-red-300 dark:border-red-700",
-};
+const TERMINAL_STATUSES = new Set(["CANCELLED", "FAILED"]);
 
 // State machine per ticket type (Wilson P10)
 const TICKET_STATE_MACHINE: Record<string, TicketStatus[]> = {
@@ -151,7 +127,7 @@ export default function TicketDetail() {
 	if (loading) {
 		return (
 			<div className="flex items-center justify-center py-20">
-				<Loader2 size={24} className="animate-spin text-[#d43533]" />
+				<Loader2 size={24} className="animate-spin text-brand" />
 			</div>
 		);
 	}
@@ -159,12 +135,12 @@ export default function TicketDetail() {
 	if (error || !ticket) {
 		return (
 			<div className="text-center py-20">
-				<p className="font-cairo text-lg text-[#57534e] dark:text-[#a8a29e]">
+				<p className="font-cairo text-lg text-muted">
 					{error ?? "التذكرة غير موجودة"}
 				</p>
 				<a
 					href="/service"
-					className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#d43533] hover:bg-[#b91c1c] text-white font-cairo font-bold text-sm transition-all mt-4"
+					className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand hover:bg-[var(--c-brand-hover)] text-white font-cairo font-bold text-sm transition-all mt-4"
 				>
 					العودة للتذاكر
 				</a>
@@ -185,8 +161,8 @@ export default function TicketDetail() {
 				<div>
 					<div className="flex items-center gap-3 flex-wrap">
 						<div className="flex items-center gap-2">
-							<TypeIcon size={18} className="text-[#d43533]" />
-							<h2 className="font-mono font-bold text-lg text-[#1c1917] dark:text-[#f5f5f4]">
+							<TypeIcon size={18} className="text-brand" />
+							<h2 className="font-mono font-bold text-lg text-ink">
 								{ticket.ticketCode}
 							</h2>
 						</div>
@@ -201,7 +177,7 @@ export default function TicketDetail() {
 							{STATUS_LABELS[ticket.status] ?? ticket.status}
 						</span>
 					</div>
-					<p className="font-cairo text-xs text-[#57534e] dark:text-[#a8a29e] mt-1">
+					<p className="font-cairo text-xs text-muted mt-1">
 						{new Date(ticket.createdAt).toLocaleDateString("ar-EG", {
 							weekday: "long",
 							year: "numeric",
@@ -213,19 +189,19 @@ export default function TicketDetail() {
 			</div>
 
 			{/* Product info */}
-			<section className="rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] p-5">
-				<h3 className="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4] mb-3">
+			<section className="rounded-2xl bg-surface border border-hvar p-5">
+				<h3 className="font-cairo font-bold text-sm text-ink mb-3">
 					المنتج
 				</h3>
-				<p className="font-cairo text-base text-[#1c1917] dark:text-[#f5f5f4] font-semibold">
+				<p className="font-cairo text-base text-ink font-semibold">
 					{ticket.productName}
 				</p>
 				{ticket.description && (
 					<>
-						<h4 className="font-cairo font-bold text-xs text-[#57534e] dark:text-[#a8a29e] mt-4 mb-1">
+						<h4 className="font-cairo font-bold text-xs text-muted mt-4 mb-1">
 							وصف المشكلة
 						</h4>
-						<p className="font-cairo text-sm text-[#57534e] dark:text-[#a8a29e] leading-relaxed">
+						<p className="font-cairo text-sm text-muted leading-relaxed">
 							{ticket.description}
 						</p>
 					</>
@@ -233,16 +209,22 @@ export default function TicketDetail() {
 				{ticket.transactionId && (
 					<a
 						href={`/orders/${ticket.transactionId}`}
-						className="inline-flex items-center gap-1.5 mt-4 text-xs font-cairo font-semibold text-[#d43533] hover:underline"
+						className="inline-flex items-center gap-1.5 mt-4 text-xs font-cairo font-semibold text-brand hover:underline"
 					>
 						الطلب المرتبط #{ticket.transactionId}
 					</a>
 				)}
 			</section>
 
-			{/* Service stepper (Wilson P10) */}
-			<section className="rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] p-5">
-				<h3 className="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4] mb-6">
+			{/* Service stepper — unified ember brand timeline */}
+			<section className="rounded-2xl bg-surface border border-hvar p-5">
+				<style dangerouslySetInnerHTML={{ __html: `
+					@keyframes nodeGlow {
+						0%, 100% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-brand) 20%, transparent), 0 0 12px color-mix(in srgb, var(--c-brand) 30%, transparent); }
+						50% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--c-brand) 12%, transparent), 0 0 20px color-mix(in srgb, var(--c-brand) 22%, transparent); }
+					}
+				` }} />
+				<h3 className="font-cairo font-bold text-sm text-ink mb-6">
 					حالة الطلب
 				</h3>
 
@@ -250,78 +232,72 @@ export default function TicketDetail() {
 					{idealSteps.map((step, idx) => {
 						const isPast = currentIndex >= 0 && idx < currentIndex;
 						const isCurrent = idx === currentIndex;
-						const isActive = isPast || isCurrent;
 
 						return (
-							<div
-								key={step}
-								className="relative flex items-stretch"
-								style={{
-									minHeight:
-										currentIndex === idx && isTerminal ? "auto" : "72px",
-								}}
-							>
-								{/* Vertical line (connecting dots) */}
+							<div key={step} className="relative flex items-stretch" style={{ minHeight: "72px" }}>
+								{/* Vertical connector */}
 								{idx < idealSteps.length - 1 && (
 									<div
-										className={`absolute right-[15px] top-8 w-[2px] h-[calc(100%-8px)] ${
-											isActive
-												? (STEP_COLORS[step] ??
-													"bg-stone-300 dark:bg-stone-600")
-												: "bg-stone-200 dark:bg-stone-700"
-										}`}
+										className="absolute top-8 w-[2px] h-[calc(100%-8px)]"
+										style={{
+											insetInlineEnd: "15px",
+											background: isPast || isCurrent
+												? "var(--c-brand)"
+												: "var(--c-hairline)",
+											opacity: isPast || isCurrent ? 0.5 : 1,
+										}}
 									/>
 								)}
 
 								{/* Dot */}
-								<div className="flex flex-col items-center ml-4">
+								<div className="flex flex-col items-center" style={{ marginInlineStart: "0.25rem", marginInlineEnd: "1rem" }}>
 									<div
-										className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+										className="relative z-10 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300"
+										style={
 											isCurrent
-												? `${STEP_COLORS[step] ?? "bg-stone-400"} ring-4 ${
-														STEP_BORDER[step] ??
-														"border-stone-300 dark:border-stone-600"
-													} scale-110`
+												? {
+													background: "var(--c-brand)",
+													transform: "scale(1.12)",
+													animation: "nodeGlow 2.4s ease-in-out infinite",
+												}
 												: isPast
-													? `${STEP_COLORS[step] ?? "bg-stone-300"}`
-													: "bg-white dark:bg-[#1c1917] border-2 border-stone-300 dark:border-stone-600"
-										}`}
+												? { background: "var(--c-brand)" }
+												: {
+													background: "var(--c-surface)",
+													border: "2px solid var(--c-hairline)",
+												}
+										}
 									>
-										{isPast || isCurrent ? (
-											isCurrent ? (
-												<div className="w-3 h-3 rounded-full bg-white" />
-											) : (
-												<CheckCircle2 size={14} className="text-white" />
-											)
+										{isPast ? (
+											<CheckCircle2 size={14} color="#fff" />
+										) : isCurrent ? (
+											<div className="w-3 h-3 rounded-full bg-white" />
 										) : (
-											<div className="w-2 h-2 rounded-full bg-stone-300 dark:bg-stone-600" />
+											<div className="w-2 h-2 rounded-full" style={{ background: "var(--c-hairline)" }} />
 										)}
 									</div>
 								</div>
 
-								{/* Label */}
+								{/* Label + history date + ETA box */}
 								<div className="flex-1 pb-6">
 									<p
-										className={`font-cairo text-sm font-semibold ${
-											isCurrent
-												? "text-[#d43533]"
+										className="font-cairo text-sm font-semibold"
+										style={{
+											color: isCurrent
+												? "var(--c-brand)"
 												: isPast
-													? "text-[#1c1917] dark:text-[#f5f5f4]"
-													: "text-stone-400 dark:text-stone-500"
-										}`}
+												? "var(--c-ink)"
+												: "var(--c-ink-faint)",
+										}}
 									>
 										{STATUS_LABELS[step] ?? step}
 									</p>
 
-									{/* Show date/time when this step was reached from history */}
 									{ticket.history
 										.filter((h) => h.status === step)
 										.slice(-1)
 										.map((h) => (
-											<p
-												key={h.id}
-												className="font-cairo text-xs text-[#a8a29e] mt-0.5"
-											>
+											<p key={h.id} className="font-cairo text-xs text-faint mt-0.5">
 												{new Date(h.createdAt).toLocaleDateString("ar-EG", {
 													day: "numeric",
 													month: "short",
@@ -330,21 +306,31 @@ export default function TicketDetail() {
 												})}
 											</p>
 										))}
+
+									{isCurrent && !isTerminal && (
+										<div
+											className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-lg font-cairo text-xs font-semibold"
+											style={{
+												background: "var(--c-brand-tint)",
+												color: "var(--c-brand)",
+												border: "1px solid color-mix(in srgb, var(--c-brand) 22%, transparent)",
+											}}
+										>
+											<Clock size={11} />
+											الوقت المتوقع: ٢–٤ أيام عمل
+										</div>
+									)}
 								</div>
 							</div>
 						);
 					})}
 
-					{/* Terminal state (CANCELLED / FAILED) */}
+					{/* Terminal state overlay */}
 					{isTerminal && (
 						<div className="relative flex items-stretch">
-							<div className="flex flex-col items-center ml-4">
-								<div
-									className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center ${
-										STEP_COLORS[ticket.status] ?? "bg-red-500"
-									} ring-4 border-red-300 dark:border-red-700 scale-110`}
-								>
-									<AlertCircle size={14} className="text-white" />
+							<div className="flex flex-col items-center" style={{ marginInlineStart: "0.25rem", marginInlineEnd: "1rem" }}>
+								<div className="relative z-10 w-8 h-8 rounded-full flex items-center justify-center bg-red-500" style={{ transform: "scale(1.1)" }}>
+									<AlertCircle size={14} color="#fff" />
 								</div>
 							</div>
 							<div className="flex-1 pb-2">
@@ -355,10 +341,7 @@ export default function TicketDetail() {
 									.filter((h) => h.status === ticket.status)
 									.slice(-1)
 									.map((h) => (
-										<p
-											key={h.id}
-											className="font-cairo text-xs text-[#a8a29e] mt-0.5"
-										>
+										<p key={h.id} className="font-cairo text-xs text-faint mt-0.5">
 											{new Date(h.createdAt).toLocaleDateString("ar-EG", {
 												day: "numeric",
 												month: "short",
@@ -375,10 +358,10 @@ export default function TicketDetail() {
 
 			{/* History log */}
 			{ticket.history.length > 0 && (
-				<section className="rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] p-5">
+				<section className="rounded-2xl bg-surface border border-hvar p-5">
 					<div className="flex items-center gap-2 mb-4">
-						<Clock size={16} className="text-[#d43533]" />
-						<h3 className="font-cairo font-bold text-sm text-[#1c1917] dark:text-[#f5f5f4]">
+						<Clock size={16} className="text-brand" />
+						<h3 className="font-cairo font-bold text-sm text-ink">
 							سجل التحديثات
 						</h3>
 					</div>
@@ -390,21 +373,20 @@ export default function TicketDetail() {
 							>
 								<div className="flex flex-col items-center">
 									<div
-										className={`w-2 h-2 rounded-full mt-1.5 ${
-											STEP_COLORS[h.status] ?? "bg-stone-300"
-										}`}
+										className="w-2 h-2 rounded-full mt-1.5"
+										style={{ background: TERMINAL_STATUSES.has(h.status) ? "#ef4444" : "var(--c-brand)", opacity: 0.7 }}
 									/>
 								</div>
 								<div className="flex-1 min-w-0">
-									<p className="font-cairo font-semibold text-[#1c1917] dark:text-[#f5f5f4]">
+									<p className="font-cairo font-semibold text-ink">
 										{STATUS_LABELS[h.status] ?? h.status}
 									</p>
 									{h.notes && (
-										<p className="font-cairo text-xs text-[#57534e] dark:text-[#a8a29e] mt-0.5">
+										<p className="font-cairo text-xs text-muted mt-0.5">
 											{h.notes}
 										</p>
 									)}
-									<p className="font-cairo text-[10px] text-[#a8a29e] mt-1">
+									<p className="font-cairo text-[10px] text-faint mt-1">
 										{new Date(h.createdAt).toLocaleDateString("ar-EG", {
 											day: "numeric",
 											month: "short",

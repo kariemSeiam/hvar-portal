@@ -4,6 +4,7 @@ export interface CartItem {
 	productId: number;
 	variationId: number;
 	slug: string;
+	sku?: string;
 	name: string;
 	image: string | null;
 	price: number;

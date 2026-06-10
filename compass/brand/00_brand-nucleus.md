@@ -153,6 +153,129 @@ She is:
 
 ---
 
+## Digital Presence
+
+**Social footprint as of 2026-06-06:**
+
+| Platform | Handle | Followers | Posts | Following |
+|----------|--------|-----------|-------|-----------|
+| Facebook | hvarstore | 147,558 | — | — |
+| Instagram | @hvar222 | 22,087 (22K) | 39 | 3 |
+| TikTok | @hvarstore1 | 966 | — | 0 |
+
+Facebook drives discovery (17% engagement rate — exceptional for a brand page). Instagram closes visually. TikTok punches above its follower count: top video at 26,500 views against 966 followers signals a virality engine that is not yet fully built.
+
+### Instagram Content Formula
+
+Every post follows this 5-step structure without exception:
+
+1. **Hook** — Arabic opener naming the dish or problem ("عايزة تعملي كبة في دقايق؟")
+2. **Chef** — Named chef doing the demo, building personal trust transfer
+3. **Demo** — Product in real use on a real Egyptian dish
+4. **Specs** — Key product specs named (power, capacity, warranty)
+5. **Close** — Hotline 17566 + tagline `هفار ... اسم يُعتمد عليه`
+
+This formula is not accidental. It is the Egyptian sale compressed into a caption: desire (dish), trust (chef), proof (demo), credibility (specs), action (hotline).
+
+### Chef Roster
+
+| Chef | Platforms | Primary Products |
+|------|-----------|-----------------|
+| شيف ساره صقر | IG + TT | Hand blender 4x1, air fryer, kibbeh 5x1 |
+| شيف ياسمين صالح | IG + TT | Air fryer 9L (SKU 5019), blender 7x1 |
+| شيف نهلة | IG | Air fryer 9L |
+| شيف عزة / عزة في المطبخ | IG | Air fryer 9L |
+| شيف نهى الفيشاوي | TT | كبة النينجا 5x1 3L (SKU 5029) — top TT video 26.5K views |
+| شيف ميادة محمد / فانيلا ومستكة | TT | Stand mixer 11L, 7L, hand mixer |
+| شيف بسمة / مكسرات وبهارات | TT | Stand mixer 11L |
+| شيف سهير جاد | TT | كبة البلدوزر 2000W |
+| شيف أسماء فايز | TT | Blender 7x1 |
+| شيف ليلي النجار | TT | Blender 7x1 |
+
+The chef roster is the brand's sales force. Each chef owns a product cluster. Chef Sara Saqr (ساره صقر) appears across both platforms and covers the broadest product range — she is the anchor.
+
+### Second Confirmed Tagline
+
+**`هفار ... اسم يُعتمد عليه`**
+*"Hvar... a name you can rely on"*
+
+This closes every Instagram and TikTok post. It is distinct from the Facebook cover tagline in both context and function:
+
+| Tagline | Context | Function |
+|---------|---------|----------|
+| `بيتك دايما جاهز مع هفار` | Facebook cover, top-of-funnel | Brand promise — why Hvar exists |
+| `هفار ... اسم يُعتمد عليه` | Every social post close | Trust close at the moment of desire |
+
+Both are true. Together they bracket the entire purchase journey: from "I should have a brand that keeps my home ready" to "I can trust this specific brand to deliver on that."
+
+---
+
+## Commerce Mechanics
+
+Everything the site communicates about buying:
+
+| Signal | Detail |
+|--------|--------|
+| Hotline | **17566** — NTRA-registered 5-digit shortcode. Not a local number — a national-tier access point requiring Egyptian telecom authority registration. Equivalent infrastructure investment to a 0800 number. |
+| Phone | 01204444196 |
+| Email | info@hvarstore.com |
+| Wholesale | WhatsApp: `https://wa.me/message/RURCTAQLT5ASO1` |
+| Physical stores | `/branches` page exists — Google Maps widget. Addresses not yet extracted (widget renders blank headlessly; needs real browser session to pull showroom locations). |
+| Delivery | 3–5 business days, free shipping |
+| Support | 24-hour customer service stated |
+| Multi-unit | Discounts available (stated on product pages) |
+| Payments | COD primary · Kashier card · ValU / Souhoola / Aman installments |
+| Site | Built internally |
+
+The 17566 shortcode is a meaningful trust signal. Registering a 5-digit shortcode with NTRA requires formal entity verification and ongoing telecom fees — it is not available to a pop-up store. It reads as institutional to any Egyptian buyer who has called brand hotlines before.
+
+---
+
+## Live Product Intelligence
+
+### Product Range & Live Prices
+
+| Product | Category | Price (EGP) | SKU | Notes |
+|---------|----------|-------------|-----|-------|
+| كبة البلدوزر 2000W / 6.5L | Kibbeh maker | 3,250 | — | Hero product; kitchen apron + spatula gift |
+| كبة الكبيرة 1000W / 2.5L | Kibbeh maker | 1,850 | — | 6-blade, silicone garlic peeler |
+| كبة 1500W / 2L | Kibbeh maker | 1,600 | — | 6-blade SS, anti-leak seals |
+| كبة النينجا 5x1 / 3L | Kibbeh maker | 1,400 | 5029 | TikTok top performer |
+| Air Fryer 9L | Air fryer | 2,900 | 5019 | Double heater, 12 programs, 2400W |
+| Air Fryer 6.5L ديجيتال | Air fryer | 4,250 | — | Premium tier |
+| Stand Mixer 11L / 2200W | Stand mixer | — | — | "المدفع" (IG) / "الإعصار" (TT) — same product |
+| Stand Mixer 7L | Stand mixer | — | — | |
+| Hand Mixer 500W + 4L bowl | Hand mixer | 1,850 | — | |
+| Hand Mixer 500W (no bowl) | Hand mixer | 1,000 | — | |
+| Hand Blender 4x1 | Blender | — | — | Copper motor, 15 speeds, 2yr warranty |
+| Blender 7x1 | Blender | — | — | |
+| Iron 2800W / 450ml | Iron | — | — | 710 reviews, 2.02★ display — see anomaly note |
+
+### TikTok Bestseller Hierarchy (by peak views)
+
+| Rank | Product | Chef | Peak Views |
+|------|---------|------|-----------|
+| 1 | كبة النينجا 5x1 / 3L (SKU 5029) | شيف نهى الفيشاوي | 26,500 |
+| 2 | كبة البلدوزر 2000W | شيف سهير جاد | ~15,000+ |
+| 3 | Air Fryer 9L (SKU 5019) | شيف ياسمين / شيف نهلة | ~10,000+ |
+| 4 | Stand Mixer "الإعصار/المدفع" 11L | شيف ميادة / شيف بسمة | ~8,000+ |
+| 5 | Blender 7x1 | شيف أسماء / شيف ليلي | ~5,000+ |
+
+The stand mixer has a cross-platform name inconsistency: **"المدفع"** on Instagram, **"الإعصار"** on TikTok. Same product SKU, different audience-facing names. When building PDP content, use both or standardize — do not use only one without awareness of the other.
+
+### Known Gaps
+
+| Gap | Source | Priority |
+|-----|--------|----------|
+| 5 empty category pages (stand mixer, vacuum, oven, grinder, kettle) | Live site audit | HIGH — zero SEO value, zero conversion |
+| Physical store addresses on /branches page | /branches (Google Maps widget, blank headlessly) | MEDIUM — needs real browser session |
+| Star-rating UX bug on iron | 710 reviews → 2.02★ while all text reviews positive | HIGH — misleading product score, broken UX |
+| Stand mixer pricing not listed | Not on hvarstore.com | MEDIUM — sold via DM only |
+
+**Iron anomaly detail:** 710 reviews averaging 2.02/5 while every visible text review is positive. Most likely cause: customers write a text review without clicking any star, which defaults to 0 or 1 star and drags the average down. The star average is not a reliable quality signal for this product. Fix: require star selection before text submission, or retroactively audit zero-star-text submissions.
+
+---
+
 ## Logo System
 
 **[TBD: Awaiting formal brand identity delivery]**

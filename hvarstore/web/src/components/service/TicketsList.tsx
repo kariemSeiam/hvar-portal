@@ -75,7 +75,7 @@ export default function TicketsList() {
 	if (loading) {
 		return (
 			<div className="flex items-center justify-center py-20">
-				<Loader2 size={24} className="animate-spin text-[#d43533]" />
+				<Loader2 size={24} className="animate-spin text-brand" />
 			</div>
 		);
 	}
@@ -83,15 +83,15 @@ export default function TicketsList() {
 	if (tickets.length === 0) {
 		return (
 			<div className="text-center py-20">
-				<div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-2xl bg-stone-100 dark:bg-stone-800 text-[#a8a29e]">
+				<div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-2xl bg-stone-100 dark:bg-stone-800 text-muted">
 					<Wrench size={28} />
 				</div>
-				<p className="font-cairo text-lg text-[#57534e] dark:text-[#a8a29e] mb-2">
+				<p className="font-cairo text-lg text-muted mb-2">
 					لا يوجد تذاكر خدمة
 				</p>
 				<a
 					href="/service/new"
-					className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#d43533] hover:bg-[#b91c1c] text-white font-cairo font-bold text-sm transition-all mt-4"
+					className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand hover:bg-[var(--c-brand-hover)] text-white font-cairo font-bold text-sm transition-all mt-4"
 				>
 					فتح تذكرة جديدة
 				</a>
@@ -105,14 +105,14 @@ export default function TicketsList() {
 				<a
 					key={t.id}
 					href={`/service/${t.id}`}
-					className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] hover:border-[#d43533] transition-all group"
+					className="flex items-center gap-4 p-4 rounded-2xl bg-surface border border-hvar hover:border-[var(--c-brand)] transition-all group"
 				>
-					<div className="w-10 h-10 flex items-center justify-center rounded-xl bg-red-50 dark:bg-red-950/20 text-[#d43533]">
+					<div className="w-10 h-10 flex items-center justify-center rounded-xl bg-red-50 dark:bg-red-950/20 text-brand">
 						<Wrench size={18} />
 					</div>
 					<div className="flex-1 min-w-0">
 						<div className="flex items-center gap-2 mb-1">
-							<span className="font-mono text-xs font-bold text-[#1c1917] dark:text-[#f5f5f4]">
+							<span className="font-mono text-xs font-bold text-ink">
 								{t.ticketCode}
 							</span>
 							{TYPE_LABELS[t.type] && (
@@ -128,7 +128,7 @@ export default function TicketsList() {
 								{STATUS_LABELS[t.status] ?? t.status}
 							</span>
 						</div>
-						<div className="flex items-center gap-3 text-xs font-cairo text-[#57534e] dark:text-[#a8a29e]">
+						<div className="flex items-center gap-3 text-xs font-cairo text-muted">
 							<span className="truncate">{t.productName}</span>
 							<span className="shrink-0">
 								{new Date(t.createdAt).toLocaleDateString("ar-EG", {
@@ -140,7 +140,7 @@ export default function TicketsList() {
 					</div>
 					<ChevronLeft
 						size={16}
-						className="text-stone-300 dark:text-stone-600 group-hover:text-[#d43533] transition-colors"
+						className="text-stone-300 dark:text-stone-600 group-hover:text-[var(--c-brand)] transition-colors"
 					/>
 				</a>
 			))}
