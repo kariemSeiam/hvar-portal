@@ -75,31 +75,47 @@ export default function CartView() {
 	if (items.length === 0) {
 		return (
 			<div
-				className="flex flex-col items-center justify-center text-center px-4"
-				style={{ background: "#130F0C", minHeight: "calc(100vh - 56px)" }}
+				className="relative flex flex-col items-center justify-center text-center px-4 overflow-hidden"
+				style={{ background: "var(--c-bg)", minHeight: "calc(100vh - 56px)" }}
 			>
-				{/* Ghosted zero */}
-				<p
-					className="font-cairo font-black select-none pointer-events-none leading-none"
+				{/* Ember mesh — soft warmth behind the ghost zero */}
+				<div
+					className="absolute inset-0 pointer-events-none"
+					aria-hidden="true"
 					style={{
-						fontSize: "clamp(7rem,28vw,16rem)",
-						color: "var(--c-brand)",
-						opacity: 0.10,
-						letterSpacing: "-0.04em",
+						background:
+							"radial-gradient(ellipse 60% 45% at 50% 38%, rgba(var(--c-brand-rgb),0.07) 0%, transparent 70%)",
 					}}
+				/>
+
+				{/* Ghosted empty bag */}
+				<svg
+					className="relative select-none pointer-events-none"
+					aria-hidden="true"
+					width="clamp(120px,22vw,200px)"
+					height="clamp(120px,22vw,200px)"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="var(--c-brand)"
+					strokeWidth={0.9}
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					style={{ opacity: 0.14, width: "clamp(120px,22vw,200px)", height: "auto" }}
 				>
-					٠
-				</p>
+					<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+					<line x1="3" y1="6" x2="21" y2="6" />
+					<path d="M16 10a4 4 0 0 1-8 0" />
+				</svg>
 
 				<p
-					className="font-cairo font-black text-2xl sm:text-3xl -mt-6"
-					style={{ color: "#F5EFE6" }}
+					className="relative font-cairo font-black text-2xl sm:text-3xl mt-6"
+					style={{ color: "var(--c-ink)" }}
 				>
 					مطبخك يستاهل أكتر
 				</p>
 				<p
-					className="font-cairo text-sm mt-2 mb-10"
-					style={{ color: "rgba(245,239,230,0.38)" }}
+					className="relative font-cairo text-sm mt-2 mb-10"
+					style={{ color: "var(--c-ink-muted)" }}
 				>
 					السلة فاضية — البلدوزر بيستنّاك
 				</p>

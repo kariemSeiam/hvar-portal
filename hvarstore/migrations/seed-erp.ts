@@ -1,8 +1,17 @@
 /**
- * seed-erp.ts — minimal realistic fixtures for local hvar_erp dev DB.
+ * seed-erp.ts — the REAL Hvar catalog as local hvar_erp dev fixtures.
  *
- * Idempotent: re-runs are safe. Wipes only the rows it owns (sku prefix `HVR-DEMO-`).
- * Targets `business_id = 1`, `location_id = 1` (already exist from Ultimate POS install).
+ * Products, SKUs, names, categories, confirmed prices, and stock states mirror
+ * compass/products/catalog.md (synced from MCRM API). SKUs are the real ones
+ * (5070, 5029, 5019…) so the storefront enrichment layer (nicknames, chefs,
+ * FAQs, accessories, comparisons) keyed by SKU lights up in dev.
+ *
+ * Prices marked `dev` are placeholders — compass has no confirmed price yet.
+ * Stock follows compass merchandising reality: deficits seeded as 0,
+ * low-stock items kept low so the كمية محدودة / غير متاح states render.
+ *
+ * Idempotent: re-runs are safe. Wipes only the SKUs it owns (see DEMO_SKUS).
+ * Targets `business_id = 1`, `location_id = 1`.
  *
  * Run: bun --cwd migrations seed
  */
@@ -20,96 +29,107 @@ const ENV = {
 };
 const BUSINESS_ID = Number(env.ERP_BUSINESS_ID ?? 1);
 const LOCATION_ID = Number(env.ERP_LOCATION_ID ?? 1);
-const SKU_PREFIX = "HVR-DEMO-";
+const SKU_PREFIX = ""; // real SKUs — no prefix; ownership tracked via DEMO_SKUS
 
+// Canonical category taxonomy — compass/products/catalog.md. Arabic names are canonical.
 const CATEGORIES = [
-	{ name: "أجهزة المطبخ الصغيرة", slug: "small-kitchen" },
-	{ name: "الأجهزة الكبرى", slug: "large-appliances" },
-	{ name: "الإكسسوارات", slug: "accessories" },
+	{ name: "كبة", slug: "chopper" },
+	{ name: "خلاط", slug: "blender" },
+	{ name: "هاند بلندر", slug: "hand_blender" },
+	{ name: "عجان", slug: "stand_mixer" },
+	{ name: "مضرب", slug: "hand_beater" },
+	{ name: "قلاية هوائية", slug: "air_fryer" },
+	{ name: "مكواه", slug: "iron" },
+	{ name: "مكنسة", slug: "vacuum" },
+	{ name: "فرن", slug: "oven" },
+	{ name: "مطحنة", slug: "spice_grinder" },
+	{ name: "كاتيل", slug: "kettle" },
 ];
 
+// Real Hvar catalog. price: compass-confirmed unless marked dev.
+// stock: compass on-hand reality (deficit → 0, low kept low).
 const PRODUCTS = [
-	{
-		cat: 0,
-		name: "خلاط كهربائي هـفار",
-		sku: "BLD-01",
-		price: 1199,
-		compare: 1499,
-		stock: 25,
-		weight: "2.4",
-		desc: "خلاط بقوة 600 وات مع 3 سرعات ودورق زجاجي 1.5 لتر.",
-	},
-	{
-		cat: 0,
-		name: "محضرة طعام هـفار 8 في 1",
-		sku: "FP-01",
-		price: 1899,
-		compare: 2299,
-		stock: 12,
-		weight: "3.8",
-		desc: "محضرة طعام متعددة الاستخدامات مع 8 ملحقات للقطع والفرم والخفق.",
-	},
-	{
-		cat: 0,
-		name: "غلاية كهربائية هـفار 1.7L",
-		sku: "KTL-01",
-		price: 599,
-		compare: null,
-		stock: 40,
-		weight: "1.0",
-		desc: "غلاية إستانلس ستيل بسعة 1.7 لتر مع إيقاف تلقائي.",
-	},
-	{
-		cat: 0,
-		name: "محمصة خبز هـفار",
-		sku: "TST-01",
-		price: 749,
-		compare: 899,
-		stock: 18,
-		weight: "1.6",
-		desc: "محمصة خبز شريحتين بـ 6 مستويات تحميص.",
-	},
-	{
-		cat: 1,
-		name: "قلاية هوائية هـفار 5.5L",
-		sku: "AF-01",
-		price: 2799,
-		compare: 3299,
-		stock: 8,
-		weight: "5.5",
-		desc: "قلاية هوائية بسعة كبيرة ولوحة تحكم رقمية بـ 8 برامج.",
-	},
-	{
-		cat: 1,
-		name: "فرن كهربائي هـفار 45L",
-		sku: "OV-01",
-		price: 3499,
-		compare: null,
-		stock: 6,
-		weight: "12.0",
-		desc: "فرن كهربائي بسعة 45 لتر مع شواية ومروحة.",
-	},
-	{
-		cat: 2,
-		name: "طقم سكاكين مطبخ هـفار",
-		sku: "KN-01",
-		price: 449,
-		compare: 599,
-		stock: 50,
-		weight: "1.2",
-		desc: "طقم 6 سكاكين إستانلس ستيل مع حامل خشبي.",
-	},
-	{
-		cat: 2,
-		name: "ميزان مطبخ رقمي هـفار",
-		sku: "SC-01",
-		price: 199,
-		compare: null,
-		stock: 35,
-		weight: "0.3",
-		desc: "ميزان مطبخ رقمي حتى 5 كجم بدقة 1 جرام.",
-	},
+	// ── كبة — the hero category. البلدوزر is the flagship ──────────────────────
+	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات اسود نيو", sku: "5070", price: 1750 /* dev */, compare: null, stock: 60, weight: "4.2",
+		desc: "كبة البلدوزر — أقوى كبة هفار بـ2000 وات ووعاء 6.5 لتر ضد الكسر بضمان 20 سنة." },
+	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات بينك / روز", sku: "5070+1", price: 1750 /* dev */, compare: null, stock: 35, weight: "4.2",
+		desc: "كبة البلدوزر باللون الروز — نفس الماتور النحاس 2000 وات ووعاء 6.5 لتر بضمان 20 سنة." },
+	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات موف", sku: "5070+4", price: 1750 /* dev */, compare: null, stock: 22, weight: "4.2",
+		desc: "كبة البلدوزر باللون الموف — ماتور نحاس 2000 وات ووعاء 6.5 لتر ضد الكسر." },
+	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات أحمر", sku: "5070+5", price: 1750 /* dev */, compare: null, stock: 18, weight: "4.2",
+		desc: "كبة البلدوزر باللون الأحمر — ماتور نحاس 2000 وات ووعاء 6.5 لتر ضد الكسر." },
+	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات 4 سرعات", sku: "5070+04", price: 1850 /* dev */, compare: null, stock: 1005, weight: "4.3",
+		desc: "كبة البلدوزر بـ4 سرعات — تحكم أدق بنفس قوة الـ2000 وات ووعاء 6.5 لتر." },
+	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات 6 سلاح", sku: "5070 PREMIUM", price: 2000, compare: null, stock: 3, weight: "4.4",
+		desc: "كبة البلدوزر PREMIUM بسلاح 6 شفرات استانلس — أقوى كبة في مصر بشهادة كل شيفات مصر." },
+	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات 3 سرعات", sku: "5073", price: 1700 /* dev */, compare: null, stock: 25, weight: "4.3",
+		desc: "كبة هفار 2000 وات بـ3 سرعات ووعاء 6.5 لتر ضد الكسر." },
+	{ cat: 0, name: "كبه هفار النينجا 3 لتر 800 وات", sku: "5029", price: 1100 /* dev */, compare: null, stock: 5, weight: "2.6",
+		desc: "كبة النينجا 5x1 — 800 وات تربو، 3 لتر استيل، 5 وظائف وضمان سنتين." },
+	{ cat: 0, name: "كبه هفار الكبيرة تربو 1000 وات", sku: "5027", price: 1850, compare: null, stock: 48, weight: "3.1",
+		desc: "كبة 1000 وات تربو بسعة 2.5 لتر وسلاح 6 شفرات وضمان عامين." },
+	{ cat: 0, name: "كبه هفار 1200 وات", sku: "5025", price: 1300 /* dev */, compare: null, stock: 1, weight: "2.8",
+		desc: "كبة 1200 وات بوعاء 2 لتر." },
+	{ cat: 0, name: "كبه هفار 1500 وات", sku: "5022", price: 1450 /* dev */, compare: null, stock: 0, weight: "2.9",
+		desc: "كبة 1500 وات بوعاء 2 لتر ضد الكسر وسلاح 6 شفرات وضمان عامين." },
+
+	// ── خلاط — all Hvar blenders are 8000 وات ─────────────────────────────────
+	{ cat: 1, name: "خلاط هفار 8000 وات 7*1", sku: "5069", price: 3500 /* dev */, compare: null, stock: 0, weight: "5.0",
+		desc: "خلاط 7×1 — المجموعة الكاملة: خلاط، كبة، عصارة، مبشرة، قطاعة، مضرب، مطحنة. 8000 وات." },
+	{ cat: 1, name: "خلاط هفار 8000 وات 2*1", sku: "5062", price: 2000, compare: null, stock: 1000, weight: "3.8",
+		desc: "خلاط هفار 8000 وات 2×1 للخلط الأساسي — قوة لا تتوقف." },
+	{ cat: 1, name: "خلاط هفار 8000 وات 3*1", sku: "5066", price: 2400 /* dev */, compare: null, stock: 0, weight: "4.1",
+		desc: "خلاط هفار 8000 وات 3×1 مع ملحقات إضافية." },
+
+	// ── هاند بلندر ─────────────────────────────────────────────────────────────
+	{ cat: 2, name: "هاند بلندر هفار 1500 وات 4*1", sku: "5057", price: 2250, compare: null, stock: 2, weight: "1.8",
+		desc: "هاند بلندر 4x1 بنحاس 1500 وات، 15 سرعة + تربو، تروس معدن وضمان سنتين." },
+	{ cat: 2, name: "هاند بلندر هفار 3*1", sku: "5053", price: 1900 /* dev */, compare: null, stock: 21, weight: "1.6",
+		desc: "هاند بلندر هفار 3×1 — ملحقات إضافية بنفس قوة الـ1500 وات." },
+
+	// ── عجان ───────────────────────────────────────────────────────────────────
+	{ cat: 3, name: "عجان هفار 11 لتر", sku: "10011", price: 5500 /* dev */, compare: null, stock: 50, weight: "9.5",
+		desc: "عجان المدفع 11 لتر بـ2200 وات نحاس وتروس معدن — الأقوى في الفئة." },
+	{ cat: 3, name: "عجان هفار 7 لتر", sku: "10007", price: 4200 /* dev */, compare: null, stock: 50, weight: "7.8",
+		desc: "عجان هفار 7 لتر — المرحلة بين المنزلي والاحترافي." },
+
+	// ── مضرب ───────────────────────────────────────────────────────────────────
+	{ cat: 4, name: "مضرب بيض 500 وات", sku: "1101", price: 1000, compare: null, stock: 19, weight: "1.1",
+		desc: "مضرب هفار 500 وات بماتور نحاس و5 سرعات + تربو." },
+	{ cat: 4, name: "مضرب بيض 500 وات بالحلة", sku: "1104", price: 1850, compare: null, stock: 998, weight: "2.4",
+		desc: "مضرب هفار 500 وات مع حلة استيل 4 لتر — 5 سرعات + تربو." },
+
+	// ── قلاية هوائية ───────────────────────────────────────────────────────────
+	{ cat: 5, name: "قلاية هوائية 6.5 لتر ديجيتال", sku: "5016", price: 4250, compare: null, stock: 51, weight: "5.2",
+		desc: "قلاية هوائية ديجيتال 6.5 لتر — الحجم المتوسط للأسرة." },
+	{ cat: 5, name: "قلاية هوائية 9 لتر ديجيتال 2 هيتر", sku: "5019", price: 4900 /* dev */, compare: null, stock: 50, weight: "6.8",
+		desc: "قلاية الجامبو 9 لتر بـ2400 وات ودبل هيتر وشاشة لمس و12 برنامج — زيت أقل 90%." },
+
+	// ── مكواه ──────────────────────────────────────────────────────────────────
+	{ cat: 6, name: "مكواه 2800 هفار New", sku: "1115", price: 1350, compare: null, stock: 1000, weight: "1.4",
+		desc: "مكواة بخار 2800 وات بخزان 450 مل وقاعدة سيراميك وضمان سنة." },
+	{ cat: 6, name: "مكواه بخار 3200 وات هفار", sku: "1117", price: 1600 /* dev */, compare: null, stock: 2, weight: "1.5",
+		desc: "مكواة بخار 3200 وات — المستوى المتقدم." },
+
+	// ── مكنسة ──────────────────────────────────────────────────────────────────
+	{ cat: 7, name: "مكنسة هفار 2000 وات تربو", sku: "7720", price: 3250, compare: null, stock: 1000, weight: "5.6",
+		desc: "مكنسة هفار 2000 وات تربو بكامل الملحقات وضمان سنتين." },
+
+	// ── فرن ────────────────────────────────────────────────────────────────────
+	{ cat: 8, name: "فرن هفار 46 لتر 2200 وات", sku: "10046", price: 2450, compare: null, stock: 0, weight: "12.5",
+		desc: "فرن هفار 46 لتر 2200 وات." },
+
+	// ── مطحنة ──────────────────────────────────────────────────────────────────
+	{ cat: 9, name: "مطحنة توابل هفار", sku: "5030", price: 450 /* dev */, compare: null, stock: 13, weight: "0.9",
+		desc: "مطحنة توابل هفار." },
+
+	// ── كاتيل ──────────────────────────────────────────────────────────────────
+	{ cat: 10, name: "كاتيل بيركس هفار 2 لتر", sku: "10002", price: 700 /* dev */, compare: null, stock: 4, weight: "1.2",
+		desc: "كاتيل بيركس هفار 2 لتر." },
 ];
+
+// Every SKU this seed owns — wipe() targets exactly these.
+const DEMO_SKUS = PRODUCTS.map((p) => p.sku);
 
 const GOVERNORATES = [
 	{ id: 1, code: "CAI", name: "Cairo", nameAr: "القاهرة" },
@@ -159,18 +179,18 @@ async function main(): Promise<void> {
 	await seedProducts(pool);
 	await seedLocations(pool);
 
-	const pattern = `${SKU_PREFIX}%`;
+	const placeholders = DEMO_SKUS.map(() => "?").join(",");
 	const [countRows] = await pool.query<mysql.RowDataPacket[]>(
 		`SELECT
 			(SELECT COUNT(*) FROM categories WHERE business_id = ? AND short_code LIKE 'HVR-%') AS c,
-			(SELECT COUNT(*) FROM products WHERE business_id = ? AND sku LIKE ?) AS p,
+			(SELECT COUNT(*) FROM products WHERE business_id = ? AND sku IN (${placeholders})) AS p,
 			(SELECT COUNT(*) FROM variation_location_details vld
 				JOIN variations v ON v.id = vld.variation_id
 				JOIN products pr ON pr.id = v.product_id
-				WHERE pr.sku LIKE ?) AS s,
+				WHERE pr.sku IN (${placeholders})) AS s,
 			(SELECT COUNT(*) FROM cities) AS g,
 			(SELECT COUNT(*) FROM districts) AS d`,
-		[BUSINESS_ID, BUSINESS_ID, pattern, pattern],
+		[BUSINESS_ID, BUSINESS_ID, ...DEMO_SKUS, ...DEMO_SKUS],
 	);
 	const counts = countRows[0];
 
@@ -179,23 +199,30 @@ async function main(): Promise<void> {
 }
 
 async function wipe(pool: Pool): Promise<void> {
-	const pattern = `${SKU_PREFIX}%`;
+	const placeholders = DEMO_SKUS.map(() => "?").join(",");
+	// Also wipe rows from older seed iterations (HVR-DEMO- prefix)
+	const legacyPattern = "HVR-DEMO-%";
 	await pool.execute(
 		`DELETE vld FROM variation_location_details vld
 		 JOIN variations v ON v.id = vld.variation_id
 		 JOIN products p ON p.id = v.product_id
-		 WHERE p.sku LIKE ?`,
-		[pattern],
+		 WHERE p.sku IN (${placeholders}) OR p.sku LIKE ?`,
+		[...DEMO_SKUS, legacyPattern],
 	);
 	await pool.execute(
-		`DELETE v FROM variations v JOIN products p ON p.id = v.product_id WHERE p.sku LIKE ?`,
-		[pattern],
+		`DELETE v FROM variations v JOIN products p ON p.id = v.product_id
+		 WHERE p.sku IN (${placeholders}) OR p.sku LIKE ?`,
+		[...DEMO_SKUS, legacyPattern],
 	);
 	await pool.execute(
-		`DELETE pv FROM product_variations pv JOIN products p ON p.id = pv.product_id WHERE p.sku LIKE ?`,
-		[pattern],
+		`DELETE pv FROM product_variations pv JOIN products p ON p.id = pv.product_id
+		 WHERE p.sku IN (${placeholders}) OR p.sku LIKE ?`,
+		[...DEMO_SKUS, legacyPattern],
 	);
-	await pool.execute(`DELETE FROM products WHERE sku LIKE ?`, [pattern]);
+	await pool.execute(
+		`DELETE FROM products WHERE sku IN (${placeholders}) OR sku LIKE ?`,
+		[...DEMO_SKUS, legacyPattern],
+	);
 	await pool.execute(
 		`DELETE FROM categories WHERE short_code LIKE 'HVR-%' AND business_id = ?`,
 		[BUSINESS_ID],
