@@ -18,6 +18,47 @@ interface Product {
 	stock: number;
 }
 
+function ApplianceIcon({ name, style }: { name: string; style?: React.CSSProperties }) {
+	const n = name.toLowerCase();
+	const base = { width: "100%", height: "100%", ...style };
+	const s = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, style: base };
+
+	if (n.includes("مكو") || n.includes("كوي"))
+		return <svg {...s}><path d="M3 16.5c0 1.5 1.5 2.5 4 2.5h10c2.5 0 4-1 4-2.5V14c0-1.5-1-2.5-2.5-2.5H7L5 9H3v7.5Z"/><line x1="12" y1="5" x2="12" y2="9"/><circle cx="12" cy="4" r="1"/><line x1="9" y1="15" x2="9" y2="15.5"/><line x1="12" y1="15" x2="12" y2="15.5"/><line x1="15" y1="15" x2="15" y2="15.5"/></svg>;
+
+	if (n.includes("هاند") || n.includes("بلندر"))
+		return <svg {...s}><rect x="12.2" y="1.6" width="5" height="9" rx="2.2" transform="rotate(18 14.7 6.1)"/><path d="M11.6 10.5 9.2 16"/><path d="M6.8 15.4l4.9 1.6-1 3a3 3 0 0 1-3.8 1.9A3 3 0 0 1 5 18.2l1-2.8Z" transform="rotate(4 9 18)"/></svg>;
+
+	if (n.includes("كبة") || n.includes("كبه"))
+		return <svg {...s}><path d="M5 10h14l-1 7a3 3 0 0 1-3 2.6H9A3 3 0 0 1 6 17l-1-7Z"/><path d="M7 10a5 5 0 0 1 10 0"/><rect x="10" y="2.5" width="4" height="3" rx="1"/><line x1="12" y1="5.5" x2="12" y2="7.5"/></svg>;
+
+	if (n.includes("عجان"))
+		return <svg {...s}><path d="M4 21h16"/><path d="M6 21V8a2.5 2.5 0 0 1 2.5-2.5H17a2.5 2.5 0 0 1 0 5h-3"/><line x1="13" y1="10.5" x2="13" y2="13"/><path d="M9.5 13h7l-.8 5a2.5 2.5 0 0 1-2.5 2h-.4a2.5 2.5 0 0 1-2.5-2l-.8-5Z"/></svg>;
+
+	if (n.includes("مضرب"))
+		return <svg {...s}><path d="M5 4h11a3 3 0 0 1 3 3v1.5a2.5 2.5 0 0 1-2.5 2.5H5a1.5 1.5 0 0 1-1.5-1.5V5.5A1.5 1.5 0 0 1 5 4Z"/><line x1="9" y1="11" x2="9" y2="14"/><line x1="14" y1="11" x2="14" y2="14"/><path d="M9 14c-1.6 0-2.4 1.7-2.4 3.2S7.4 20.5 9 20.5s2.4-1.8 2.4-3.3S10.6 14 9 14Z"/><path d="M14 14c-1.6 0-2.4 1.7-2.4 3.2s.8 3.3 2.4 3.3 2.4-1.8 2.4-3.3S15.6 14 14 14Z"/></svg>;
+
+	if (n.includes("مطحن") || n.includes("توابل"))
+		return <svg {...s}><path d="M7 9h10v8a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3V9Z"/><path d="M7.5 9a4.5 4.5 0 0 1 9 0"/><circle cx="10.5" cy="14" r="0.6"/><circle cx="13.5" cy="15.5" r="0.6"/><circle cx="12" cy="17" r="0.6"/></svg>;
+
+	if (n.includes("خلا") || n.includes("عصا"))
+		return <svg {...s}><path d="M7 4h10l-2 10H9L7 4Z"/><path d="M9 14v4h6v-4"/><line x1="8" y1="18" x2="16" y2="18"/><line x1="12" y1="18" x2="12" y2="22"/></svg>;
+
+	if (n.includes("فرن") || n.includes("ميكر"))
+		return <svg {...s}><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="6" y="9" width="12" height="9" rx="1"/><circle cx="8" cy="6" r="1"/><circle cx="12" cy="6" r="1"/><circle cx="16" cy="6" r="1"/></svg>;
+
+	if (n.includes("مكنس"))
+		return <svg {...s}><circle cx="8" cy="16" r="4"/><path d="M12 16h4a4 4 0 0 0 0-8H8"/><line x1="8" y1="8" x2="8" y2="12"/></svg>;
+
+	if (n.includes("قلاي") || n.includes("هواء"))
+		return <svg {...s}><path d="M7 4h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/><circle cx="12" cy="12" r="3"/><path d="M12 6v1m0 8v1M6 12h1m8 0h1"/><line x1="9" y1="3" x2="15" y2="3"/></svg>;
+
+	if (n.includes("كاتيل") || n.includes("سخان") || n.includes("غلاي"))
+		return <svg {...s}><path d="M6 8h12l-1.5 9A2 2 0 0 1 14.5 19h-5a2 2 0 0 1-2-1.8L6 8Z"/><path d="M18 8c1.5 0 3 .5 3 2s-1.5 2-3 2"/><line x1="7" y1="5" x2="17" y2="5"/><line x1="12" y1="3" x2="12" y2="5"/></svg>;
+
+	return <svg {...s}><path d="M13 2L4.5 13H11l-1 9L21 11H14l1-9Z"/></svg>;
+}
+
 export default function WishlistView() {
 	const ids = useStore(wishlistIds);
 	const [products, setProducts] = useState<Product[] | null>(null);
@@ -37,7 +78,7 @@ export default function WishlistView() {
 		return (
 			<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
 				{Array.from({ length: 4 }).map((_, i) => (
-					<div key={i} className="rounded-2xl bg-surface border border-hvar overflow-hidden shimmer-skel">
+					<div key={i} className="rounded-2xl overflow-hidden shimmer-skel" style={{ backgroundColor: "var(--c-surface)", border: "1px solid var(--c-border)" }}>
 						<div className="aspect-square" style={{ backgroundColor: "var(--c-border)" }} />
 						<div className="p-4 space-y-3">
 							<div className="h-3 w-3/4 rounded-full" style={{ backgroundColor: "var(--c-border)" }} />
@@ -57,8 +98,7 @@ export default function WishlistView() {
 					className="absolute inset-0 pointer-events-none"
 					aria-hidden="true"
 					style={{
-						background:
-							"radial-gradient(ellipse 55% 50% at 50% 40%, rgba(var(--c-brand-rgb),0.06) 0%, transparent 70%)",
+						background: "radial-gradient(ellipse 55% 50% at 50% 40%, rgba(var(--c-brand-rgb),0.06) 0%, transparent 70%)",
 					}}
 				/>
 				<Heart
@@ -107,18 +147,15 @@ export default function WishlistView() {
 						<a
 							href={`/products/${p.slug}`}
 							className="relative block aspect-square overflow-hidden"
-							style={{ backgroundColor: "var(--c-surface-2)" }}
+							style={{ background: p.image ? "linear-gradient(160deg,#ffffff 0%,#faf6f0 100%)" : "var(--c-surface-2)" }}
 							aria-label={p.name}
 						>
 							{p.image ? (
 								<img src={p.image} alt={p.name} className="w-full h-full object-contain p-4" loading="lazy" />
 							) : (
 								<span className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
-									<span
-										className="font-cairo font-black select-none"
-										style={{ fontSize: "3rem", lineHeight: 1, color: "var(--c-brand)", opacity: 0.16 }}
-									>
-										هـ
+									<span style={{ width: "45%", height: "45%", color: "var(--c-brand)", opacity: 0.30 }}>
+										<ApplianceIcon name={p.name} />
 									</span>
 								</span>
 							)}
@@ -133,7 +170,7 @@ export default function WishlistView() {
 							style={{
 								backgroundColor: "color-mix(in srgb, var(--c-surface) 85%, transparent)",
 								border: "1px solid var(--c-border)",
-								color: "var(--c-ink-muted)",
+								color: "var(--c-brand)",
 								backdropFilter: "blur(4px)",
 							}}
 						>
