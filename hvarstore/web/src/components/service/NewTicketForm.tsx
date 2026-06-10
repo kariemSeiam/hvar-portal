@@ -180,6 +180,12 @@ export default function NewTicketForm() {
 			setLoading(false);
 		}
 
+		const authHeaders = getAuthHeaders();
+		if (!authHeaders.Authorization) {
+			setError("حدث خطأ في تسجيل الدخول — حاولي تاني");
+			return;
+		}
+
 		setLoading(true);
 		try {
 			const body: {
@@ -198,7 +204,7 @@ export default function NewTicketForm() {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					...getAuthHeaders(),
+					...authHeaders,
 				},
 				body: JSON.stringify(body),
 			});
