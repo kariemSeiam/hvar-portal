@@ -85,32 +85,56 @@ export default function NewTicketForm() {
 
 	if (success) {
 		return (
-			<div className="text-center py-16 space-y-4">
-				<div className="w-16 h-16 mx-auto flex items-center justify-center rounded-2xl bg-green-50 dark:bg-green-950/20 text-green-600">
-					<CheckCircle2 size={32} />
-				</div>
-				<h2 className="font-cairo font-black text-xl text-ink">
-					تم إرسال الطلب
-				</h2>
-				<p className="font-cairo text-sm text-muted">
-					رقم التذكرة:{" "}
-					<span className="font-mono font-bold text-brand">
-						{success.ticketCode}
-					</span>
-				</p>
-				<div className="flex flex-col sm:flex-row gap-3 justify-center mt-6">
-					<a
-						href={`/service/${success.id}`}
-						className="px-6 py-3 rounded-xl bg-brand hover:bg-[var(--c-brand-hover)] text-white font-cairo font-bold text-sm transition-all"
+			<div className="py-4">
+				<div
+					className="relative overflow-hidden rounded-2xl p-8 text-center"
+					style={{
+						background: "linear-gradient(135deg, #130F0C 0%, #1e1208 100%)",
+						border: "1px solid rgba(var(--c-brand-rgb),0.20)",
+					}}
+				>
+					<div
+						className="absolute inset-0 pointer-events-none"
+						aria-hidden="true"
+						style={{ background: "radial-gradient(ellipse 70% 60% at 50% 0%, rgba(var(--c-brand-rgb),0.14) 0%, transparent 70%)" }}
+					/>
+					<div
+						className="relative w-16 h-16 mx-auto flex items-center justify-center rounded-2xl mb-5"
+						style={{ background: "rgba(34,197,94,0.10)", border: "1px solid rgba(34,197,94,0.22)" }}
 					>
-						تتبع الطلب
-					</a>
-					<a
-						href="/service"
-						className="px-6 py-3 rounded-xl border border-hvar text-ink font-cairo font-semibold text-sm hover:border-[var(--c-brand)] transition-all"
+						<CheckCircle2 size={32} className="text-green-400" />
+					</div>
+					<h2 className="relative font-cairo font-black text-2xl mb-3" style={{ color: "#F5EFE6" }}>
+						تم إرسال الطلب
+					</h2>
+					<div
+						className="relative inline-flex items-center gap-2 px-4 py-2 rounded-xl mb-4"
+						style={{ background: "rgba(var(--c-brand-rgb),0.10)", border: "1px solid rgba(var(--c-brand-rgb),0.25)" }}
 					>
-						كل الطلبات
-					</a>
+						<Ticket size={13} style={{ color: "var(--c-brand)" }} />
+						<span className="font-mono font-bold text-lg" style={{ color: "var(--c-brand)" }}>
+							{success.ticketCode}
+						</span>
+					</div>
+					<p className="relative font-cairo text-sm mb-8" style={{ color: "rgba(245,239,230,0.50)" }}>
+						فريق الصيانة هيتواصل معك خلال ٢٤ ساعة
+					</p>
+					<div className="relative flex flex-col sm:flex-row gap-3 justify-center">
+						<a
+							href={`/service/${success.id}`}
+							className="px-6 py-3 rounded-xl font-cairo font-bold text-sm text-white transition-all hover:opacity-90"
+							style={{ background: "var(--c-brand)", transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)" }}
+						>
+							تتبع الطلب
+						</a>
+						<a
+							href="/service"
+							className="px-6 py-3 rounded-xl font-cairo font-semibold text-sm transition-all"
+							style={{ border: "1px solid rgba(245,239,230,0.15)", color: "rgba(245,239,230,0.60)" }}
+						>
+							كل الطلبات
+						</a>
+					</div>
 				</div>
 			</div>
 		);

@@ -270,13 +270,13 @@ export default function CartView() {
 									<a
 										href={`/products/${item.slug}`}
 										className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden"
-										style={{ background: "var(--c-surface-2)" }}
+										style={{ background: item.image ? "linear-gradient(160deg,#ffffff 0%,#faf6f0 100%)" : "var(--c-surface-2)" }}
 									>
 										{item.image ? (
 											<img
 												src={item.image}
 												alt={item.name}
-												className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+												className="w-full h-full object-contain p-2 transition-transform duration-300 group-hover:scale-105"
 											/>
 										) : (
 											<div className="w-full h-full flex items-center justify-center">

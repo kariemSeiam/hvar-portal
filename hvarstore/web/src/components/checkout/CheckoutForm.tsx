@@ -652,7 +652,7 @@ export default function CheckoutForm() {
 										<p className="font-cairo text-sm text-ink truncate">{item.name}</p>
 										<p className="font-cairo text-xs text-faint">{item.quantity} × {item.price.toLocaleString("ar-EG")} ج.م</p>
 									</div>
-									<p className="font-inter font-bold text-sm text-ink mr-4">{(item.price * item.quantity).toLocaleString("ar-EG")} ج.م</p>
+									<p className="font-inter font-bold text-sm text-ink ms-4">{(item.price * item.quantity).toLocaleString("ar-EG")} ج.م</p>
 								</div>
 							))}
 						</div>
