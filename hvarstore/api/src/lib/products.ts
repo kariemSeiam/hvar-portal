@@ -173,7 +173,7 @@ export async function getProductById(
 
 /**
  * Curated bestseller order — compass/products/catalog.md merchandising reality:
- * البلدوزر (flagship) → النينجا (top TikTok) → الجامبو → هاند بلندر 4×1 →
+ * كبة 2000 وات (flagship) → كبة 800 وات (top TikTok) → الجامبو → هاند بلندر 4×1 →
  * المكواة (most-reviewed on site) → then the rest of the lineup.
  * SKUs not in this list fall back after it, newest first.
  */
