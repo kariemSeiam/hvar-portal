@@ -30,7 +30,9 @@ rows.push({ label: "كود المنتج",   value: sku, mono: true })
       {rows.map((row, i) => (
         <tr class={`sp-row${i === rows.length - 1 ? ' sp-row--last' : ''}`}>
           <td class="sp-key">{row.label}</td>
-          <td class={`sp-val${row.mono ? ' sp-val--mono' : ''}`}>{row.value}</td>
+          <td class="sp-val">
+            {row.mono ? <code class="sp-code">{row.value}</code> : row.value}
+          </td>
         </tr>
       ))}
     </tbody>
@@ -87,13 +89,21 @@ rows.push({ label: "كود المنتج",   value: sku, mono: true })
     vertical-align: middle;
   }
 
-  .sp-val--mono {
+  /* SKU sits in a tight chip that hugs the code — never a full-cell fill */
+  .sp-code {
+    display: inline-block;
     font-family: "Roboto Mono", "JetBrains Mono", ui-monospace, monospace;
     font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1.5;
     color: var(--c-brand);
     background: rgba(var(--c-brand-rgb), 0.06);
-    border-radius: 0.25rem;
-    padding-inline: 0.375rem;
-    /* Keeps the cell layout but adds pill feel on the value */
+    border: 1px solid rgba(var(--c-brand-rgb), 0.14);
+    border-radius: 0.5rem;
+    padding: 0.15rem 0.5rem;
+    /* SKU is latin — keep glyph order LTR inside the RTL cell */
+    direction: ltr;
+    unicode-bidi: isolate;
   }
 </style>
