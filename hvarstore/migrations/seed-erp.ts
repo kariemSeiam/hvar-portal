@@ -3,7 +3,7 @@
  *
  * Products, SKUs, names, categories, confirmed prices, and stock states mirror
  * compass/products/catalog.md (synced from MCRM API). SKUs are the real ones
- * (5070, 5029, 5019…) so the storefront enrichment layer (nicknames, chefs,
+ * (5070, 5029, 5019…) so the storefront enrichment layer (chefs,
  * FAQs, accessories, comparisons) keyed by SKU lights up in dev.
  *
  * Prices marked `dev` are placeholders — compass has no confirmed price yet.
@@ -49,48 +49,81 @@ const CATEGORIES = [
 // Real Hvar catalog. price: compass-confirmed unless marked dev.
 // stock: compass on-hand reality (deficit → 0, low kept low).
 const PRODUCTS = [
-	// ── كبة — the hero category. البلدوزر is the flagship ──────────────────────
-	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات اسود نيو", sku: "5070", price: 1750 /* dev */, compare: null, stock: 60, weight: "4.2",
-		desc: "كبة البلدوزر — أقوى كبة هفار بـ2000 وات ووعاء 6.5 لتر ضد الكسر بضمان 20 سنة." },
-	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات بينك / روز", sku: "5070+1", price: 1750 /* dev */, compare: null, stock: 35, weight: "4.2",
-		desc: "كبة البلدوزر باللون الروز — نفس الماتور النحاس 2000 وات ووعاء 6.5 لتر بضمان 20 سنة." },
-	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات موف", sku: "5070+4", price: 1750 /* dev */, compare: null, stock: 22, weight: "4.2",
-		desc: "كبة البلدوزر باللون الموف — ماتور نحاس 2000 وات ووعاء 6.5 لتر ضد الكسر." },
-	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات أحمر", sku: "5070+5", price: 1750 /* dev */, compare: null, stock: 18, weight: "4.2",
-		desc: "كبة البلدوزر باللون الأحمر — ماتور نحاس 2000 وات ووعاء 6.5 لتر ضد الكسر." },
+	// ── كبة — the hero category ──────────────────────────────────────────────────
+	// Stock = ERP في المخزن (physical on-hand). 5070 merged from its black dup SKU 5070+b.
+	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات اسود نيو", sku: "5070", price: 1750 /* dev */, compare: null, stock: 1043 /* physical — merged from black dup SKU 5070+b */, weight: "4.2",
+		desc: "كبة هفار 2000 وات — ماتور نحاس، وعاء 6.5 لتر ضد الكسر بضمان 20 سنة." },
+	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات بينك / روز", sku: "5070+1", price: 1450 /* live */, compare: null, stock: 0, weight: "4.2",
+		desc: "كبة هفار 2000 وات باللون الروز — ماتور نحاس ووعاء 6.5 لتر بضمان 20 سنة." },
+	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات موف", sku: "5070+4", price: 1850 /* live */, compare: null, stock: 0, weight: "4.2",
+		desc: "كبة هفار 2000 وات باللون الموف — ماتور نحاس ووعاء 6.5 لتر ضد الكسر." },
+	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات أحمر", sku: "5070+5", price: 1850 /* live */, compare: null, stock: 0, weight: "4.2",
+		desc: "كبة هفار 2000 وات باللون الأحمر — ماتور نحاس ووعاء 6.5 لتر ضد الكسر." },
+	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات ليموني", sku: "5070+3", price: 1850 /* live */, compare: null, stock: 5, weight: "4.2",
+		desc: "كبة هفار 2000 وات باللون الليموني — ماتور نحاس ووعاء 6.5 لتر ضد الكسر." },
 	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات 4 سرعات", sku: "5070+04", price: 1850 /* dev */, compare: null, stock: 1005, weight: "4.3",
-		desc: "كبة البلدوزر بـ4 سرعات — تحكم أدق بنفس قوة الـ2000 وات ووعاء 6.5 لتر." },
-	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات 6 سلاح", sku: "5070 PREMIUM", price: 2000, compare: null, stock: 3, weight: "4.4",
-		desc: "كبة البلدوزر PREMIUM بسلاح 6 شفرات استانلس — أقوى كبة في مصر بشهادة كل شيفات مصر." },
-	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات 3 سرعات", sku: "5073", price: 1700 /* dev */, compare: null, stock: 25, weight: "4.3",
+		desc: "كبة هفار 2000 وات بـ4 سرعات — تحكم أدق ووعاء 6.5 لتر." },
+	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات 6 سلاح", sku: "5070 PREMIUM", price: 2000, compare: null, stock: 32, weight: "4.4",
+		desc: "كبة هفار PREMIUM بسلاح 6 شفرات استانلس — أقوى كبة في مصر بشهادة كل شيفات مصر." },
+	{ cat: 0, name: "كبه هفار 2000 وات بلاك", sku: "5077", price: 1750 /* dev */, compare: null, stock: 0, weight: "4.2",
+		desc: "كبة هفار 2000 وات باللون الأسود — ماتور نحاس ووعاء 6.5 لتر ضد الكسر." },
+	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات 3 سرعات", sku: "5073", price: 1700 /* dev */, compare: null, stock: 12, weight: "4.3",
 		desc: "كبة هفار 2000 وات بـ3 سرعات ووعاء 6.5 لتر ضد الكسر." },
-	{ cat: 0, name: "كبه هفار النينجا 3 لتر 800 وات", sku: "5029", price: 1100 /* dev */, compare: null, stock: 5, weight: "2.6",
-		desc: "كبة النينجا 5x1 — 800 وات تربو، 3 لتر استيل، 5 وظائف وضمان سنتين." },
+	{ cat: 0, name: "كبه هفار 6.5 لتر 2000 وات 3 سرعات روز", sku: "5073+1", price: 1700 /* dev */, compare: null, stock: 3, weight: "4.3",
+		desc: "كبة هفار 2000 وات بـ3 سرعات ووعاء 6.5 لتر باللون الروز." },
+	{ cat: 0, name: "كبه هفار النينجا 3 لتر 800 وات", sku: "5029", price: 1600 /* live */, compare: null, stock: 8, weight: "2.6",
+		desc: "كبة هفار 5x1 — 800 وات تربو، 3 لتر استيل، 5 وظائف وضمان سنتين." },
 	{ cat: 0, name: "كبه هفار الكبيرة تربو 1000 وات", sku: "5027", price: 1850, compare: null, stock: 48, weight: "3.1",
 		desc: "كبة 1000 وات تربو بسعة 2.5 لتر وسلاح 6 شفرات وضمان عامين." },
-	{ cat: 0, name: "كبه هفار 1200 وات", sku: "5025", price: 1300 /* dev */, compare: null, stock: 1, weight: "2.8",
+	{ cat: 0, name: "كبه هفار 1200 وات", sku: "5025", price: 1350 /* live */, compare: null, stock: 1, weight: "2.8",
 		desc: "كبة 1200 وات بوعاء 2 لتر." },
-	{ cat: 0, name: "كبه هفار 1500 وات", sku: "5022", price: 1450 /* dev */, compare: null, stock: 0, weight: "2.9",
+	{ cat: 0, name: "كبه هفار 1500 وات", sku: "5022", price: 1850 /* live */, compare: null, stock: 0, weight: "2.9",
 		desc: "كبة 1500 وات بوعاء 2 لتر ضد الكسر وسلاح 6 شفرات وضمان عامين." },
+	{ cat: 0, name: "كبه هفار الأندلسية روز", sku: "hvar0221", price: 1850 /* dev */, compare: null, stock: 0, weight: "4.2",
+		desc: "كبة هفار الأندلسية باللون الروز — تصميم مميز بنفس قوة هفار ووعاء ضد الكسر." },
+	{ cat: 0, name: "كبه هفار الأندلسية أحمر", sku: "hvar0222", price: 1850 /* dev */, compare: null, stock: 0, weight: "4.2",
+		desc: "كبة هفار الأندلسية باللون الأحمر — تصميم مميز بنفس قوة هفار ووعاء ضد الكسر." },
+	{ cat: 0, name: "كبه هفار الأندلسية لبني", sku: "hvar0223", price: 1850 /* dev */, compare: null, stock: 0, weight: "4.2",
+		desc: "كبة هفار الأندلسية باللون اللبني — تصميم مميز بنفس قوة هفار ووعاء ضد الكسر." },
+	{ cat: 0, name: "كبه هفار الأندلسية أسود", sku: "hvar0224", price: 1850 /* dev */, compare: null, stock: 0, weight: "4.2",
+		desc: "كبة هفار الأندلسية باللون الأسود — تصميم مميز بنفس قوة هفار ووعاء ضد الكسر." },
+	{ cat: 0, name: "كبه هفار حور", sku: "hvar0225", price: 1850 /* dev */, compare: null, stock: 0, weight: "4.2",
+		desc: "كبة هفار حور — موديل مميز بوعاء ضد الكسر وماتور نحاس قوي." },
+	{ cat: 0, name: "كبة هفار بيت العز", sku: "hvar0226", price: 1950 /* dev */, compare: null, stock: 0, weight: "4.3",
+		desc: "كبة هفار بيت العز — الموديل الفاخر بتشطيب مميز وأداء قوي." },
 
 	// ── خلاط — all Hvar blenders are 8000 وات ─────────────────────────────────
-	{ cat: 1, name: "خلاط هفار 8000 وات 7*1", sku: "5069", price: 3500 /* dev */, compare: null, stock: 0, weight: "5.0",
+	{ cat: 1, name: "خلاط هفار 8000 وات 7*1", sku: "5069", price: 3250 /* live */, compare: null, stock: 225, weight: "5.0",
 		desc: "خلاط 7×1 — المجموعة الكاملة: خلاط، كبة، عصارة، مبشرة، قطاعة، مضرب، مطحنة. 8000 وات." },
 	{ cat: 1, name: "خلاط هفار 8000 وات 2*1", sku: "5062", price: 2000, compare: null, stock: 1000, weight: "3.8",
 		desc: "خلاط هفار 8000 وات 2×1 للخلط الأساسي — قوة لا تتوقف." },
-	{ cat: 1, name: "خلاط هفار 8000 وات 3*1", sku: "5066", price: 2400 /* dev */, compare: null, stock: 0, weight: "4.1",
+	{ cat: 1, name: "خلاط هفار 8000 وات 3*1", sku: "5066", price: 2250 /* live */, compare: null, stock: 0, weight: "4.1",
 		desc: "خلاط هفار 8000 وات 3×1 مع ملحقات إضافية." },
+	// live-store only — published on hvarstore.com, absent from ERP export (placeholder SKU)
+	{ cat: 1, name: "خلاط هفار 2.5 لتر", sku: "5040", price: 2250 /* live */, compare: null, stock: 0, weight: "2.5",
+		desc: "خلاط هفار 2.5 لتر — للاستخدام اليومي بقوة وكفاءة." },
 
 	// ── هاند بلندر ─────────────────────────────────────────────────────────────
-	{ cat: 2, name: "هاند بلندر هفار 1500 وات 4*1", sku: "5057", price: 2250, compare: null, stock: 2, weight: "1.8",
+	{ cat: 2, name: "هاند بلندر هفار 1500 وات 4*1", sku: "5057", price: 2250, compare: null, stock: 172, weight: "1.8",
 		desc: "هاند بلندر 4x1 بنحاس 1500 وات، 15 سرعة + تربو، تروس معدن وضمان سنتين." },
-	{ cat: 2, name: "هاند بلندر هفار 3*1", sku: "5053", price: 1900 /* dev */, compare: null, stock: 21, weight: "1.6",
+	{ cat: 2, name: "هاند بلندر هفار 3*1", sku: "5053", price: 1750 /* live */, compare: null, stock: 21, weight: "1.6",
 		desc: "هاند بلندر هفار 3×1 — ملحقات إضافية بنفس قوة الـ1500 وات." },
+	{ cat: 2, name: "هاند بلندر هفار 2*1", sku: "5052", price: 1400 /* live */, compare: null, stock: 0, weight: "1.5",
+		desc: "هاند بلندر هفار 2×1 — خلط وفرم بماتور قوي وتصميم خفيف." },
+	// live-store only — published on hvarstore.com, absent from ERP export (placeholder SKUs)
+	{ cat: 2, name: "هاند بلندر هفار 1500 وات", sku: "5050", price: 1200 /* live */, compare: null, stock: 0, weight: "1.5",
+		desc: "هاند بلندر هفار 1500 وات — الموديل الأساسي بماتور قوي." },
+	{ cat: 2, name: "هاند بلندر هفار التركي 1500 وات نبيتي", sku: "5058+N", price: 1950 /* live */, compare: null, stock: 0, weight: "1.6",
+		desc: "هاند بلندر هفار التركي 1500 وات باللون النبيتي — تصميم تركي أنيق." },
+	{ cat: 2, name: "هاند بلندر هفار التركي 1500 وات تركواز", sku: "5058+T", price: 1950 /* live */, compare: null, stock: 0, weight: "1.6",
+		desc: "هاند بلندر هفار التركي 1500 وات باللون التركواز — تصميم تركي أنيق." },
+	{ cat: 2, name: "هاند بلندر هفار التركي 1500 وات بينك", sku: "5058+P", price: 1950 /* live */, compare: null, stock: 0, weight: "1.6",
+		desc: "هاند بلندر هفار التركي 1500 وات باللون الوردي — تصميم تركي أنيق." },
 
 	// ── عجان ───────────────────────────────────────────────────────────────────
-	{ cat: 3, name: "عجان هفار 11 لتر", sku: "10011", price: 5500 /* dev */, compare: null, stock: 50, weight: "9.5",
-		desc: "عجان المدفع 11 لتر بـ2200 وات نحاس وتروس معدن — الأقوى في الفئة." },
-	{ cat: 3, name: "عجان هفار 7 لتر", sku: "10007", price: 4200 /* dev */, compare: null, stock: 50, weight: "7.8",
+	{ cat: 3, name: "عجان هفار 11 لتر", sku: "10011", price: 7500 /* live */, compare: null, stock: 1000, weight: "9.5",
+		desc: "عجان هفار 11 لتر بـ2200 وات نحاس وتروس معدن — الأقوى في الفئة." },
+	{ cat: 3, name: "عجان هفار 7 لتر", sku: "10007", price: 5750 /* live */, compare: null, stock: 1000, weight: "7.8",
 		desc: "عجان هفار 7 لتر — المرحلة بين المنزلي والاحترافي." },
 
 	// ── مضرب ───────────────────────────────────────────────────────────────────
@@ -102,29 +135,35 @@ const PRODUCTS = [
 	// ── قلاية هوائية ───────────────────────────────────────────────────────────
 	{ cat: 5, name: "قلاية هوائية 6.5 لتر ديجيتال", sku: "5016", price: 4250, compare: null, stock: 51, weight: "5.2",
 		desc: "قلاية هوائية ديجيتال 6.5 لتر — الحجم المتوسط للأسرة." },
-	{ cat: 5, name: "قلاية هوائية 9 لتر ديجيتال 2 هيتر", sku: "5019", price: 4900 /* dev */, compare: null, stock: 50, weight: "6.8",
+	{ cat: 5, name: "قلاية هوائية 8.5 لتر 2500 وات", sku: "5011", price: 4950 /* live */, compare: null, stock: 50, weight: "5.8",
+		desc: "قلاية هوائية 2500 وات بسعة 8.5 لتر — الحجم العائلي الكبير، زيت أقل 90%." },
+	{ cat: 5, name: "قلاية هوائية 9 لتر ديجيتال 2 هيتر", sku: "5019", price: 5850 /* live */, compare: null, stock: 50, weight: "6.8",
 		desc: "قلاية الجامبو 9 لتر بـ2400 وات ودبل هيتر وشاشة لمس و12 برنامج — زيت أقل 90%." },
 
 	// ── مكواه ──────────────────────────────────────────────────────────────────
-	{ cat: 6, name: "مكواه 2800 هفار New", sku: "1115", price: 1350, compare: null, stock: 1000, weight: "1.4",
+	{ cat: 6, name: "مكواه 2800 هفار New", sku: "1115", price: 1250 /* live */, compare: null, stock: 1001, weight: "1.4",
 		desc: "مكواة بخار 2800 وات بخزان 450 مل وقاعدة سيراميك وضمان سنة." },
-	{ cat: 6, name: "مكواه بخار 3200 وات هفار", sku: "1117", price: 1600 /* dev */, compare: null, stock: 2, weight: "1.5",
+	{ cat: 6, name: "مكواه بخار 3200 وات هفار", sku: "1117", price: 1150 /* live */, compare: null, stock: 2, weight: "1.5",
 		desc: "مكواة بخار 3200 وات — المستوى المتقدم." },
 
 	// ── مكنسة ──────────────────────────────────────────────────────────────────
-	{ cat: 7, name: "مكنسة هفار 2000 وات تربو", sku: "7720", price: 3250, compare: null, stock: 1000, weight: "5.6",
+	{ cat: 7, name: "مكنسة هفار 2000 وات تربو", sku: "7720", price: 3750 /* live */, compare: null, stock: 1003, weight: "5.6",
 		desc: "مكنسة هفار 2000 وات تربو بكامل الملحقات وضمان سنتين." },
+	{ cat: 7, name: "مكنسة هفار بطة 2800 وات", sku: "228", price: 2850 /* live */, compare: null, stock: 2, weight: "4.8",
+		desc: "مكنسة هفار بطة 2800 وات — شفط قوي بكامل الملحقات." },
+	{ cat: 7, name: "مكنسة هفار برميل 30 لتر", sku: "hvar0010", price: 2950 /* live */, compare: null, stock: 1, weight: "7.5",
+		desc: "مكنسة هفار برميل 30 لتر — للتنظيف الجاف والمبلل بسعة كبيرة." },
 
 	// ── فرن ────────────────────────────────────────────────────────────────────
 	{ cat: 8, name: "فرن هفار 46 لتر 2200 وات", sku: "10046", price: 2450, compare: null, stock: 0, weight: "12.5",
 		desc: "فرن هفار 46 لتر 2200 وات." },
 
 	// ── مطحنة ──────────────────────────────────────────────────────────────────
-	{ cat: 9, name: "مطحنة توابل هفار", sku: "5030", price: 450 /* dev */, compare: null, stock: 13, weight: "0.9",
+	{ cat: 9, name: "مطحنة توابل هفار", sku: "5030", price: 825 /* live */, compare: null, stock: 13, weight: "0.9",
 		desc: "مطحنة توابل هفار." },
 
 	// ── كاتيل ──────────────────────────────────────────────────────────────────
-	{ cat: 10, name: "كاتيل بيركس هفار 2 لتر", sku: "10002", price: 700 /* dev */, compare: null, stock: 4, weight: "1.2",
+	{ cat: 10, name: "كاتيل بيركس هفار 2 لتر", sku: "10002", price: 550 /* live */, compare: null, stock: 4, weight: "1.2",
 		desc: "كاتيل بيركس هفار 2 لتر." },
 ];
 

@@ -23,7 +23,11 @@ export const customers = mysqlTable(
 		contactId: int("contact_id").notNull().unique(), // FK to hvar_erp.contacts.id
 		phone: varchar("phone", { length: 15 }).notNull().unique(),
 		name: varchar("name", { length: 100 }).notNull(),
-		passwordHash: varchar("password_hash", { length: 255 }).notNull(),
+		email: varchar("email", { length: 255 }), // from Facebook login (enrichment)
+		facebookId: varchar("facebook_id", { length: 64 }).unique(), // FB app-scoped id
+		avatarUrl: varchar("avatar_url", { length: 512 }), // FB profile picture
+		// Nullable: passwordless (phone-only) and Facebook accounts have no password.
+		passwordHash: varchar("password_hash", { length: 255 }),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 	},
