@@ -27,7 +27,6 @@ export interface ColorVariant {
 }
 
 export interface ProductEnrichment {
-  nickname?: string;             // "البلدوزر", "النينجا", "المدفع"
   wattage?: number;              // numeric: 2000 (no unit)
   wattageDisplay?: string;       // "٢٠٠٠ وات" (Arabic-Indic numerals)
   keyClaim?: string;             // "أقوى كبة في مصر بشهادة كل شيفات مصر"
@@ -36,7 +35,7 @@ export interface ProductEnrichment {
   accessories?: AccessoryItem[];
   motorMaterial?: string;        // "نحاس"
   warrantyMonths: number;
-  bowlWarrantyYears?: number;    // 20 for البلدوزر
+  bowlWarrantyYears?: number;
   chefs?: ChefEndorsement[];
   keyFeatures?: string[];
   faq?: FaqItem[];
@@ -63,7 +62,6 @@ const KEBA_2000_COLORS: ColorVariant[] = [
 
 // Base specs shared across every 5070-family variant (except where overridden below).
 const KEBA_2000_BASE: Omit<ProductEnrichment, "warrantyMonths"> & { warrantyMonths: number } = {
-  nickname: "البلدوزر",
   wattage: 2000,
   wattageDisplay: "٢٠٠٠ وات",
   keyClaim: "أقوى كبة في مصر بشهادة كل شيفات مصر",
@@ -84,7 +82,7 @@ const KEBA_2000_BASE: Omit<ProductEnrichment, "warrantyMonths"> & { warrantyMont
   chefs: [
     {
       name: "شيف سهير جاد",
-      quote: "البلدوزر دي هي اللي شيلتها معايا في مطبخي من يوم ما اشتريتها",
+      quote: "الكبة دي هي اللي شيلتها معايا في مطبخي من يوم ما اشتريتها",
     },
   ],
   keyFeatures: [
@@ -99,8 +97,8 @@ const KEBA_2000_BASE: Omit<ProductEnrichment, "warrantyMonths"> & { warrantyMont
       a: "آه — ٢٠٠٠ وات تفرم اللحمة النيئة والكبة بكل سهولة",
     },
     {
-      q: "إيه الفرق بين البلدوزر والنينجا؟",
-      a: "النينجا ٣ لتر ٨٠٠ وات للأسرة الصغيرة. البلدوزر ٦.٥ لتر ٢٠٠٠ وات للكميات الكبيرة والعائلة الكبيرة",
+      q: "إيه الفرق بين الكبة الكبيرة والصغيرة؟",
+      a: "كبة ٣ لتر ٨٠٠ وات للأسرة الصغيرة. كبة ٦.٥ لتر ٢٠٠٠ وات للكميات الكبيرة والعائلة الكبيرة",
     },
     {
       q: "هل الوعاء بيتكسر؟",
@@ -112,7 +110,7 @@ const KEBA_2000_BASE: Omit<ProductEnrichment, "warrantyMonths"> & { warrantyMont
 // ─── SKU enrichment table ─────────────────────────────────────────────────────
 
 const SKU_ENRICHMENT: Record<string, ProductEnrichment> = {
-  // ── 5070 family (البلدوزر) ──────────────────────────────────────────────────
+  // ── 5070 family ──────────────────────────────────────────────────────────────
   "5070":    { ...KEBA_2000_BASE },
   "5070+1":  { ...KEBA_2000_BASE },
   "5070+3":  { ...KEBA_2000_BASE },
@@ -130,7 +128,6 @@ const SKU_ENRICHMENT: Record<string, ProductEnrichment> = {
 
   // Premium 6-blade — upgraded accessory set
   "5070 PREMIUM": {
-    nickname: "PREMIUM ٦ سلاح",
     wattage: 2000,
     wattageDisplay: "٢٠٠٠ وات",
     capacity: "٦.٥ لتر",
@@ -175,9 +172,8 @@ const SKU_ENRICHMENT: Record<string, ProductEnrichment> = {
     comparisonGroup: "chopper",
   },
 
-  // ── 5029 — كبة النينجا ──────────────────────────────────────────────────────
+  // ── 5029 — كبة 800 وات ───────────────────────────────────────────────────────
   "5029": {
-    nickname: "النينجا",
     wattage: 800,
     wattageDisplay: "٨٠٠ وات",
     capacity: "٣ لتر",
@@ -196,7 +192,7 @@ const SKU_ENRICHMENT: Record<string, ProductEnrichment> = {
     chefs: [
       {
         name: "شيف نهى الفيشاوي",
-        quote: "كبة النينجا — ٥ وظائف في جهاز واحد",
+        quote: "٥ وظائف في جهاز واحد",
       },
     ],
     keyFeatures: [
@@ -208,14 +204,13 @@ const SKU_ENRICHMENT: Record<string, ProductEnrichment> = {
     faq: [
       {
         q: "هل تنفع للكميات الكبيرة؟",
-        a: "السعة ٣ لتر — مناسبة للأسرة من ٤ إلى ٦ أفراد. للكميات الأكبر، البلدوزر ٦.٥ لتر هو الخيار",
+        a: "السعة ٣ لتر — مناسبة للأسرة من ٤ إلى ٦ أفراد. للكميات الأكبر، الكبة ٦.٥ لتر ٢٠٠٠ وات هي الخيار",
       },
     ],
   },
 
-  // ── 5027 — الكبيرة تربو ────────────────────────────────────────────────────
+  // ── 5027 — كبة 1000 وات تربو ─────────────────────────────────────────────────
   "5027": {
-    nickname: "الكبيرة",
     wattage: 1000,
     wattageDisplay: "١٠٠٠ وات تربو",
     capacity: "٢.٥ لتر",
@@ -359,9 +354,8 @@ const SKU_ENRICHMENT: Record<string, ProductEnrichment> = {
 
   // ─── Stand Mixers ─────────────────────────────────────────────────────────────
 
-  // ── 10011 — العجان المدفع 11 لتر ────────────────────────────────────────────
+  // ── 10011 — العجان 11 لتر ────────────────────────────────────────────────────
   "10011": {
-    nickname: "المدفع",
     wattage: 2200,
     wattageDisplay: "٢٢٠٠ وات",
     capacity: "١١ لتر",
@@ -545,21 +539,21 @@ export const COMPARISON_GROUPS: Record<
     products: [
       {
         sku: "5029",
-        nameAr: "كبة النينجا",
+        nameAr: "كبة ٨٠٠ وات ٣ لتر",
         wattage: 800,
         capacity: "٣ لتر",
         useCase: "للأسرة الصغيرة",
       },
       {
         sku: "5027",
-        nameAr: "الكبيرة تربو",
+        nameAr: "كبة ١٠٠٠ وات تربو",
         wattage: 1000,
         capacity: "٢.٥ لتر",
         useCase: "للاستخدام المتوسط",
       },
       {
         sku: "5070",
-        nameAr: "البلدوزر",
+        nameAr: "كبة ٢٠٠٠ وات",
         wattage: 2000,
         capacity: "٦.٥ لتر",
         useCase: "للكميات الكبيرة",

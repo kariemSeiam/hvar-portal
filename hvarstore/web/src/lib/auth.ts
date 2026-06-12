@@ -4,6 +4,8 @@ export interface User {
 	contactId: number;
 	phone: string;
 	name: string;
+	email?: string | null;
+	avatar?: string | null;
 }
 
 export const authToken = atom<string | null>(null);
@@ -61,6 +63,95 @@ export async function register(phone: string, name: string, password: string) {
 	});
 	const data = await res.json();
 	if (!res.ok) throw new Error(data.error ?? "خطأ في التسجيل");
+	authToken.set(data.token);
+	authUser.set(data.user);
+	if (data.refreshToken) {
+		localStorage.setItem("hvar-refresh-token", data.refreshToken);
+	}
+	return data;
+}
+
+/** Passwordless: phone is identity. Known phone logs in, new phone signs up. */
+export async function loginWithPhone(phone: string, name?: string) {
+	const res = await fetch(`${apiBase()}/api/auth/phone`, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ phone, name }),
+	});
+	const data = await res.json();
+	if (!res.ok) throw new Error(data.error ?? "خطأ في تسجيل الدخول");
+	authToken.set(data.token);
+	authUser.set(data.user);
+	if (data.refreshToken) {
+		localStorage.setItem("hvar-refresh-token", data.refreshToken);
+	}
+	return data;
+}
+
+/** Read-only lookup: is this phone already a customer? Drives the phone-first
+ *  flow — branch to login vs "introduce yourself" before any account is made. */
+export async function checkPhone(phone: string): Promise<boolean> {
+	const res = await fetch(`${apiBase()}/api/auth/phone/check`, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ phone }),
+	});
+	const data = await res.json();
+	if (!res.ok) throw new Error(data.error ?? "حدث خطأ");
+	return !!data.exists;
+}
+
+export interface FacebookExchange {
+	loggedIn: boolean;
+	/** Set when FB succeeded but we still need a phone to finish (step 2). */
+	needsPhone?: boolean;
+	fbToken?: string;
+	name?: string;
+	email?: string | null;
+}
+
+/** Step 1: hand the FB access token to the API. Logs in or asks for a phone. */
+export async function facebookExchange(
+	accessToken: string,
+): Promise<FacebookExchange> {
+	const res = await fetch(`${apiBase()}/api/auth/facebook`, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ accessToken }),
+	});
+	const data = await res.json();
+	if (!res.ok) throw new Error(data.error ?? "تعذّر الدخول عبر فيسبوك");
+
+	if (data.token) {
+		authToken.set(data.token);
+		authUser.set(data.user);
+		if (data.refreshToken) {
+			localStorage.setItem("hvar-refresh-token", data.refreshToken);
+		}
+		return { loggedIn: true };
+	}
+	return {
+		loggedIn: false,
+		needsPhone: true,
+		fbToken: data.fbToken,
+		name: data.name,
+		email: data.email,
+	};
+}
+
+/** Step 2: complete a Facebook signup with the phone the user just entered. */
+export async function facebookComplete(
+	fbToken: string,
+	phone: string,
+	name?: string,
+) {
+	const res = await fetch(`${apiBase()}/api/auth/facebook/complete`, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ fbToken, phone, name }),
+	});
+	const data = await res.json();
+	if (!res.ok) throw new Error(data.error ?? "خطأ في إكمال التسجيل");
 	authToken.set(data.token);
 	authUser.set(data.user);
 	if (data.refreshToken) {
