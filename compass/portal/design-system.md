@@ -38,9 +38,9 @@ Every value in the design system has a named CSS variable. No hardcoded colors, 
 --hvar-red-800: 1 56% 34%;        /* deep red, rarely used directly */
 --hvar-red-900: 1 52% 26%;        /* near-black red, text on light tint */
 
---brass-500:    32 55% 51%;       /* #C8893B — premium warmth, installment badges */
---brass-400:    33 60% 62%;       /* lighter brass, hover on dark */
---brass-600:    31 50% 42%;       /* deeper brass, pressed state */
+--flame-600:    17 72% 41%;       /* #B3471D — burnt flame: text-safe accent on light canvas */
+--flame-500:    14 80% 55%;       /* #E8552E — bright flame: decorative only (sparks, lines, dots) */
+--flame-400:    21 100% 69%;      /* #FF9A62 — flame on dark canvas (text-safe in dark theme) */
 
 --trust-green:  142 71% 38%;      /* COD, WhatsApp buttons, success — NEVER decorative */
 --trust-green-soft: 142 60% 94%; /* success backgrounds */
@@ -50,7 +50,8 @@ Every value in the design system has a named CSS variable. No hardcoded colors, 
 - `--hvar-red-600`: primary CTAs, active navigation, key highlights. One in ten visual elements, maximum.
 - `--hvar-red-700`: hover and pressed states on red elements only. Never a surface or decorative color.
 - `--hvar-red-50`: alert backgrounds, badge tints — use when red surface is needed but full saturation would overwhelm.
-- `--brass-500`: installment badges, price highlights, premium callouts, secondary accent on dark surfaces.
+- `--flame-600` / `--flame-400`: installment badges, price highlights, premium callouts, eyebrow labels — burnt on light canvas, bright on dark. Replaces the retired brass/gold (ratified 2026-06-10): the secondary accent is the fire's own hot edge, never a foreign metal.
+- `--flame-500`: decorative flame only — sparks, accent lines, line-art dots, star fills. Never body text on light canvas.
 - `--trust-green`: functional trust signals only — COD confirmation, WhatsApp, success states.
 
 ### Canvas and Surface Tokens
@@ -349,7 +350,7 @@ html::after {
     ),
     radial-gradient(
       ellipse 50% 40% at 10% 60%,
-      hsl(var(--brass-500) / calc(var(--mesh-red) * 0.7)) 0%,
+      hsl(var(--flame-500) / calc(var(--mesh-red) * 0.7)) 0%,
       transparent 60%
     );
 }
@@ -365,7 +366,7 @@ html::after {
 }
 ```
 
-Two gradient sources: ember red (top-right, 80% / 5%) + warm brass (bottom-left, 10% / 60%). The brass gradient runs at 70% of the red opacity (`mesh-red * 0.7`), creating the sensation of a secondary warm light source.
+Two gradient sources: ember red (top-right, 80% / 5%) + warm flame (bottom-left, 10% / 60%). The flame gradient runs at 70% of the red opacity (`mesh-red * 0.7`), creating the sensation of a secondary warm light source.
 
 ### Design Purpose
 
@@ -429,7 +430,7 @@ These patterns are always present — not triggered by interaction.
 |---|---------|-----------|-----------|-----------------|
 | P1 | Appliance Doodle BG | 22 SVG appliance motifs at `opacity: 0.18–0.22`, theme-aware stroke, `pointer-events: none` | `.doodle-bg` | Hero section, mobile nav drawer, footer |
 | P2 | Grain Texture | `::before` SVG fractalNoise, `mix-blend-mode: overlay`, `opacity: var(--grain)` | `.grain-overlay` | Hero, cards on dark, premium surfaces |
-| P4 | Red Mesh Hero | Radial gradient at 8% opacity — Hvar red at top, brass at bottom-left | `html::after` (global) or `.mesh-hero-red::after` | Hero sections, category headers |
+| P4 | Red Mesh Hero | Radial gradient at 8% opacity — Hvar red at top, flame at bottom-left | `html::after` (global) or `.mesh-hero-red::after` | Hero sections, category headers |
 
 **These three together (P1 + P2 + P4):** create the base atmosphere. Mesh adds warmth through color. Grain adds texture. Doodles add brand-specific cultural context — kitchen appliances rendered as art. The result: a hero that belongs to a brand, not a template.
 

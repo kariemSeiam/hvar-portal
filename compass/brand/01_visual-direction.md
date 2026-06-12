@@ -33,13 +33,15 @@ The tension is not a contradiction. It is the differentiator. Brands that are on
 | `--hvar-red-600` | `1 64% 51%` | `#d43533` | Hvar Red | Primary action color. Brand signature. CTAs, active states, key highlights. |
 | `--hvar-red-700` | `1 60% 42%` | `#ad2a28` | Deep Red | Hover state. Pressed state. Never used as surface. |
 | `--hvar-red-50` | `6 70% 97%` | `#fef2f2` | Red Tint | Subtle highlight wash. Pill backgrounds. Alert tints. |
-| `--brass-500` | `32 55% 51%` | `#C8893B` | Brass | Premium warmth accent. Price highlights, installment badges, secondary calls, dividers on dark canvas. |
+| `--c-flame` | `17 72% 41%` | `#B3471D` | Flame (burnt) | Secondary warmth accent — text-safe. Eyebrow labels, nicknames, price highlights, installment badges, hotline numbers. Light theme; dark theme uses `#FF9A62`. |
+| `--c-flame-bright` | `14 80% 55%` | `#E8552E` | Flame (bright) | Decorative flame only: sparks, accent lines, line-art dots, star fills, 3px borders. Never body text on light canvas. |
 | `--trust-green` | `142 71% 38%` | `#1d9a4a` | Trust Green | COD confirmation, WhatsApp, success states, delivery confirmation. |
 
 **Color system notes:**
 - **[TBD: Pantone equivalents, CMYK values, RGB values for print production — pending brand identity delivery]**
 - Hvar Red is the dominant brand color. It is not decorative. Every use of `--hvar-red-600` must earn its place — it carries the brand's full weight.
-- Brass is the warmth modifier. It prevents red from reading as aggressive or urgent. When red needs softening, add brass context (nearby, not mixed).
+- Flame is the warmth modifier. It is the fire's own hot edge — hotter and more orange than the ember core — so the secondary accent stays inside the brand story instead of importing a foreign metal. It prevents red from reading as aggressive while keeping the whole palette one fire.
+- **Ratified 2026-06-10 (Kariem):** Brass/gold (`#C8893B`) is retired across product and brand. Gold read as a foreign material against the ember identity. Every former brass role moved to the flame scale: burnt flame for text, bright flame for decoration. No gold anywhere.
 - Trust Green appears only in functional trust contexts: COD, WhatsApp, delivery success. It is never decorative.
 
 ### Canvas & Surface
@@ -62,7 +64,7 @@ The tension is not a contradiction. It is the differentiator. Brands that are on
 |------------|---------|--------|
 | 60% | Canvas and surface — the base that everything lives on | `--bg`, `--surface`, `--ink` |
 | 30% | Structure — borders, dividers, muted text, section backgrounds | `--border`, `--ink-muted`, `--surface` used as section separator |
-| 10% | Brand — Hvar red for actions, brass for premium accents | `--hvar-red-600`, `--brass-500`, selective use |
+| 10% | Brand — Hvar red for actions, flame for premium accents | `--hvar-red-600`, `--c-flame`, selective use |
 
 The 10% rule is the discipline that keeps Hvar from shouting. Every brand element you add beyond this proportion reduces the power of everything else.
 
@@ -276,13 +278,13 @@ html::after {
   z-index: 0;
   background:
     radial-gradient(ellipse 60% 50% at 80% 5%, hsl(var(--hvar-red-600) / var(--mesh-red)) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 40% at 10% 60%, hsl(var(--brass-500) / calc(var(--mesh-red) * 0.7)) 0%, transparent 60%);
+    radial-gradient(ellipse 50% 40% at 10% 60%, hsl(var(--c-flame-bright) / calc(var(--mesh-red) * 0.7)) 0%, transparent 60%);
 }
 ```
 
 **Why this is the brand signature:**
 
-The ambient glow transforms Hvar red from a flat corporate color into a warm atmospheric light source. Without it, `#d43533` is a standard ecommerce red — the same color used by scores of discount brands. With the ambient glow, that red becomes warmth: a living ember that gives the whole page a kitchen-fire quality. The brass glow on the left adds depth and makes the composition feel three-dimensional.
+The ambient glow transforms Hvar red from a flat corporate color into a warm atmospheric light source. Without it, `#d43533` is a standard ecommerce red — the same color used by scores of discount brands. With the ambient glow, that red becomes warmth: a living ember that gives the whole page a kitchen-fire quality. The flame glow on the left adds depth and makes the composition feel three-dimensional.
 
 In dark mode, the glows are stronger (`--mesh-red: 0.12` vs `0.08` in light) because the dark canvas allows the glow to be more present without overpowering content.
 

@@ -22,7 +22,7 @@ These documents are written from the inside. They assume you have spent time wit
 ### Locked (do not deviate without a compass update)
 
 - The two named themes: **هفار الأحمر** (light) and **هفار الليل** (dark)
-- The color palette: warm ivory canvas, brand red `#d43533`, brass `#C8893B`, charcoal dark canvas
+- The color palette: warm ivory canvas, brand red `#d43533`, flame `#B3471D`/`#E8552E`, charcoal dark canvas
 - The typeface trio: Cairo (Arabic UI + display) + Inter (prices, tabular) + JetBrains Mono (codes)
 - The motion signature: Wilson curve `cubic-bezier(0.22,1,0.36,1)`
 - The grain texture: `mix-blend-mode:overlay`, `0.04` opacity in light / `0.06` in dark

@@ -64,7 +64,7 @@ Example:
 
 **Visual style:**
 - Customer testimony: real photo or screenshot with privacy handled appropriately (face visible only with permission, otherwise quoted text on brand graphic)
-- Trust mechanic graphics: Hvar red/brass on ivory, clean typography, one message per graphic. No cluttered trust-seal stacking.
+- Trust mechanic graphics: Hvar red/flame on ivory, clean typography, one message per graphic. No cluttered trust-seal stacking.
 - The design reads premium, not bargain-brand. The trust is communicated by the confidence of the statement, not by a badge graphic that looks like it came from a cheap template.
 
 **Arabic caption formula:**

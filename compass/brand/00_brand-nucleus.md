@@ -84,7 +84,7 @@ The Ruler archetype contributes mastery, premium craft, control, and quality sta
 **What this means for Hvar creative decisions:**
 
 - Product craftsmanship language: materials, engineering, motor power, blade construction — stated with authority, not bragged about.
-- The visual system's premium cues (brass accent, geometric precision, grain texture, ambient glow) are Ruler expressions.
+- The visual system's premium cues (flame accent, geometric precision, grain texture, ambient glow) are Ruler expressions.
 - Warranty is also Ruler: we offer 2–3 years because we know our products can hold it.
 - When Ruler voice leads: product specification pages, warranty explanation, material descriptions, the "why Hvar" sections.
 

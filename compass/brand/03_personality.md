@@ -83,7 +83,7 @@ Hvar holds both simultaneously. This is harder. It requires discipline at every 
 | Warm ivory canvas | This costs nothing. It signals consideration. The premium feel is in the care of design, not the price tag. |
 | Editorial photography | Every editorial shot should have real food in it that an Egyptian woman would actually cook. Premium aesthetics, not aspirational distance. |
 | Wilson pattern system | The patterns serve the user experience — grain texture reduces eye strain, ambient glow creates warmth. Premium function, not premium decoration. |
-| Brass accent color | Used on installment badges, price highlights, premium cues — always in service of helping the buyer understand value, not just looking expensive. |
+| Flame accent color | Used on installment badges, price highlights, premium cues — always in service of helping the buyer understand value, not just looking expensive. |
 | Cairo typeface | Free. Better than 95% of what Egyptian brands use on digital. Premium result from correct decision. |
 
 ---

@@ -27,7 +27,7 @@ These override nothing in `brand/01_visual-direction.md` — they apply it to th
 
 - **Background:** Warm ivory canvas `#F5EDD8` (light) or charcoal `#1A1612` (dark, for special print runs only)
 - **Primary accent:** Brand red `#d43533`
-- **Secondary accent:** Brass `#C8893B`
+- **Secondary accent:** Flame `#B3471D` (burnt, text) / `#E8552E` (bright, decorative) — brass/gold retired 2026-06-10
 - **Body text:** Charcoal `#1A1612` on light background. Cream `#F5EDD8` on dark.
 - **No additional colors.** Never introduce a third accent for print. The palette discipline is what makes the brand look considered.
 
