@@ -5,7 +5,7 @@
  * Replaces the bare <h1> + breadcrumb pattern that lived on every inner page.
  * Three variants:
  *   utility — light surface, P3 dot grid. For: orders, account, checkout.
- *   service — same but adds a 3px brand-red→brass→brand-red top accent bar.
+ *   service — same but adds a 3px brand-red→flame→brand-red top accent bar.
  *             For: support, maintenance, service pages.
  *   brand   — dark forced canvas, P2 grain + P4 red mesh. For future use.
  *
@@ -18,7 +18,7 @@
  */
 
 interface Props {
-  /** Brass pre-heading above the title, e.g. "الدعم والصيانة" */
+  /** Flame pre-heading above the title, e.g. "الدعم والصيانة" */
   label?: string
   /** Main h1 heading — required */
   title: string
@@ -56,7 +56,7 @@ const isService = variant === 'service'
   {isService && (
     <div
       class="absolute top-0 inset-x-0 h-[3px] pointer-events-none"
-      style="background:linear-gradient(90deg,var(--c-brand) 0%,var(--c-brass) 50%,var(--c-brand) 100%)"
+      style="background:linear-gradient(90deg,var(--c-brand) 0%,var(--c-flame-bright) 50%,var(--c-brand) 100%)"
       aria-hidden="true"
     />
   )}
@@ -89,16 +89,16 @@ const isService = variant === 'service'
 
       <div>
 
-        {/* Brass pre-heading label */}
+        {/* Flame pre-heading label */}
         {label && (
           <p
             class="reveal-child font-cairo font-semibold text-[10px] uppercase tracking-[0.14em] mb-2"
             style={
               isBrand
-                ? 'color:var(--c-brass)'
+                ? 'color:var(--c-flame)'
                 : isService
                   ? 'color:var(--c-brand)'
-                  : 'color:var(--c-brass)'
+                  : 'color:var(--c-flame)'
             }
           >
             {label}

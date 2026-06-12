@@ -140,6 +140,15 @@ const renderOrder = [home, products] // cart goes between products and wishlist
     font-weight: 700;
     line-height: 1;
   }
+
+  @keyframes bnav-cart-bounce {
+    0%, 100% { transform: scale(1); }
+    30%       { transform: scale(1.3);  }
+    60%       { transform: scale(0.88); }
+  }
+  #bnav-cart.bnav-cart-pulse {
+    animation: bnav-cart-bounce 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
 </style>
 
 <script>
@@ -155,5 +164,12 @@ const renderOrder = [home, products] // cart goes between products and wishlist
     if (!badge) return
     badge.hidden = n === 0
     badge.textContent = n > 99 ? '99+' : String(n)
+  })
+
+  document.addEventListener('hvar:cartadd', () => {
+    if (!btn) return
+    btn.classList.remove('bnav-cart-pulse')
+    void (btn as HTMLElement).offsetWidth
+    btn.classList.add('bnav-cart-pulse')
   })
 </script>

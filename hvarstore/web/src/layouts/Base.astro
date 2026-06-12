@@ -11,7 +11,6 @@ import "@fontsource/jetbrains-mono/500.css"
 import Navbar from "../components/Navbar.astro"
 import Footer from "../components/Footer.astro"
 import BottomNav from "../components/BottomNav.astro"
-import WhatsAppFab from "../components/WhatsAppFab.astro"
 import CartFab from "../components/cart/CartFab"
 import CartDrawer from "../components/cart/CartDrawer"
 
@@ -28,8 +27,8 @@ interface Props {
 }
 
 const {
-  title = 'هفار — أجهزة منزلية بضمان حقيقي وشحن مجاني',
-  description = 'تسوق أجهزة المطبخ من هفار: خلاطات، قلايات هوائية، مكاوي، عجانات. ضمان سنتين، شحن مجاني لجميع المحافظات، افحص قبل الدفع.',
+  title = 'هفار | أجهزة مطبخ مصرية، شحن مجاني لكل مصر',
+  description = 'تسوق أجهزة المطبخ من هفار: خلاطات، قلايات هوائية، مكاوي، عجانات. صناعة مصرية، شحن مجاني لجميع المحافظات، افحص قبل الدفع.',
   image,
   noFooter = false,
   noBottomNav = false,
@@ -52,7 +51,7 @@ const orgJsonld = ld({
   alternateName: 'HVAR',
   url: 'https://hvarstore.com',
   logo: defaultOgImage,
-  description: 'أجهزة منزلية موثوقة لكل مطبخ مصري. ضمان سنتين، شحن مجاني، افحص قبل الدفع.',
+  description: 'أجهزة منزلية لكل مطبخ مصري. صناعة مصرية، شحن مجاني، افحص قبل الدفع.',
   telephone: '17566',
   contactPoint: {
     ['@type']: 'ContactPoint',
@@ -127,7 +126,7 @@ const websiteJsonld = ld({
       ;(function () {
         var stored = localStorage.getItem('hvar-theme')
         var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-        if (stored === 'dark' || (!stored && prefersDark)) {
+        if (stored === 'dark' || !stored) {
           document.documentElement.classList.add('dark')
         }
       })()
@@ -143,13 +142,20 @@ const websiteJsonld = ld({
       <slot />
     </main>
 
-    {/* Mobile: bottom nav owns the cart; CartFab stays for desktop */}
-    <div class="hidden md:block">
-      <CartFab client:idle />
-    </div>
+    <CartFab client:idle />
     <CartDrawer client:idle />
-    <WhatsAppFab hideOnMobile={noBottomNav} />
     {!noBottomNav && <BottomNav />}
+
+    {!noBottomNav && (
+      <div id="cart-toast" role="status" aria-live="polite" aria-atomic="true">
+        <span class="ct-icon" aria-hidden="true">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </span>
+        <span id="ct-text" class="ct-text font-cairo"></span>
+      </div>
+    )}
 
     {!noFooter && <Footer />}
 
@@ -159,8 +165,81 @@ const websiteJsonld = ld({
         body.has-bnav {
           padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px));
         }
+        /* Cart already reachable via bottom nav — hide the floating pill */
+        body.has-bnav .cart-fab-pill {
+          display: none;
+        }
+      }
+
+      /* Cart toast — mobile only, floats above bottom nav */
+      #cart-toast {
+        position: fixed;
+        inset-inline: 0;
+        bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px) + 0.625rem);
+        margin-inline: auto;
+        width: fit-content;
+        max-width: calc(100vw - 2.5rem);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1rem 0.6rem 0.75rem;
+        border-radius: 9999px;
+        background: var(--c-ink);
+        color: var(--c-bg);
+        font-size: 0.8125rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        z-index: 58;
+        pointer-events: none;
+        transform: translateY(calc(100% + 1rem));
+        opacity: 0;
+        transition:
+          transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.22s ease;
+      }
+      #cart-toast.toast--show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .ct-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--c-brand);
+        color: #fff;
+        flex-shrink: 0;
+      }
+      .ct-text {
+        font-weight: 600;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      @media (min-width: 768px) {
+        #cart-toast { display: none; }
       }
     </style>
+
+    <!-- Cart toast — fires on hvar:cartadd from any add-to-cart button -->
+    <script>
+      {
+        let toastTimer: ReturnType<typeof setTimeout>
+        const toast = document.getElementById('cart-toast')
+        const textEl = document.getElementById('ct-text')
+        if (toast && textEl) {
+          document.addEventListener('hvar:cartadd', (e) => {
+            const name: string = (e as CustomEvent).detail?.name ?? ''
+            textEl.textContent = name.length > 22 ? name.slice(0, 22) + '…' : name
+            toast.classList.add('toast--show')
+            clearTimeout(toastTimer)
+            toastTimer = setTimeout(() => toast.classList.remove('toast--show'), 2400)
+          })
+        }
+      }
+    </script>
 
     <!-- Wilson P7: Scroll reveal observer -->
     <script>

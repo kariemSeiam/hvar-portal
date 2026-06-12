@@ -26,10 +26,12 @@
   --c-brand-line:   rgba(212, 53, 51, 0.28);
   --c-brand-glow:   rgba(212, 53, 51, 0.12);
   --c-brand-rgb:    212, 53, 51;
-  /* Brass accent */
-  --c-brass:        #c8893b;
-  --c-brass-rgb:    200, 137, 59;
-  --c-brass-tint:   #fdf3e7;
+  /* Flame accent — the fire's hot edge. Replaces brass/gold (ratified 2026-06-10):
+     the secondary accent comes from inside the ember story, not a foreign metal. */
+  --c-flame:        #b3471d;            /* burnt flame — text-safe on paper (≥4.5:1) */
+  --c-flame-bright: #e8552e;            /* decorative only: sparks, dots, lines, fills */
+  --c-flame-rgb:    232, 85, 46;        /* alpha variants ride the bright value */
+  --c-flame-tint:   #fcefe8;
   /* Semantic */
   --c-trust:        #16a34a;
   --c-trust-dark:   #22c55e;
@@ -61,10 +63,11 @@
   --c-brand-line:   rgba(255, 107, 82, 0.34);
   --c-brand-glow:   rgba(232, 90, 88, 0.18);
   --c-brand-rgb:    232, 90, 88;
-  /* Brass */
-  --c-brass:        #d4a050;
-  --c-brass-rgb:    212, 160, 80;
-  --c-brass-tint:   rgba(212, 160, 80, 0.12);
+  /* Flame — brighter in the dark, same fire */
+  --c-flame:        #ff9a62;
+  --c-flame-bright: #ff9a62;
+  --c-flame-rgb:    255, 154, 98;
+  --c-flame-tint:   rgba(255, 154, 98, 0.12);
   /* Semantic */
   --c-trust:        #22c55e;
   --c-trust-dark:   #22c55e;
@@ -89,9 +92,9 @@
   /* Ember glow warm */
   --color-ember-glow:   #ff6b52;
   --color-ember-warm:   #ff8a70;
-  --color-brass-400:    #daa545;
-  --color-brass-500:    #c8893b;
-  --color-brass-600:    #b06f2e;
+  --color-flame-400:    #f0683f;
+  --color-flame-500:    #e8552e;
+  --color-flame-600:    #b3471d;
   --color-trust-green:  #16a34a;
 
   /* Spacing */
@@ -150,6 +153,9 @@
   html {
     scroll-behavior: smooth;
     scroll-padding-top: 5rem;
+    /* Reserve scrollbar gutter on all pages — prevents 15-17px layout shift
+       when a vertical scrollbar appears/disappears between page navigations */
+    scrollbar-gutter: stable;
   }
   html[dir="rtl"] { text-align: start; }
 
@@ -176,6 +182,11 @@
     color: var(--c-ink);
     -webkit-font-smoothing: antialiased;
     transition: background-color 0.5s ease, color 0.35s ease;
+    /* Clip horizontal overflow without creating a scroll container.
+       overflow-x: hidden would force overflow-y to auto (CSS spec), making
+       <body> a scroll container and breaking position:sticky on the navbar.
+       overflow-x: clip does the same visual cut with no scroll-container side-effect. */
+    overflow-x: clip;
   }
 
   /* Paper / charcoal grain — global fixed overlay */
@@ -326,6 +337,15 @@
 }
 
 /* ── Image fade-in on load ──────────────────────────────────────────────── */
+@keyframes fabGlow {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 1; }
+}
+@keyframes fabSlideUp {
+  from { opacity: 0; transform: translateY(14px) scale(0.94); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
 @keyframes imgReveal {
   from { opacity: 0; transform: scale(0.97); filter: blur(10px); }
 }
@@ -385,7 +405,7 @@ img[loading="lazy"] {
 .text-muted   { color: var(--c-ink-muted); }
 .text-faint   { color: var(--c-ink-faint); }
 .text-brand   { color: var(--c-brand); }
-.text-brass   { color: var(--c-brass); }
+.text-flame   { color: var(--c-flame); }
 .border-hvar  { border-color: var(--c-border); }
 
 /* ── Hvar input — canonical form field style ────────────────────────────── */
@@ -518,23 +538,23 @@ html[dir="rtl"] .pill-tilt-alt { transform: rotate(-1deg); }
     transform 0.3s var(--ease-spring);
 }
 .trust-pillar:hover {
-  border-color: rgba(200, 137, 59, 0.45);
-  box-shadow: 0 0 22px rgba(200, 137, 59, 0.12), 0 4px 12px rgba(0,0,0,0.06);
+  border-color: rgba(var(--c-flame-rgb), 0.45);
+  box-shadow: 0 0 22px rgba(var(--c-flame-rgb), 0.12), 0 4px 12px rgba(0,0,0,0.06);
   transform: translateY(-3px) !important; /* overrides pill-tilt */
 }
 .dark .trust-pillar { background-color: var(--c-surface); }
 .dark .trust-pillar:hover {
-  border-color: rgba(212, 160, 80, 0.50);
-  box-shadow: 0 0 22px rgba(212, 160, 80, 0.16), 0 4px 12px rgba(0,0,0,0.25);
+  border-color: rgba(var(--c-flame-rgb), 0.50);
+  box-shadow: 0 0 22px rgba(var(--c-flame-rgb), 0.16), 0 4px 12px rgba(0,0,0,0.25);
 }
 
-/* ── Brass title underline ──────────────────────────────────────────────── */
-.title-underline-brass {
+/* ── Flame title underline ──────────────────────────────────────────────── */
+.title-underline-flame {
   position: relative;
   display: inline-block;
   padding-bottom: 0.625rem;
 }
-.title-underline-brass::after {
+.title-underline-flame::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -542,9 +562,70 @@ html[dir="rtl"] .pill-tilt-alt { transform: rotate(-1deg); }
   transform: translateX(-50%);
   width: 3rem;
   height: 3px;
-  background: var(--c-brass);
+  background: var(--c-flame-bright);
   border-radius: 2px;
-  box-shadow: 0 1px 4px rgba(200, 137, 59, 0.28);
+  box-shadow: 0 1px 4px rgba(var(--c-flame-rgb), 0.28);
+}
+
+/* ── Page header — quiet utility band (theme-aware) ─────────────────────────
+   One canvas for every page / catalog / section header. Light (هفار الأحمر):
+   warm surface + ink. Dark (هفار الليل): charcoal + ivory — same markup, the
+   tokens flip. Replaces the old forced-dark #130F0C slabs that read as dark
+   islands on warm paper; the header now belongs to the active theme instead of
+   fighting it. Dot-grid is the quiet pattern that ties it to the catalog grid. */
+.page-hero {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--c-surface);
+  border-bottom: 1px solid var(--c-border);
+}
+.page-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, var(--c-border) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.page-hero > * { position: relative; z-index: 1; }
+/* Flush variant — sits on the page bg instead of a lifted surface */
+.page-hero--flush { background-color: var(--c-bg); }
+
+.page-hero-label {
+  font-family: "Cairo", system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.625rem;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--c-flame);
+}
+.page-hero-title {
+  font-family: "Cairo", system-ui, sans-serif;
+  font-weight: 900;
+  line-height: 1.15;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  color: var(--c-ink);
+}
+.page-hero-sub {
+  font-family: "Cairo", system-ui, sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--c-ink-muted);
+}
+/* Small wattage / spec chip — flame on flame-tint, the one warm brand accent */
+.page-hero-chip {
+  display: inline-flex;
+  align-items: center;
+  font-family: "Cairo", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  color: var(--c-flame);
+  background: var(--c-flame-tint);
+  border: 1px solid rgba(var(--c-flame-rgb), 0.22);
 }
 
 /* ── Reduced motion ─────────────────────────────────────────────────────── */
