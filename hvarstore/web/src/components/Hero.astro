@@ -1,243 +1,365 @@
 ---
-// No props — static section with design tokens
-// Design: "المطبخ الدافئ × هفار لوكس" — Warm Kitchen warmth + Hvar Luxe system
-// DESIGN_DIRECTIONS.md: C gives the bones, A gives the soul, B gives the close
 import Doodles from './Doodles.astro'
+
+/*
+ * Home hero — "the maker's hearth".
+ *
+ * The brand promise rendered as warmth, not a sales pitch. H1 is the confirmed
+ * tagline «بيتك دايما جاهز مع هفار» (compass/brand/00). The hero never leads with
+ * warranty or price — it leads with craft + the "always ready" feeling, and lets
+ * quality whisper through the maker's seal.
+ *
+ * LOGO SLOT: the lockup above the H1 is a placeholder built from the brand device
+ * (ember diamond + H-mark, the same mark used in the navbar) so the hero reads as
+ * finished. Swap in the official SVG when ready — replace `.hero-logo-mark`'s inline
+ * <svg> (keep the `.hero-logo` wrapper + sizing) or drop the asset and reference it.
+ *
+ * Mobile is copy-first by design: the promise + CTAs own the first screen over a
+ * giant faint هـ maker's monogram, and the catalog peeks below the fold. The hotline
+ * lives here as a quiet help line (the top utility strip hides its contact < 768px,
+ * so this is the only above-the-fold hotline on mobile — keep it).
+ *
+ * Desktop (≥1024px) gets "the maker's seal": a warm, breathing scene — the logo on a
+ * medallion over a living ember core, ringed once by a self-drawing circle, with the
+ * real manufacturing range floating around it like embers around a hearth. Motion is
+ * eased + asymmetric + breathing (never a constant linear spin — that reads as a tech
+ * loader). Nothing depends on the product API, so it never degrades to a stale card.
+ */
+
 ---
 
-<!-- Wilson P6: Grain texture is now inline via style block -->
+<section class="hero-section relative overflow-hidden" data-hero>
 
-<section class="relative overflow-hidden pt-12 pb-14 sm:pt-24 sm:pb-32 md:min-h-[calc(100svh-4rem)] flex flex-col justify-center" style="background-color:var(--c-bg)">
+  <!-- Red mesh glow — .mesh-red carries its own dark-theme variant -->
+  <div class="absolute inset-0 mesh-red pointer-events-none z-0" aria-hidden="true"></div>
 
-  <!-- Grain texture overlay -->
-  <div class="absolute inset-0 pointer-events-none opacity-[0.035] dark:opacity-[0.05] z-0" aria-hidden="true"
-    style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E&quot;); mix-blend-mode: multiply;">
-  </div>
+  <!-- Giant maker's monogram — the brand stamp behind everything (anchors mobile) -->
+  <span class="hero-watermark font-cairo" aria-hidden="true">هـ</span>
 
-  <!-- Red mesh glow -->
-  <div class="absolute inset-0 pointer-events-none z-0" aria-hidden="true"
-    style="background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(212,53,51,0.08) 0%, transparent 70%);">
-  </div>
-  <div class="dark:hidden absolute inset-0 pointer-events-none z-0" aria-hidden="true"
-    style="background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(212,53,51,0.12) 0%, transparent 70%);">
-  </div>
-
-  <!-- Wilson P1: appliance doodle field — shared, theme-aware, animated -->
+  <!-- Ambient doodle field (trimmed `hero` layout) -->
   <Doodles variant="hero" />
 
-  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid md:grid-cols-12 gap-8 items-center">
+  <div class="hero-inner relative z-10 w-full max-w-7xl mx-auto">
+    <div class="hero-grid">
 
-      <!-- Left content (RTL: visual right side = content side) -->
-      <div class="md:col-span-7 relative">
+      <!-- ── Copy column ─────────────────────────────────────── -->
+      <div class="hero-col-copy">
 
-        <!-- Premium badge — Direction A warmth cue: brass accent -->
-        <div class="inline-flex items-center gap-2 mb-6 reveal-fade">
-          <span class="w-6 h-px bg-[#C8893B]"></span>
-          <span class="text-[#C8893B] text-[10px] font-semibold uppercase tracking-[0.15em] font-cairo">أجهزة منزلية موثوقة</span>
-        </div>
-
-        <!-- Headline — Direction A: editorial Arabic warmth, red like a ribbon -->
-        <h1 class="font-cairo font-black text-[2.6rem] sm:text-[3.4rem] lg:text-[3.8rem] leading-[1.12] mb-5 reveal-fade" style="color:var(--c-ink);transition-delay: 0.1s;">
-          <span class="block">مطبخك</span>
-          <span class="relative inline-block">
-            يستاهل الأحسن
-            <span class="absolute -bottom-2 right-0 left-0 h-[3px] rounded-full"
-                  style="background: linear-gradient(90deg, #C8893B 0%, #daa545 50%, #C8893B 100%); opacity:0.6;"></span>
-            <span class="absolute -bottom-[11px] right-0 w-[7px] h-[7px] rounded-full bg-[#d43533]"></span>
+        <!-- Logo lockup — placeholder built from the brand device; swap in official SVG -->
+        <a href="/" class="hero-logo hv-reveal" style="--d:0s" aria-label="هفار — الصفحة الرئيسية">
+          <span class="hero-logo-mark" aria-hidden="true">
+            <svg viewBox="0 0 40 40" fill="none">
+              <rect x="8" y="8" width="24" height="24" rx="6.5" transform="rotate(45 20 20)" fill="currentColor"/>
+              <path d="M14 13v14M26 13v14M14 20h12" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>
+            </svg>
           </span>
+          <span class="hero-logo-word font-cairo">هفار</span>
+        </a>
+
+        <!-- H1 — the confirmed tagline, verbatim -->
+        <h1 class="hero-h1 font-cairo font-black hv-reveal" style="--d:0.08s">
+          <span class="block">بيتك دايما <span class="hero-key">جاهز</span></span>
+          <span class="block hero-h1-with">مع <span class="hero-brand-word">هفار</span></span>
         </h1>
 
-        <!-- Subline — warm trust prose -->
-        <p class="font-cairo text-base sm:text-lg leading-relaxed mb-6 max-w-lg reveal-fade" style="color:var(--c-ink-muted);transition-delay: 0.2s;">
-          خلاطات، مكاوي، أجهزة مطبخ — كل اللي تحتاجه لمطبخك
-          <span class="text-[#C8893B] font-semibold">بضمان سنتين</span>
-          وشحن مجاني لباب البيت.
+        <!-- Subline — craft + the "always ready" promise; quality whispers, never a warranty number -->
+        <p class="hero-subline font-cairo leading-relaxed hv-reveal" style="--d:0.16s">
+          أجهزة مصرية معمولة بإتقان وخامات تستحمل الشغل، تفضل معاكِ سنين —
+          عشان بيتك يكون <span class="hero-stamp font-cairo">دايماً جاهز</span> لأي حاجة.
         </p>
 
-        <!-- CTAs — Direction B: trust architecture, clear primary/secondary -->
-        <div class="flex flex-wrap items-center gap-3 reveal-fade" style="transition-delay: 0.3s;">
-          <a
-            href="/products"
-            class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#d43533] hover:bg-[#b91c1c] text-white font-cairo font-bold text-base transition-all hover:shadow-[0_8px_24px_rgba(212,53,51,0.3)] hover:-translate-y-0.5"
-            style="transition: all 0.3s cubic-bezier(0.22,1,0.36,1)"
-          >
-            تسوق الآن
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M4 8h8M8 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- CTAs — shop + the track-order entry (→ /orders; returning buyers land on their orders) -->
+        <div class="hero-ctas hv-reveal" style="--d:0.24s">
+          <a href="/products" class="hero-cta-primary font-cairo font-bold">
+            تسوقي دلوقتي
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M12 8H4M8 4L4 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </a>
-          <a
-            href="/orders"
-            class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-white dark:bg-[#1c1917] border border-[#e7e0d6] dark:border-[#2c2825] text-[#1c1917] dark:text-[#f5f5f4] font-cairo font-semibold text-base hover:border-[#d43533] dark:hover:border-[#d43533] transition-all"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          <a href="/orders" class="hero-cta-secondary font-cairo font-semibold">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 7h11l3 4v5h-2"/><path d="M5 7v9h2"/>
+              <circle cx="9" cy="17" r="1.8"/><circle cx="17" cy="17" r="1.8"/>
+              <path d="M3 10h5"/>
             </svg>
-            تتبع طلبك
+            تتبّعي طلبك
           </a>
         </div>
 
-        <!-- Hero stats -->
-        <div class="flex flex-wrap items-center gap-x-8 gap-y-2 mt-8 reveal-fade" style="transition-delay: 0.35s;">
-          <div>
-            <div class="font-inter font-black text-[1.4rem] sm:text-[1.7rem] tabular-nums" style="color:var(--c-ink)" dir="ltr">+100K</div>
-            <div class="text-[11px] font-cairo" style="color:var(--c-ink-faint)">عميل واثق</div>
-          </div>
-          <div>
-            <div class="font-inter font-black text-[1.4rem] sm:text-[1.7rem] tabular-nums" style="color:var(--c-ink)" dir="ltr">24h</div>
-            <div class="text-[11px] font-cairo" style="color:var(--c-ink-faint)">خدمة عملاء</div>
-          </div>
-          <div>
-            <div class="font-inter font-black text-[1.4rem] sm:text-[1.7rem] tabular-nums" style="color:var(--c-ink)" dir="ltr">2-5</div>
-            <div class="text-[11px] font-cairo" style="color:var(--c-ink-faint)">أيام توصيل</div>
-          </div>
+        <!-- Help + trust — hotline's quiet home (mobile-safe) over whispered trust marks -->
+        <div class="hero-meta hv-reveal" style="--d:0.32s">
+          <a href="tel:17566" class="hero-hotline-link" aria-label="اتصلي بالخط الساخن ١٧٥٦٦">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2-.5c.9.3 1.9.6 2.9.7A2 2 0 0 1 22 16.9Z"/>
+            </svg>
+            <span class="hero-hotline-text">محتاجة مساعدة؟ كلمينا</span>
+            <span class="hero-hotline-num font-inter" dir="ltr">17566</span>
+          </a>
+          <ul class="hero-trust" aria-label="مزايا الشراء">
+            <li>شحن مجاني</li>
+            <li>افحصي قبل ما تدفعي</li>
+            <li>دفع عند الاستلام</li>
+          </ul>
         </div>
 
-        <!-- Trust line — single swipeable line on mobile, wraps on larger screens -->
-        <div class="hero-trust flex sm:flex-wrap items-center gap-x-5 gap-y-2 mt-6 text-xs font-cairo reveal-fade" style="color:var(--c-ink-muted);transition-delay: 0.4s;">
-          <span class="inline-flex items-center gap-1.5">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-            ضمان سنتين
-          </span>
-          <span class="inline-flex items-center gap-1.5">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M5 12h14"/>
-              <path d="M12 5l7 7-7 7"/>
-            </svg>
-            شحن مجاني
-          </span>
-          <span class="inline-flex items-center gap-1.5">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-              <polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
-            افحص قبل الدفع
-          </span>
-          <span class="inline-flex items-center gap-1.5">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="1" x2="12" y2="23"/>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-            </svg>
-            تقسيط بدون فوائد
-          </span>
-        </div>
-
-      </div>
-
-      <!-- Right visual — morphing ember orb + floating product cards -->
-      <div class="hidden md:block md:col-span-5 relative" style="height:clamp(300px,40vw,460px)">
-
-        <!-- Stage orb — morphing organic background shape -->
-        <div class="absolute inset-[8%] z-0 stage-orb" aria-hidden="true"
-          style="background: radial-gradient(circle at 32% 28%, rgba(255,107,82,0.65), rgba(212,53,51,0.52) 42%, rgba(168,31,29,0.32) 92%); filter: blur(2px); box-shadow: 0 30px 80px -30px rgba(168,31,29,0.42);">
-        </div>
-
-        <!-- Floating card 1 — مكواة بخار -->
-        <div class="absolute top-[8%] -start-[4%] z-10 flex items-center gap-3 backdrop-blur-sm rounded-[18px] px-4 py-3 bob-card"
-          style="background-color:color-mix(in srgb,var(--c-surface) 88%,transparent);border:1px solid var(--c-border);box-shadow:var(--c-shadow-card)">
-          <div class="w-[42px] h-[42px] rounded-[11px] flex items-center justify-center flex-shrink-0" style="background-color:var(--c-brand-tint)">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--c-brand)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="14" y="8" width="8" height="12" rx="2"/>
-              <ellipse cx="9" cy="14" rx="5" ry="6"/>
-              <line x1="22" y1="11" x2="24" y2="11"/>
-              <line x1="22" y1="14" x2="24" y2="14"/>
-            </svg>
-          </div>
-          <div>
-            <div class="font-cairo font-bold text-sm" style="color:var(--c-ink)">مكواة بخار ٢٨٠٠ وات</div>
-            <div class="font-inter font-bold text-xs tabular-nums" style="color:var(--c-brand)" dir="ltr">١٬٣٥٠ ج.م</div>
-          </div>
-        </div>
-
-        <!-- Floating card 2 — قلاية هوائية -->
-        <div class="absolute bottom-[16%] -end-[6%] z-10 flex items-center gap-3 backdrop-blur-sm rounded-[18px] px-4 py-3 bob-card"
-          style="background-color:color-mix(in srgb,var(--c-surface) 88%,transparent);border:1px solid var(--c-border);box-shadow:var(--c-shadow-card);animation-delay:0.8s">
-          <div class="w-[42px] h-[42px] rounded-[11px] flex items-center justify-center flex-shrink-0" style="background-color:var(--c-brand-tint)">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--c-brand)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M5 9Q5 4 12 4Q19 4 19 9"/>
-              <rect x="4" y="9" width="16" height="12" rx="3"/>
-              <path d="M9 9V7h6v2"/>
-              <line x1="7" y1="16" x2="17" y2="16"/>
-            </svg>
-          </div>
-          <div>
-            <div class="font-cairo font-bold text-sm" style="color:var(--c-ink)">قلاية هوائية ٦.٥ لتر</div>
-            <div class="font-inter font-bold text-xs tabular-nums" style="color:var(--c-brand)" dir="ltr">٤٬٢٥٠ ج.م</div>
-          </div>
-        </div>
-
-        <!-- Floating card 3 — تم الشحن -->
-        <div class="absolute bottom-[0%] start-[16%] z-10 flex items-center gap-3 backdrop-blur-sm rounded-[18px] px-4 py-3 bob-card"
-          style="background-color:color-mix(in srgb,var(--c-surface) 88%,transparent);border:1px solid var(--c-border);box-shadow:var(--c-shadow-card);animation-delay:1.6s">
-          <div class="w-[42px] h-[42px] rounded-[11px] flex items-center justify-center flex-shrink-0" style="background-color:rgba(22,163,74,0.10)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 6L9 17l-5-5"/>
-            </svg>
-          </div>
-          <div>
-            <div class="font-cairo font-bold text-sm" style="color:var(--c-ink)">تم الشحن</div>
-            <div class="font-cairo font-bold text-xs" style="color:var(--c-trust)">عبر بوسطة</div>
-          </div>
-        </div>
-
-        <!-- Decorative amber glow dot -->
-        <div class="absolute -top-2 -left-2 w-5 h-5 rounded-full blur-sm" style="background:rgba(200,137,59,0.22)"></div>
       </div>
 
     </div>
   </div>
+
 </section>
 
 <style>
-  /* Floating cards bob animation */
-  .bob-card {
-    animation: bobCard 5s ease-in-out infinite;
+  /* ── Section ── */
+  .hero-section {
+    display: flex;
+    align-items: center;
+    /* 3.5rem mobile navbar + ~3.5rem bottom nav; 88svh (not 100) so the
+       catalog peeks above the fold — the scroll affordance IS the layout */
+    min-height: calc(88svh - 7rem - env(safe-area-inset-bottom, 0px));
+    padding-block: 1.5rem 2.5rem;
+    background-color: var(--c-bg);
   }
-  .bob-card:nth-child(2) { animation-delay: 0.8s; }
-  .bob-card:nth-child(3) { animation-delay: 1.6s; }
-  @keyframes bobCard {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-13px); }
-  }
-
-  /* Stage orb morph */
-  .stage-orb {
-    animation: morphOrb 14s ease-in-out infinite;
-  }
-  @keyframes morphOrb {
-    0%, 100% { border-radius: 36% 64% 58% 42% / 52% 44% 56% 48%; }
-    50% { border-radius: 58% 42% 38% 62% / 46% 58% 42% 54%; }
-  }
-
-  /* Trust line: one swipeable line on mobile */
-  @media (max-width: 639px) {
-    .hero-trust {
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      margin-inline: -1rem;
-      padding-inline: 1rem;
+  @media (min-width: 1024px) {
+    .hero-section {
+      /* 4rem desktop navbar; capped so ultra-tall monitors don't stretch it */
+      min-height: min(calc(100svh - 4rem), 50rem);
+      padding-block: 3.5rem 4rem;
     }
-    .hero-trust::-webkit-scrollbar { display: none; }
-    .hero-trust > span { white-space: nowrap; flex-shrink: 0; }
+  }
+  @media (max-height: 560px) {
+    .hero-section { min-height: auto; }
   }
 
-  /* Fade-in reveals */
-  .reveal-fade {
+  .hero-inner { padding-inline: 1rem; }
+  @media (min-width: 640px)  { .hero-inner { padding-inline: 1.5rem; } }
+  @media (min-width: 1024px) { .hero-inner { padding-inline: 2rem; } }
+
+  /* ── Maker's monogram watermark ──
+     A giant faint هـ behind the copy. Carries the brand feel on mobile (where the
+     seal is hidden); a quiet echo on desktop. Theme-aware, edge-anchored to the
+     reading start so it never muddies the headline. */
+  .hero-watermark {
+    position: absolute;
+    z-index: 0;
+    inset-block-start: 50%;
+    inset-inline-start: -0.18em;
+    transform: translateY(-52%);
+    font-weight: 900;
+    line-height: 0.8;
+    font-size: clamp(20rem, 64vw, 30rem);
+    color: var(--c-brand);
+    opacity: 0.04;
+    pointer-events: none;
+    user-select: none;
+  }
+  :global(html.dark) .hero-watermark { opacity: 0.06; }
+  @media (min-width: 1024px) {
+    .hero-watermark {
+      inset-inline-start: -0.1em;
+      font-size: 34rem;
+      opacity: 0.035;
+    }
+    :global(html.dark) .hero-watermark { opacity: 0.05; }
+  }
+
+  /* ── Grid: single copy column ── */
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+  }
+  @media (min-width: 1024px) {
+    .hero-grid { max-width: 52rem; }
+  }
+
+  /* ── Logo lockup ── */
+  .hero-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.1rem;
+  }
+  .hero-logo-mark {
+    display: inline-flex;
+    width: 2.1rem;
+    height: 2.1rem;
+    color: var(--c-brand);
+    filter: drop-shadow(0 4px 12px rgba(var(--c-brand-rgb), 0.30));
+  }
+  .hero-logo-mark svg { width: 100%; height: 100%; }
+  .hero-logo-word {
+    font-weight: 900;
+    font-size: 1.6rem;
+    line-height: 1;
+    color: var(--c-ink);
+    letter-spacing: -0.01em;
+  }
+  @media (min-width: 1024px) {
+    .hero-logo { margin-bottom: 1.35rem; }
+    .hero-logo-mark { width: 2.35rem; height: 2.35rem; }
+    .hero-logo-word { font-size: 1.8rem; }
+  }
+
+  /* ── H1 — the tagline. Copy-first mobile earns bigger type ── */
+  .hero-h1 {
+    font-size: clamp(2.4rem, 10.8vw, 3rem);
+    line-height: 1.16;
+    color: var(--c-ink);
+    margin-bottom: 0.875rem;
+  }
+  @media (min-width: 640px)  { .hero-h1 { font-size: clamp(3rem, 6vw, 3.6rem); } }
+  @media (min-width: 1024px) { .hero-h1 { font-size: 3.9rem; margin-bottom: 1.125rem; } }
+
+  /* مع stays in the dark hearth — no gray. The only color in the line is red. */
+  .hero-h1-with { color: var(--c-ink); }
+  /* The two heat-words — جاهز (the payoff) and هفار (the brand) — share one fire.
+     The repeated red links promise to brand: «ready ⟷ with Hvar». */
+  .hero-key { color: var(--c-brand); }
+  .hero-brand-word { color: var(--c-brand); }
+
+  /* ── Subline ── */
+  .hero-subline {
+    font-size: 1rem;
+    max-width: 33rem;
+    color: var(--c-ink-muted);
+    margin-bottom: 1.5rem;
+  }
+  @media (min-width: 640px) { .hero-subline { font-size: 1.125rem; margin-bottom: 1.75rem; } }
+
+  /* «دايماً جاهز» — the promise, stamped. Ember ink on red tint, the inline echo of
+     the maker's seal: a promise is a thing you stamp, so the phrase IS one.
+     Irregular radius + slight tilt = hand-pressed, not printed. */
+  .hero-stamp {
+    display: inline-block;
+    padding: 0.04em 0.5em 0.14em;
+    margin-inline: 0.1em;
+    font-weight: 800;
+    color: var(--c-brand-deep);
+    background: var(--c-brand-tint);
+    border: 1.5px solid var(--c-brand-line);
+    border-radius: 0.55em 0.7em 0.5em 0.75em / 0.75em 0.5em 0.8em 0.55em;
+    transform: rotate(-2deg);
+    animation: stampThump 0.4s var(--ease-spring) 0.85s both;
+  }
+  :global(html.dark) .hero-stamp { color: var(--c-brand-warm); }
+  @keyframes stampThump {
+    0%   { opacity: 0; transform: rotate(-5deg) scale(1.5); }
+    62%  { opacity: 1; transform: rotate(-2deg) scale(0.95); }
+    100% { opacity: 1; transform: rotate(-2deg) scale(1); }
+  }
+
+  /* ── CTAs ── */
+  .hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.625rem;
+    margin-bottom: 1.25rem;
+  }
+  .hero-cta-primary,
+  .hero-cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 3rem;
+    padding: 0.75rem 1.375rem;
+    border-radius: 0.875rem;
+    font-size: 0.9875rem;
+    white-space: nowrap;
+  }
+  /* Narrow phones: both CTAs share one row, equal width */
+  @media (max-width: 479px) {
+    .hero-cta-primary,
+    .hero-cta-secondary { flex: 1 1 0; padding-inline: 1rem; }
+  }
+  .hero-cta-primary {
+    color: #fff;
+    background: linear-gradient(135deg, var(--c-brand), var(--c-brand-deep));
+    box-shadow: 0 12px 26px -12px var(--c-brand);
+    transition: box-shadow 0.22s var(--ease-ember), transform 0.22s var(--ease-ember);
+  }
+  .hero-cta-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 34px -12px var(--c-brand);
+  }
+  .hero-cta-primary:active { transform: translateY(0); }
+  .hero-cta-secondary {
+    background-color: var(--c-surface);
+    border: 1px solid var(--c-border);
+    color: var(--c-ink);
+    transition: border-color 0.2s ease, color 0.2s ease, transform 0.22s var(--ease-ember);
+  }
+  .hero-cta-secondary:hover { border-color: var(--c-flame-bright); color: var(--c-brand); transform: translateY(-2px); }
+  .hero-cta-secondary:active { transform: translateY(0); }
+
+  /* ── Help + trust meta ── */
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.625rem 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+  .hero-hotline-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: "Cairo", system-ui, sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--c-ink-muted);
+    transition: color 0.18s ease;
+  }
+  .hero-hotline-link svg { color: var(--c-flame); flex-shrink: 0; }
+  .hero-hotline-link:hover { color: var(--c-brand); }
+  .hero-hotline-num {
+    font-weight: 700;
+    font-size: 0.9375rem;
+    color: var(--c-brand);
+    letter-spacing: 0.04em;
+  }
+  .hero-trust {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.7rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: "Cairo", system-ui, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--c-ink-faint);
+  }
+  .hero-trust li {
+    display: inline-flex;
+    align-items: center;
+  }
+  .hero-trust li:not(:first-child)::before {
+    content: '';
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--c-flame-bright);
+    opacity: 0.6;
+    margin-inline-end: 0.7rem;
+  }
+
+  /* ── Entrance reveal — staggered via --d ── */
+  .hv-reveal {
     opacity: 0;
     transform: translateY(16px);
-    animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation: hvFadeUp 0.65s var(--ease-spring) var(--d, 0s) forwards;
   }
-  .reveal-fade:nth-child(2) { animation-delay: 0.1s; }
-  .reveal-fade:nth-child(3) { animation-delay: 0.2s; }
-  .reveal-fade:nth-child(4) { animation-delay: 0.3s; }
-  .reveal-fade:nth-child(5) { animation-delay: 0.35s; }
-  .reveal-fade:nth-child(6) { animation-delay: 0.4s; }
-  @keyframes fadeUp {
+  @keyframes hvFadeUp {
     to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hv-reveal { animation: none; opacity: 1; transform: none; }
+    .hero-stamp { animation: none; opacity: 1; }
+    .hero-cta-primary, .hero-cta-secondary { transition: none; }
   }
 </style>

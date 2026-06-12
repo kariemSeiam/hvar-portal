@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 716 348" role="img" aria-label="HVAR Logo">
+  <title>HVAR</title>
+  <defs>
+    <style><![CDATA[@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&display=swap');]]></style>
+    <clipPath id="dm">
+      <rect x="88" y="72" width="206" height="206" rx="26" transform="rotate(45 191 175)"/>
+    </clipPath>
+  </defs>
+
+  <!-- Black wordmark -->
+  <text
+    x="102"
+    y="258"
+    font-family="'Playfair Display', Georgia, 'Times New Roman', serif"
+    font-weight="900"
+    font-size="202"
+    fill="#0d0d0d"
+    letter-spacing="-3"
+  >HVAR</text>
+
+  <!-- Red rounded diamond -->
+  <rect
+    x="88" y="72"
+    width="206" height="206"
+    rx="26"
+    fill="#C0181A"
+    transform="rotate(45 191 175)"
+  />
+
+  <!-- White wordmark clipped to diamond -->
+  <text
+    x="102"
+    y="258"
+    font-family="'Playfair Display', Georgia, 'Times New Roman', serif"
+    font-weight="900"
+    font-size="202"
+    fill="#ffffff"
+    letter-spacing="-3"
+    clip-path="url(#dm)"
+  >HVAR</text>
+
+  <!-- Registered mark -->
+  <text
+    x="652"
+    y="76"
+    font-family="Georgia, serif"
+    font-size="34"
+    fill="#0d0d0d"
+  >®</text>
+</svg>

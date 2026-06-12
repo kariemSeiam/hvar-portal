@@ -2,8 +2,6 @@
 import Base from '../layouts/Base.astro'
 import Hero from '../components/Hero.astro'
 import CategoriesStrip from '../components/CategoriesStrip.astro'
-import TrustBlock from '../components/TrustBlock.astro'
-import ChefStrip from '../components/ChefStrip.astro'
 import ProductCard from '../components/ProductCard.astro'
 import { api } from '../lib/api'
 
@@ -18,13 +16,11 @@ const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.va
 ---
 
 <Base
-  title="هفار | أجهزة منزلية بضمان سنتين وشحن مجاني لجميع أنحاء مصر"
-  description="تسوق أجهزة هفار: خلاطات، قلايات هوائية، مكاوي بخار، عجانات. ضمان من سنتين لثلاث سنوات، شحن مجاني، افحص قبل الدفع."
+  title="هفار | أجهزة منزلية مصرية بجودة تستاهل بيتك وشحن مجاني لكل مصر"
+  description="تسوّقي أجهزة هفار: خلاطات، قلايات هوائية، مكاوي بخار، عجانات وكبّة. صناعة مصرية، شحن مجاني لكل مصر، وافحصي قبل ما تدفعي."
 >
 
   <Hero />
-
-  <TrustBlock />
 
   <CategoriesStrip categories={categories} />
 
@@ -32,14 +28,18 @@ const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.va
   <section class="py-16 sm:py-20 reveal-section">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-      <div class="flex items-center justify-between mb-7">
-        <h2 class="font-cairo font-bold text-xl" style="color:var(--c-ink)">
-          الأكثر مبيعاً من هفار
-        </h2>
+      <div class="flex items-end justify-between mb-8">
+        <div>
+          <p class="font-cairo text-xs font-semibold tracking-[0.14em] mb-1.5" style="color:var(--c-flame)">الأكثر مبيعاً</p>
+          <h2 class="font-cairo font-bold text-xl" style="color:var(--c-ink)">
+            من هفار
+          </h2>
+        </div>
         {featured.length > 0 && (
           <a
             href="/products"
-            class="font-cairo text-sm text-brand hover:text-[var(--c-brand-hover)] font-semibold transition-colors flex items-center gap-1"
+            class="font-cairo text-sm font-semibold transition-colors flex items-center gap-1 pb-0.5"
+            style="color:var(--c-brand)"
           >
             عرض الكل
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
@@ -51,21 +51,22 @@ const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.va
 
       <div class="feat-row">
         {featured.length === 0 ? (
-          /* Skeleton shimmer while loading */
-          Array.from({ length: 4 }).map(() => (
-            <div class="rounded-2xl bg-surface border border-hvar overflow-hidden shimmer-skel">
-              <div class="aspect-square" style="background-color:var(--c-border)"></div>
-              <div class="p-4 space-y-3">
-                <div class="h-2.5 w-1/3 rounded-full" style="background-color:var(--c-border)"></div>
-                <div class="h-3 w-3/4 rounded-full" style="background-color:var(--c-border)"></div>
-                <div class="h-3 w-1/2 rounded-full" style="background-color:var(--c-border)"></div>
+          Array.from({ length: 4 }).map((_, i) => (
+            <div class="reveal-child feat-card" style={`--stagger:${i * 55}ms`}>
+              <div class="rounded-2xl overflow-hidden shimmer-skel" style="background-color:var(--c-surface);border:1px solid var(--c-border)">
+                <div class="aspect-square" style="background-color:var(--c-border)"></div>
+                <div class="p-4 space-y-3">
+                  <div class="h-2.5 w-1/3 rounded-full" style="background-color:var(--c-border)"></div>
+                  <div class="h-3 w-3/4 rounded-full" style="background-color:var(--c-border)"></div>
+                  <div class="h-3 w-1/2 rounded-full" style="background-color:var(--c-border)"></div>
+                </div>
               </div>
             </div>
           ))
         ) : (
-          featured.map((product) => (
-            <div class="reveal-child">
-              <ProductCard product={product} />
+          featured.map((product, i) => (
+            <div class="reveal-child feat-card" style={`--stagger:${Math.min(i, 3) * 55}ms`}>
+              <ProductCard product={product} eager={i < 2} />
             </div>
           ))
         )}
@@ -75,30 +76,14 @@ const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.va
   </section>
 
   <style>
-    /* Featured: thumb-driven horizontal snap carousel on mobile (with edge
-       peek), grid on larger screens */
-    @media (max-width: 639px) {
-      .feat-row {
-        display: flex;
-        gap: 0.875rem;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        margin-inline: -1rem;
-        padding-inline: 1rem;
-        padding-bottom: 0.5rem;
-      }
-      .feat-row::-webkit-scrollbar { display: none; }
-      .feat-row > * {
-        min-width: min(62vw, 240px);
-        flex-shrink: 0;
-        scroll-snap-align: start;
-      }
+    /* Featured: clean vertical grid at every breakpoint — no horizontal scroll */
+    .feat-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
     }
     @media (min-width: 640px) {
       .feat-row {
-        display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 1rem;
       }
@@ -106,41 +91,17 @@ const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.va
     @media (min-width: 1024px) {
       .feat-row { grid-template-columns: repeat(4, 1fr); }
     }
+
+    /* Staggered wave reveal — each card inherits its own delay */
+    .feat-card.reveal-child {
+      transform: translateY(24px) scale(0.97);
+      transition-delay: var(--stagger, 0ms);
+    }
+    .feat-card.reveal-child.visible {
+      transform: translateY(0) scale(1);
+      transition-delay: var(--stagger, 0ms);
+    }
   </style>
-
-  <ChefStrip />
-
-  <!-- ── WhatsApp CTA band ─────────────────────────────────── -->
-  <section class="relative overflow-hidden py-10 sm:py-12 reveal-section" style="background:#1a1208;border-top:1px solid rgba(var(--c-brass-rgb),0.12);border-bottom:1px solid rgba(var(--c-brass-rgb),0.12)">
-    <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(ellipse 60% 80% at 80% 50%, rgba(37,211,102,0.06) 0%, transparent 65%)" aria-hidden="true"></div>
-    <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col sm:flex-row items-center gap-5 sm:gap-8 reveal-child">
-        <div class="flex-1 text-center sm:text-start">
-          <p class="font-cairo font-semibold text-xs uppercase tracking-[0.16em] mb-1" style="color:#25d366;opacity:0.75">+١٤٧ ألف عيلة هفار</p>
-          <h2 class="font-cairo font-black text-xl sm:text-2xl leading-tight" style="color:#F5EFE6">
-            وصفات، نصايح، وأسعار حصرية — يوميًا على واتساب
-          </h2>
-          <p class="font-cairo text-sm mt-1.5 leading-relaxed" style="color:rgba(245,239,230,0.45)">
-            انضمي لمجتمع هفار على واتساب — كوبونات، قبل الإطلاق، واستشارات مجانية
-          </p>
-        </div>
-        <a
-          href="https://wa.me/201204444196?text=عايزة أنضم لمجموعة هفار"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="flex-shrink-0 inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-cairo font-bold text-base text-white transition-all"
-          style="background:#25D366;box-shadow:0 4px 20px rgba(37,211,102,0.25);transition:all 0.3s cubic-bezier(0.22,1,0.36,1)"
-          onmouseover="this.style.background='#1db954';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(37,211,102,0.35)'"
-          onmouseout="this.style.background='#25D366';this.style.transform='';this.style.boxShadow='0 4px 20px rgba(37,211,102,0.25)'"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-          </svg>
-          انضمي دلوقتي
-        </a>
-      </div>
-    </div>
-  </section>
 
   <!-- ── Social Proof ───────────────────────────────────────── -->
   <section class="py-16 sm:py-20 reveal-section" style="background-color:var(--c-surface);border-top:1px solid var(--c-border);border-bottom:1px solid var(--c-border)">
@@ -148,7 +109,7 @@ const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.va
 
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
         <div class="reveal-child">
-          <p class="font-cairo font-semibold text-xs uppercase tracking-[0.16em] mb-1" style="color:var(--c-brass)">هيقولوا إيه عنا؟</p>
+          <p class="font-cairo font-semibold text-xs uppercase tracking-[0.16em] mb-1" style="color:var(--c-flame)">هيقولوا إيه عنا؟</p>
           <h2 class="font-cairo font-black text-2xl sm:text-3xl" style="color:var(--c-ink)">١٤٧٫٠٠٠+ بيثقوا فينا</h2>
         </div>
         <a href="https://www.facebook.com/hvar22" target="_blank" rel="noopener noreferrer"
@@ -169,8 +130,8 @@ const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.va
             name: "سارة محمود",
             city: "القاهرة",
             stars: 5,
-            text: "الكبة البلدوزر ٢٠٠٠ وات دي أكتر من هيلة! شغالة من ٣ سنين ومافيهاش أي مشكلة. والضمان حقيقي مش كلام.",
-            product: "كبة البلدوزر ٢٠٠٠ وات",
+            text: "كبة هفار ٢٠٠٠ وات دي أكتر من هيلة! شغالة من ٣ سنين ومافيهاش أي مشكلة. جودة هفار مش كلام — تستاهل كل قرش.",
+            product: "كبة هفار ٢٠٠٠ وات",
           },
           {
             name: "منى علي",
@@ -194,11 +155,11 @@ const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.va
             product: "مكواة بخار ٢٨٠٠ وات",
           },
         ]).map(({ name, city, stars, text, product }) => (
-          <div class="proof-card reveal-child" style="background:var(--c-bg);border:1px solid var(--c-border);border-radius:1.25rem;padding:1.25rem;display:flex;flex-direction:column;gap:0.75rem;flex-shrink:0;scroll-snap-align:start">
+          <div class="proof-card reveal-child" style="background:var(--c-bg);border:1px solid var(--c-border);border-radius:1.25rem;display:flex;flex-direction:column;gap:0.625rem;">
             <!-- Stars -->
             <div class="flex gap-0.5" aria-label={`${stars} نجوم`}>
               {Array.from({ length: stars }).map(() => (
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="var(--c-brass)" aria-hidden="true">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="var(--c-flame-bright)" aria-hidden="true">
                   <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
                 </svg>
               ))}
@@ -222,7 +183,7 @@ const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.va
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
       <div class="text-center mb-10 reveal-child">
-        <p class="font-cairo font-semibold text-xs uppercase tracking-[0.16em] mb-2" style="color:var(--c-brass)">هفار بتوصلك</p>
+        <p class="font-cairo font-semibold text-xs uppercase tracking-[0.16em] mb-2" style="color:var(--c-flame)">هفار بتوصلك</p>
         <h2 class="font-cairo font-black text-2xl sm:text-3xl" style="color:var(--c-ink)">٣ خطوات وبس</h2>
       </div>
 
@@ -272,7 +233,7 @@ const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.va
             </svg>
           </div>
           <h3 class="hiw-title font-cairo">افحصي قبل الدفع</h3>
-          <p class="hiw-desc font-cairo">ادفعي لما تتأكدي — والضمان معاكِ سنتين</p>
+          <p class="hiw-desc font-cairo">ادفعي لما تتأكدي — وخدمة هفار معاكِ بعد البيع</p>
         </div>
 
       </div>
@@ -340,31 +301,20 @@ const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.va
     /* ── Social proof testimonials ── */
     .proof-row {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
     }
-    @media (max-width: 1023px) {
+    @media (min-width: 1024px) {
       .proof-row {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
       }
     }
-    @media (max-width: 639px) {
-      .proof-row {
-        display: flex;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        margin-inline: -1rem;
-        padding-inline: 1rem;
-        padding-block-end: 0.5rem;
-        gap: 0.875rem;
-      }
-      .proof-row::-webkit-scrollbar { display: none; }
-      .proof-card {
-        min-width: min(76vw, 280px) !important;
-        scroll-snap-align: start;
-      }
+    .proof-card {
+      padding: 0.875rem;
+    }
+    @media (min-width: 640px) {
+      .proof-card { padding: 1.25rem; }
     }
 
     /* ── How It Works ── */
@@ -484,29 +434,14 @@ const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.va
       .hiw-step:last-child .hiw-arrow { display: none; }
     }
 
-    /* ── Service cards – horizontal snap on mobile ── */
-    @media (max-width: 639px) {
-      .svc-row {
-        display: flex;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        margin-inline: -1rem;
-        padding-inline: 1rem;
-        padding-block-end: 0.5rem;
-        gap: 0.75rem;
-      }
-      .svc-row::-webkit-scrollbar { display: none; }
-      .svc-row .svc-card {
-        min-width: 10rem;
-        flex-shrink: 0;
-        scroll-snap-align: start;
-      }
+    /* ── Service cards — 2×2 on mobile, 4-col on desktop ── */
+    .svc-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
     }
     @media (min-width: 640px) {
       .svc-row {
-        display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 1rem;
       }
