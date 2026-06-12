@@ -86,12 +86,12 @@ export default function TicketsList() {
 				<div
 					className="absolute inset-0 pointer-events-none"
 					aria-hidden="true"
-					style={{ background: "radial-gradient(ellipse 55% 50% at 50% 40%, rgba(var(--c-brass-rgb),0.07) 0%, transparent 70%)" }}
+					style={{ background: "radial-gradient(ellipse 55% 50% at 50% 40%, rgba(var(--c-flame-rgb),0.07) 0%, transparent 70%)" }}
 				/>
 				<Wrench
 					className="relative select-none"
 					strokeWidth={0.9}
-					style={{ width: "clamp(80px,15vw,120px)", height: "auto", color: "var(--c-brass)", opacity: 0.18 }}
+					style={{ width: "clamp(80px,15vw,120px)", height: "auto", color: "var(--c-flame-bright)", opacity: 0.18 }}
 					aria-hidden="true"
 				/>
 				<p className="relative font-cairo font-black text-xl sm:text-2xl mt-5" style={{ color: "var(--c-ink)" }}>

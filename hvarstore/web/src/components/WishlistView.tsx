@@ -179,11 +179,6 @@ export default function WishlistView() {
 
 						{/* Body */}
 						<div className="flex flex-col flex-1 p-3.5">
-							{e?.nickname && (
-								<span className="font-cairo font-bold text-xs mb-0.5" style={{ color: "var(--c-brass)" }}>
-									{e.nickname}
-								</span>
-							)}
 							<a href={`/products/${p.slug}`} className="font-cairo font-semibold text-sm leading-snug line-clamp-2" style={{ color: "var(--c-ink)" }}>
 								{p.name}
 							</a>

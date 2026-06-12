@@ -10,7 +10,7 @@ const waWholesale   = 'https://wa.me/message/RURCTAQLT5ASO1'
 const faqItems = [
   {
     q: 'ما مدة ضمان منتجات هفار؟',
-    a: 'من سنتين لثلاث سنوات حسب المنتج — يبدأ من تاريخ الاستلام. الضمان يشمل قطع الغيار والإصلاح من غير شروط مخبّية.',
+    a: 'سنة من تاريخ الاستلام. الضمان يشمل عيوب التصنيع — تواصلي معنا لأي استفسار.',
   },
   {
     q: 'هل الدفع عند الاستلام متاح؟',
@@ -104,12 +104,12 @@ const contactJsonld = JSON.stringify({
     z-index: 2;
     background:
       radial-gradient(ellipse 80% 60% at 50% 0%, hsl(1 64% 51% / 0.08) 0%, transparent 70%),
-      radial-gradient(ellipse 40% 30% at 90% 80%, hsl(32 55% 51% / 0.06) 0%, transparent 60%);
+      radial-gradient(ellipse 40% 30% at 90% 80%, rgba(var(--c-flame-rgb),0.06) 0%, transparent 60%);
   }
   .dark .mesh-hero::after {
     background:
       radial-gradient(ellipse 80% 60% at 50% 0%, hsl(2 75% 58% / 0.14) 0%, transparent 70%),
-      radial-gradient(ellipse 40% 30% at 90% 80%, hsl(32 55% 51% / 0.10) 0%, transparent 60%);
+      radial-gradient(ellipse 40% 30% at 90% 80%, rgba(var(--c-flame-rgb),0.10) 0%, transparent 60%);
   }
 
   /* ── P6: Card Shine ───────────────────────────────────────────────────── */
@@ -219,7 +219,7 @@ const contactJsonld = JSON.stringify({
     font-size: clamp(3.5rem, 14vw, 8rem);
     font-weight: 900;
     letter-spacing: -0.03em;
-    color: var(--c-brass);
+    color: var(--c-flame-bright);
     line-height: 1;
   }
 
@@ -281,9 +281,9 @@ const contactJsonld = JSON.stringify({
 
       <!-- Left: hotline as the hero -->
       <div>
-        <!-- Brass pre-heading -->
+        <!-- Flame pre-heading -->
         <p class="reveal-child font-cairo font-semibold text-xs uppercase tracking-[0.16em] mb-3"
-           style="color:var(--c-brass)">
+           style="color:var(--c-flame)">
           الخط الساخن الرسمي
         </p>
 
@@ -373,11 +373,11 @@ const contactJsonld = JSON.stringify({
              flex flex-col gap-4 p-7 rounded-2xl
              bg-surface
              border-2 border-hvar
-             hover:border-[#C8893B] dark:hover:border-[#C8893B]
-             focus-visible:outline-2 focus-visible:outline-[#C8893B]"
+             hover:border-[var(--c-flame-bright)]
+             focus-visible:outline-2 focus-visible:outline-[var(--c-flame-bright)]"
     >
-      <div class="w-14 h-14 rounded-2xl bg-[#C8893B]/10
-                  flex items-center justify-center text-brass"
+      <div class="w-14 h-14 rounded-2xl bg-[rgba(var(--c-flame-rgb),0.10)]
+                  flex items-center justify-center text-flame"
            style="transition:background 250ms cubic-bezier(0.22,1,0.36,1),color 250ms cubic-bezier(0.22,1,0.36,1)">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -392,7 +392,7 @@ const contactJsonld = JSON.stringify({
           صيانة، استبدال تحت الضمان، أو إرجاع — افتحي طلب وفريقنا هيرد خلال ٢٤ ساعة
         </p>
       </div>
-      <span class="font-cairo text-sm font-bold text-brass flex items-center gap-1.5 mt-auto">
+      <span class="font-cairo text-sm font-bold text-flame flex items-center gap-1.5 mt-auto">
         افتحي طلب خدمة
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none"
              class="rtl:rotate-180" aria-hidden="true">
@@ -461,9 +461,9 @@ const contactJsonld = JSON.stringify({
                 dark:from-[#0e0b07] dark:to-[#1a1007]
                 p-8 sm:p-10 sm:p-12">
 
-      <!-- Brass ambient glow -->
+      <!-- Flame ambient glow -->
       <div class="absolute inset-0 pointer-events-none" aria-hidden="true"
-           style="background:radial-gradient(ellipse 70% 60% at 85% 20%,hsl(32 55% 51% / 0.22) 0%,transparent 65%)">
+           style="background:radial-gradient(ellipse 70% 60% at 85% 20%,rgba(var(--c-flame-rgb),0.22) 0%,transparent 65%)">
       </div>
       <!-- Red ember top-left -->
       <div class="absolute inset-0 pointer-events-none" aria-hidden="true"
@@ -474,7 +474,7 @@ const contactJsonld = JSON.stringify({
 
         <!-- Number block -->
         <div class="flex flex-col gap-3">
-          <span class="font-cairo text-xs font-semibold text-brass tracking-widest uppercase">
+          <span class="font-cairo text-xs font-semibold text-flame tracking-widest uppercase">
             الخط الساخن — مسجّل لدى NTRA
           </span>
           <p class="hotline-num" dir="ltr" aria-label="رقم الخط الساخن ١٧٥٦٦">17566</p>
@@ -489,11 +489,11 @@ const contactJsonld = JSON.stringify({
             href="tel:17566"
             class="inline-flex items-center gap-3
                    px-8 py-4 rounded-xl min-h-[52px]
-                   bg-[#C8893B] hover:bg-[#b07830]
+                   bg-[var(--c-brand)] hover:bg-[var(--c-brand-hover)]
                    text-white font-cairo font-bold text-base
-                   focus-visible:outline-2 focus-visible:outline-[#C8893B]"
+                   focus-visible:outline-2 focus-visible:outline-[var(--c-flame-bright)]"
             style="transition:background 250ms cubic-bezier(0.22,1,0.36,1),box-shadow 250ms cubic-bezier(0.22,1,0.36,1);
-                   box-shadow:0 4px 20px hsl(32 55% 51% / 0.40)"
+                   box-shadow:0 4px 20px rgba(var(--c-brand-rgb),0.40)"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -675,14 +675,14 @@ const contactJsonld = JSON.stringify({
       class="card-shine group flex flex-col items-center gap-3 p-5 rounded-2xl text-center
              bg-surface
              border border-hvar
-             hover:border-[#C8893B] dark:hover:border-[#C8893B]
-             focus-visible:outline-2 focus-visible:outline-[#C8893B]
+             hover:border-[var(--c-flame-bright)]
+             focus-visible:outline-2 focus-visible:outline-[var(--c-flame-bright)]
              min-h-[44px]"
       style="transition:border-color 250ms cubic-bezier(0.22,1,0.36,1)"
     >
-      <div class="w-11 h-11 rounded-xl bg-[#C8893B]/10
-                  flex items-center justify-center text-brass
-                  group-hover:bg-[#C8893B] group-hover:text-white"
+      <div class="w-11 h-11 rounded-xl bg-[rgba(var(--c-flame-rgb),0.10)]
+                  flex items-center justify-center text-flame
+                  group-hover:bg-[var(--c-flame-bright)] group-hover:text-white"
            style="transition:background 250ms cubic-bezier(0.22,1,0.36,1),color 250ms cubic-bezier(0.22,1,0.36,1)">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -713,7 +713,7 @@ const contactJsonld = JSON.stringify({
         <path d="M5.5 8l2 2 3-3" stroke="currentColor" stroke-width="1.5"
               stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      ضمان ٣ سنوات
+      ضمان على المنتجات
     </span>
 
     <span class="dot-sep" aria-hidden="true">·</span>
@@ -767,7 +767,7 @@ const contactJsonld = JSON.stringify({
   <div class="reveal-section mb-8">
     <h2 id="faq-heading"
         class="font-cairo font-black text-2xl text-ink mb-2">
-      أسئلة كتير — إجابات واضحة
+      أسئلة وأجوبة
     </h2>
     <p class="font-cairo text-sm text-muted">
       مش لاقية إجابتك هنا؟
@@ -809,58 +809,5 @@ const contactJsonld = JSON.stringify({
 </section>
 
 
-<!-- ═══════════════════════════════════════════════════════════════════════
-     COMMUNITY — social proof closer
-     ═══════════════════════════════════════════════════════════════════════ -->
-<section
-  class="relative overflow-hidden grain-overlay
-         bg-[#1e1814] dark:bg-[#0e0b07]
-         py-16 sm:py-20 reveal-section"
-  aria-label="مجتمع هفار"
->
-  <!-- Brass glow -->
-  <div class="absolute inset-0 pointer-events-none" aria-hidden="true"
-       style="background:radial-gradient(ellipse 80% 70% at 50% 110%,hsl(32 55% 51% / 0.30) 0%,transparent 70%)">
-  </div>
-  <!-- Red ember -->
-  <div class="absolute inset-0 pointer-events-none" aria-hidden="true"
-       style="background:radial-gradient(ellipse 40% 30% at 10% 10%,hsl(1 64% 51% / 0.18) 0%,transparent 60%)">
-  </div>
-
-  <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-
-    <p class="font-cairo font-semibold text-brass text-sm mb-4 tracking-widest uppercase">
-      عيلة هفار على فيسبوك
-    </p>
-
-    <p class="stat-num mb-2">١٤٧ ألف</p>
-
-    <p class="font-cairo text-base text-[#a8a29e] max-w-sm mx-auto mb-8 leading-relaxed">
-      بيتشاركوا وصفات وتجارب حقيقية مع منتجات هفار كل يوم. تعالي كوني جزء من الحكاية.
-    </p>
-
-    <a
-      href="https://facebook.com/hvarstore"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="inline-flex items-center gap-3
-             px-8 py-4 rounded-xl min-h-[52px]
-             bg-[#1877f2] hover:bg-[#0d6efd]
-             text-white font-cairo font-bold text-base
-             focus-visible:outline-2 focus-visible:outline-white"
-      style="transition:background 250ms cubic-bezier(0.22,1,0.36,1)"
-    >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-      </svg>
-      انضمي للعيلة
-    </a>
-
-    <p class="font-cairo text-xs text-[#8a7f78] mt-6">
-      هفار ... اسم يُعتمد عليه
-    </p>
-
-  </div>
-</section>
 
 </Base>

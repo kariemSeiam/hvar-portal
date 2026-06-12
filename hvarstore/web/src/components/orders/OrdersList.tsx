@@ -84,7 +84,7 @@ export default function OrdersList() {
 					لسه مفيش طلبات
 				</p>
 				<p className="relative font-cairo text-sm mt-2 mb-8" style={{ color: "var(--c-ink-muted)" }}>
-					أول طلب ليكِ هيبان هنا — البلدوزر بيستناكِ
+					أول طلب ليكِ هيبان هنا — منتجاتنا بتستناكِ
 				</p>
 				<a
 					href="/products"

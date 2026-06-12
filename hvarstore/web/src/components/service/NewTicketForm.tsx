@@ -13,8 +13,7 @@ import {
 	isLoggedIn,
 	authUser,
 	getAuthHeaders,
-	login,
-	register,
+	loginWithPhone,
 	logout,
 	normalizeEgyptPhone,
 } from "../../lib/auth";
@@ -67,11 +66,9 @@ export default function NewTicketForm() {
 	} | null>(null);
 	const [orders, setOrders] = useState<Order[]>([]);
 
-	// Inline contact/auth — a customer with a broken appliance never hits a login wall
-	const [authMode, setAuthMode] = useState<"new" | "existing">("new");
+	// Inline contact — passwordless, a customer with a broken appliance never hits a login wall
 	const [authPhone, setAuthPhone] = useState("");
 	const [authName, setAuthName] = useState("");
-	const [authPassword, setAuthPassword] = useState("");
 
 	useEffect(() => {
 		if (!loggedIn) return;
@@ -89,22 +86,22 @@ export default function NewTicketForm() {
 				<div
 					className="relative overflow-hidden rounded-2xl p-8 text-center"
 					style={{
-						background: "linear-gradient(135deg, #130F0C 0%, #1e1208 100%)",
-						border: "1px solid rgba(var(--c-brand-rgb),0.20)",
+						background: "var(--c-surface)",
+						border: "1px solid var(--c-border)",
 					}}
 				>
 					<div
 						className="absolute inset-0 pointer-events-none"
 						aria-hidden="true"
-						style={{ background: "radial-gradient(ellipse 70% 60% at 50% 0%, rgba(var(--c-brand-rgb),0.14) 0%, transparent 70%)" }}
+						style={{ background: "radial-gradient(ellipse 70% 60% at 50% 0%, var(--c-brand-glow) 0%, transparent 70%)" }}
 					/>
 					<div
 						className="relative w-16 h-16 mx-auto flex items-center justify-center rounded-2xl mb-5"
-						style={{ background: "rgba(34,197,94,0.10)", border: "1px solid rgba(34,197,94,0.22)" }}
+						style={{ background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.25)" }}
 					>
-						<CheckCircle2 size={32} className="text-green-400" />
+						<CheckCircle2 size={32} style={{ color: "var(--c-trust)" }} />
 					</div>
-					<h2 className="relative font-cairo font-black text-2xl mb-3" style={{ color: "#F5EFE6" }}>
+					<h2 className="relative font-cairo font-black text-2xl mb-3" style={{ color: "var(--c-ink)" }}>
 						تم إرسال الطلب
 					</h2>
 					<div
@@ -116,7 +113,7 @@ export default function NewTicketForm() {
 							{success.ticketCode}
 						</span>
 					</div>
-					<p className="relative font-cairo text-sm mb-8" style={{ color: "rgba(245,239,230,0.50)" }}>
+					<p className="relative font-cairo text-sm mb-8" style={{ color: "var(--c-ink-muted)" }}>
 						فريق الصيانة هيتواصل معك خلال ٢٤ ساعة
 					</p>
 					<div className="relative flex flex-col sm:flex-row gap-3 justify-center">
@@ -130,7 +127,7 @@ export default function NewTicketForm() {
 						<a
 							href="/service"
 							className="px-6 py-3 rounded-xl font-cairo font-semibold text-sm transition-all"
-							style={{ border: "1px solid rgba(245,239,230,0.15)", color: "rgba(245,239,230,0.60)" }}
+							style={{ border: "1px solid var(--c-border)", color: "var(--c-ink-muted)" }}
 						>
 							كل الطلبات
 						</a>
@@ -144,36 +141,18 @@ export default function NewTicketForm() {
 		e.preventDefault();
 		setError(null);
 
-		// Authenticate inline first when needed — same phone-first pattern as checkout
+		// Authenticate inline first when needed — passwordless, phone-first like checkout
 		if (!loggedIn) {
 			const phone = normalizeEgyptPhone(authPhone);
 			if (!phone) {
 				setError("رقم الموبايل المصري لازم يبدأ بـ 01 و يكون ١١ رقم.");
 				return;
 			}
-			if (authMode === "new" && !authName.trim()) {
-				setError("اكتبي اسمك");
-				return;
-			}
-			if (authPassword.length < 6) {
-				setError("كلمة السر لازم تكون ٦ حروف على الأقل");
-				return;
-			}
 			setLoading(true);
 			try {
-				if (authMode === "new") {
-					await register(phone, authName.trim(), authPassword);
-				} else {
-					await login(phone, authPassword);
-				}
+				await loginWithPhone(phone, authName.trim() || undefined);
 			} catch (err) {
-				const msg = err instanceof Error ? err.message : "حدث خطأ";
-				if (authMode === "new" && /موجود|exists|registered/i.test(msg)) {
-					setAuthMode("existing");
-					setError("الرقم ده متسجل عندنا — اكتبي كلمة السر للدخول");
-				} else {
-					setError(msg);
-				}
+				setError(err instanceof Error ? err.message : "حدث خطأ");
 				setLoading(false);
 				return;
 			}
@@ -268,37 +247,19 @@ export default function NewTicketForm() {
 								className="hvar-input w-full px-4 py-3 rounded-xl font-inter text-sm text-left"
 							/>
 						</div>
-						{authMode === "new" && (
-							<div>
-								<label className="block font-cairo text-xs font-semibold text-muted mb-1.5">الاسم</label>
-								<input
-									type="text"
-									value={authName}
-									onChange={(e) => setAuthName(e.target.value)}
-									placeholder="اسمك الكامل"
-									autoComplete="name"
-									className="hvar-input w-full px-4 py-3 rounded-xl font-cairo text-sm"
-								/>
-							</div>
-						)}
 						<div>
-							<label className="block font-cairo text-xs font-semibold text-muted mb-1.5">كلمة السر</label>
+							<label className="block font-cairo text-xs font-semibold text-muted mb-1.5">
+								الاسم <span className="font-normal text-faint">(لو أول مرة)</span>
+							</label>
 							<input
-								type="password"
-								value={authPassword}
-								onChange={(e) => setAuthPassword(e.target.value)}
-								placeholder={authMode === "new" ? "كلمة سر جديدة (٦ حروف على الأقل)" : "كلمة السر"}
-								autoComplete={authMode === "new" ? "new-password" : "current-password"}
+								type="text"
+								value={authName}
+								onChange={(e) => setAuthName(e.target.value)}
+								placeholder="اسمك الكامل"
+								autoComplete="name"
 								className="hvar-input w-full px-4 py-3 rounded-xl font-cairo text-sm"
 							/>
 						</div>
-						<button
-							type="button"
-							onClick={() => { setError(null); setAuthMode(authMode === "new" ? "existing" : "new"); }}
-							className="font-cairo text-xs text-brand hover:underline"
-						>
-							{authMode === "new" ? "عندك حساب؟ ادخلي بكلمة السر" : "أول مرة؟ كملي ببياناتك وهنعملك حساب"}
-						</button>
 					</>
 				)}
 			</section>

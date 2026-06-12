@@ -51,19 +51,19 @@ export default function AccountView() {
 	return (
 		<div className="space-y-5">
 
-			{/* Welcome + profile hero */}
+			{/* Welcome + profile hero — quiet surface card, theme-aware */}
 			<div
 				className="relative overflow-hidden rounded-2xl p-6"
 				style={{
-					background: "linear-gradient(135deg, #130F0C 0%, #1e1208 100%)",
-					border: "1px solid rgba(var(--c-brand-rgb),0.20)",
+					background: "var(--c-surface)",
+					border: "1px solid var(--c-border)",
 				}}
 			>
-				{/* Ember glow */}
+				{/* Faint ember warmth from the reading start */}
 				<div
 					className="absolute inset-0 pointer-events-none"
 					style={{
-						background: "radial-gradient(ellipse 70% 80% at 20% 50%, rgba(var(--c-brand-rgb),0.12) 0%, transparent 65%)",
+						background: "radial-gradient(ellipse 70% 80% at 0% 50%, var(--c-brand-glow) 0%, transparent 60%)",
 					}}
 					aria-hidden="true"
 				/>
@@ -72,7 +72,7 @@ export default function AccountView() {
 					{/* Avatar monogram */}
 					<div
 						className="w-14 h-14 flex-shrink-0 flex items-center justify-center rounded-2xl font-cairo font-black text-xl text-white select-none"
-						style={{ background: "rgba(var(--c-brand-rgb),0.25)", border: "1.5px solid rgba(var(--c-brand-rgb),0.40)" }}
+						style={{ background: "linear-gradient(150deg, var(--c-brand), var(--c-brand-hover))", boxShadow: "0 4px 14px rgba(var(--c-brand-rgb),0.28)" }}
 					>
 						{firstName[0]}
 					</div>
@@ -80,14 +80,14 @@ export default function AccountView() {
 					<div className="flex-1 min-w-0">
 						<p
 							className="font-cairo font-semibold text-xs uppercase tracking-[0.14em] mb-0.5"
-							style={{ color: "var(--c-brass)" }}
+							style={{ color: "var(--c-flame)" }}
 						>
 							مرحباً بيكِ
 						</p>
-						<p className="font-cairo font-black text-xl leading-tight" style={{ color: "#F5EFE6" }}>
+						<p className="font-cairo font-black text-xl leading-tight" style={{ color: "var(--c-ink)" }}>
 							{firstName}
 						</p>
-						<p className="font-inter text-sm mt-0.5 tabular-nums" dir="ltr" style={{ color: "rgba(245,239,230,0.45)" }}>
+						<p className="font-inter text-sm mt-0.5 tabular-nums" dir="ltr" style={{ color: "var(--c-ink-muted)" }}>
 							{user.phone}
 						</p>
 					</div>
