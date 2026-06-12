@@ -13,7 +13,7 @@ function arMoney(n: number): string {
 
 const KEYFRAMES = `
 @keyframes drawerSlideIn {
-  from { transform: translateX(100%); }
+  from { transform: translateX(-100%); }
   to   { transform: translateX(0); }
 }
 @keyframes scrimIn {
@@ -72,7 +72,9 @@ export default function CartDrawer() {
 				}}
 			/>
 
-			{/* Drawer — slides from physical right (RTL start) */}
+			{/* Drawer — docks on the physical left to match the bottom-left cart FAB,
+			    so it opens from the same side as its trigger (page is RTL, but the
+			    cart button sits on the left edge). */}
 			<aside
 				role="dialog"
 				aria-modal="true"
@@ -82,16 +84,16 @@ export default function CartDrawer() {
 					position: "fixed",
 					top: 0,
 					bottom: 0,
-					right: 0,
+					left: 0,
 					width: "min(420px, 92vw)",
 					background: "var(--c-surface)",
 					zIndex: 800,
-					transform: open ? "translateX(0)" : "translateX(100%)",
+					transform: open ? "translateX(0)" : "translateX(-100%)",
 					transition: "transform 0.4s cubic-bezier(0.3,0.8,0.3,1)",
 					display: "flex",
 					flexDirection: "column",
-					boxShadow: "-4px 0 60px rgba(0,0,0,0.22)",
-					borderLeft: "1px solid var(--c-border)",
+					boxShadow: "4px 0 60px rgba(0,0,0,0.22)",
+					borderRight: "1px solid var(--c-border)",
 					overflow: "hidden",
 				}}
 			>
@@ -346,7 +348,7 @@ export default function CartDrawer() {
 														fontFamily: "'Cairo', sans-serif",
 														fontWeight: 700,
 														fontSize: "0.68rem",
-														color: "var(--c-brass, #c8893b)",
+														color: "var(--c-flame, #b3471d)",
 														background: "rgba(200,137,59,0.10)",
 														padding: "2px 6px",
 														borderRadius: "6px",
@@ -504,56 +506,36 @@ export default function CartDrawer() {
 							background: "var(--c-surface-2)",
 						}}
 					>
-						{/* Summary rows */}
+						{/* Free shipping — a standing brand promise, shown as reassurance, not a
+						    priced line (subtotal == total when there's no discount, so the old
+						    subtotal/shipping rows were just noise). */}
 						<div
 							style={{
 								display: "flex",
-								justifyContent: "space-between",
-								marginBottom: "8px",
-								fontSize: "0.9rem",
+								alignItems: "center",
+								gap: "7px",
+								marginBottom: "12px",
+								fontFamily: "'Cairo', sans-serif",
+								fontSize: "0.82rem",
+								color: "var(--c-ink-muted)",
 							}}
 						>
-							<span style={{ fontFamily: "'Cairo', sans-serif", color: "var(--c-ink-muted)" }}>
-								المجموع الفرعي
-							</span>
-							<span
-								style={{
-									fontFamily: "'Inter', sans-serif",
-									fontWeight: 700,
-									color: "var(--c-ink)",
-								}}
-							>
-								{arMoney(total)} ج.م
-							</span>
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+								<path d="M1 4h13v11H1z" />
+								<path d="M14 8h4l3 3v4h-7" />
+								<circle cx="5.5" cy="17.5" r="1.8" />
+								<circle cx="17.5" cy="17.5" r="1.8" />
+							</svg>
+							<span>التوصيل مجاني لباب بيتك — كل المحافظات</span>
 						</div>
 						<div
 							style={{
 								display: "flex",
 								justifyContent: "space-between",
-								marginBottom: "10px",
-								fontSize: "0.9rem",
-							}}
-						>
-							<span style={{ fontFamily: "'Cairo', sans-serif", color: "var(--c-ink-muted)" }}>
-								الشحن
-							</span>
-							<span
-								style={{
-									fontFamily: "'Cairo', sans-serif",
-									fontWeight: 700,
-									color: "#22c55e",
-								}}
-							>
-								مجاني
-							</span>
-						</div>
-						<div
-							style={{
-								display: "flex",
-								justifyContent: "space-between",
-								paddingTop: "10px",
+								alignItems: "baseline",
+								paddingTop: "12px",
 								marginBottom: installmentMonthly ? "8px" : "16px",
-								borderTop: "1px dashed var(--c-border)",
+								borderTop: "1px solid var(--c-border)",
 							}}
 						>
 							<span
@@ -584,7 +566,7 @@ export default function CartDrawer() {
 								style={{
 									fontFamily: "'Cairo', sans-serif",
 									fontSize: "0.72rem",
-									color: "var(--c-brass, #c8893b)",
+									color: "var(--c-flame, #b3471d)",
 									textAlign: "end",
 									marginBottom: "14px",
 								}}

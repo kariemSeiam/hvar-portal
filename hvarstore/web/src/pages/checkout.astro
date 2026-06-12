@@ -1,21 +1,35 @@
 ---
 import Base from '../layouts/Base.astro'
 import CheckoutForm from '../components/checkout/CheckoutForm'
-import InnerHero from '../components/InnerHero.astro'
 ---
 
 <Base title="إتمام الطلب | هفار">
 
-  <InnerHero
-    label="خطوة أخيرة"
-    title="إتمام الشراء"
-    subtitle="أدخل بياناتك — هنوصلك المنتج لباب البيت مجاناً"
-    variant="service"
-    cta={{ label: "السلة", href: "/cart" }}
-  />
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-12">
 
-  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    {/* Quiet checkout header — back-to-cart + one clean title.
+        No hero band: the step indicator below carries the progress. */}
+    <a href="/cart" class="checkout-back inline-flex items-center gap-1.5 font-cairo text-xs font-semibold mb-3">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M4 8h8M8 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      رجوع للسلة
+    </a>
+
+    <h1
+      class="font-cairo font-extrabold leading-tight mb-6"
+      style="font-size:clamp(1.25rem,3vw,1.6rem);color:var(--c-ink)"
+    >
+      إتمام الطلب
+    </h1>
+
     <CheckoutForm client:load />
+
   </div>
 
 </Base>
+
+<style>
+  .checkout-back { color: var(--c-ink-muted); transition: color 0.2s ease; }
+  .checkout-back:hover { color: var(--c-brand); }
+</style>

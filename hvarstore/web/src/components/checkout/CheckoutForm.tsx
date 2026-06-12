@@ -14,8 +14,7 @@ import {
 	authUser,
 	isLoggedIn,
 	getAuthHeaders,
-	login,
-	register,
+	loginWithPhone,
 	logout,
 	normalizeEgyptPhone,
 } from "../../lib/auth";
@@ -51,9 +50,6 @@ export default function CheckoutForm() {
 	const [dists, setDists] = useState<Dist[]>([]);
 	const [govId, setGovId] = useState<number | null>(null);
 	const [distId, setDistId] = useState<number | null>(null);
-	const [street, setStreet] = useState("");
-	const [building, setBuilding] = useState("");
-	const [apartment, setApartment] = useState("");
 	const [shippingPhone, setShippingPhone] = useState("");
 	const [notes, setNotes] = useState("");
 	const [payment, setPayment] = useState<PaymentMethod>("cod");
@@ -68,10 +64,8 @@ export default function CheckoutForm() {
 	const [geoHit, setGeoHit] = useState<string | null>(null);
 	const [pendingDistName, setPendingDistName] = useState<string | null>(null);
 
-	// Inline contact/auth (phone-first — no redirect away from checkout)
-	const [authMode, setAuthMode] = useState<"new" | "existing">("new");
+	// Inline contact (phone-first, passwordless — no redirect away from checkout)
 	const [authName, setAuthName] = useState("");
-	const [authPassword, setAuthPassword] = useState("");
 
 	useEffect(() => {
 		if (items.length === 0 && !success) {
@@ -194,11 +188,6 @@ export default function CheckoutForm() {
 			setError("اختر المحافظة والمنطقة");
 			return;
 		}
-		if (!street.trim() || !building.trim()) {
-			setError("أكمل بيانات العنوان");
-			return;
-		}
-
 		setLoading(true);
 		try {
 			const orderPayload = {
@@ -211,9 +200,6 @@ export default function CheckoutForm() {
 				paymentMethod: payment,
 				governorateId: govId,
 				districtId: distId,
-				street,
-				building,
-				apartment: apartment || undefined,
 				shippingPhone,
 				notes: notes || undefined,
 			};
@@ -319,16 +305,12 @@ export default function CheckoutForm() {
 			setError("رقم الموبايل المصري لازم يبدأ بـ 01 و يكون ١١ رقم.");
 			return false;
 		}
-		if (!loggedIn) {
-			if (authMode === "new" && !authName.trim()) { setError("اكتب اسمك"); return false; }
-			if (authPassword.length < 6) { setError("كلمة السر لازم تكون ٦ حروف على الأقل"); return false; }
-		}
 		if (!govId || !distId) { setError("اختر المحافظة والمنطقة"); return false; }
-		if (!street.trim() || !building.trim()) { setError("أكمل بيانات العنوان"); return false; }
 		return true;
 	}
 
-	// Step 1 → Step 2: authenticate inline when needed, never leave /checkout
+	// Step 1 → Step 2: phone-only sign-in inline (no password), never leave /checkout.
+	// Known phone logs in, new phone creates the account — same single call.
 	async function handleStep1Next() {
 		setError(null);
 		if (!validateStep1()) return;
@@ -338,20 +320,9 @@ export default function CheckoutForm() {
 		if (!loggedIn) {
 			setLoading(true);
 			try {
-				if (authMode === "new") {
-					await register(phone, authName.trim(), authPassword);
-				} else {
-					await login(phone, authPassword);
-				}
+				await loginWithPhone(phone, authName.trim() || undefined);
 			} catch (err) {
-				const msg = err instanceof Error ? err.message : "حدث خطأ";
-				// Account already exists → nudge to password mode instead of failing
-				if (authMode === "new" && /موجود|exists|registered/i.test(msg)) {
-					setAuthMode("existing");
-					setError("الرقم ده متسجل عندنا — اكتبي كلمة السر للدخول");
-				} else {
-					setError(msg);
-				}
+				setError(err instanceof Error ? err.message : "حدث خطأ");
 				setLoading(false);
 				return;
 			}
@@ -417,39 +388,20 @@ export default function CheckoutForm() {
 									/>
 								</div>
 
-								{authMode === "new" && (
-									<div>
-										<label className="block font-cairo text-xs font-semibold text-muted mb-1.5">الاسم</label>
-										<input
-											type="text"
-											value={authName}
-											onChange={(e) => setAuthName(e.target.value)}
-											placeholder="اسمك الكامل"
-											autoComplete="name"
-											className="hvar-input w-full px-4 py-3 rounded-xl font-cairo text-sm transition-colors"
-										/>
-									</div>
-								)}
-
 								<div>
-									<label className="block font-cairo text-xs font-semibold text-muted mb-1.5">كلمة السر</label>
+									<label className="block font-cairo text-xs font-semibold text-muted mb-1.5">
+										الاسم <span className="font-normal text-faint">(لو أول مرة)</span>
+									</label>
 									<input
-										type="password"
-										value={authPassword}
-										onChange={(e) => setAuthPassword(e.target.value)}
-										placeholder={authMode === "new" ? "كلمة سر جديدة (٦ حروف على الأقل)" : "كلمة السر"}
-										autoComplete={authMode === "new" ? "new-password" : "current-password"}
+										type="text"
+										value={authName}
+										onChange={(e) => setAuthName(e.target.value)}
+										placeholder="اسمك الكامل"
+										autoComplete="name"
 										className="hvar-input w-full px-4 py-3 rounded-xl font-cairo text-sm transition-colors"
 									/>
 								</div>
 
-								<button
-									type="button"
-									onClick={() => { setError(null); setAuthMode(authMode === "new" ? "existing" : "new"); }}
-									className="font-cairo text-xs text-brand hover:underline"
-								>
-									{authMode === "new" ? "عندك حساب؟ ادخلي بكلمة السر" : "أول مرة؟ كملي ببياناتك وهنعملك حساب"}
-								</button>
 							</>
 						)}
 					</section>
@@ -508,22 +460,6 @@ export default function CheckoutForm() {
 									</select>
 									<ChevronDown size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" />
 								</div>
-							</div>
-						</div>
-
-						<div>
-							<label className="block font-cairo text-xs font-semibold text-muted mb-1.5">الشارع</label>
-							<input type="text" value={street} onChange={(e) => setStreet(e.target.value)} placeholder="اسم الشارع" className="hvar-input w-full px-4 py-3 rounded-xl font-cairo text-sm transition-colors" />
-						</div>
-
-						<div className="grid grid-cols-2 gap-4">
-							<div>
-								<label className="block font-cairo text-xs font-semibold text-muted mb-1.5">المبنى / العمارة</label>
-								<input type="text" value={building} onChange={(e) => setBuilding(e.target.value)} placeholder="رقم / اسم المبنى" className="hvar-input w-full px-4 py-3 rounded-xl font-cairo text-sm transition-colors" />
-							</div>
-							<div>
-								<label className="block font-cairo text-xs font-semibold text-muted mb-1.5">الشقة (اختياري)</label>
-								<input type="text" value={apartment} onChange={(e) => setApartment(e.target.value)} placeholder="رقم الشقة" className="hvar-input w-full px-4 py-3 rounded-xl font-cairo text-sm transition-colors" />
 							</div>
 						</div>
 
@@ -623,7 +559,6 @@ export default function CheckoutForm() {
 							<button type="button" onClick={() => setStep(1)} className="font-cairo text-xs text-brand hover:underline">تعديل</button>
 						</div>
 						<p className="font-cairo text-sm text-ink">{govName} — {distName}</p>
-						<p className="font-cairo text-sm text-muted">{street}، {building}{apartment ? `، شقة ${apartment}` : ""}</p>
 						<p className="font-inter text-sm text-muted mt-1" dir="ltr">{shippingPhone}</p>
 						{notes && <p className="font-cairo text-xs text-faint mt-1">{notes}</p>}
 					</section>
@@ -697,7 +632,7 @@ export default function CheckoutForm() {
 					</div>
 
 					<div className="trust-line justify-center">
-						<span>ضمان سنتين</span>
+						<span>ضمان سنة</span>
 						<span>شحن مجاني</span>
 						<span>افحص قبل الدفع</span>
 					</div>

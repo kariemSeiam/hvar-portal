@@ -45,29 +45,14 @@ function useCountUp(target: number, duration = 750): number {
 	return display;
 }
 
-// ─── Power tier ───────────────────────────────────────────────────────────────
-function getPowerTier(watts: number): { label: string; sub: string } | null {
-	if (watts >= 4200) return { label: "ترسانة هفار كاملة", sub: "مطبخك معاه كل حاجة" };
-	if (watts >= 2200) return { label: "مطبخ في المستوى ده", sub: "اختيار المحترفين" };
-	if (watts >= 2000) return { label: "قوة البلدوزر", sub: "أقوى كبة في مصر" };
-	if (watts >= 800)  return { label: "مطبخك بيتحرك", sub: "زيد من القوة" };
-	return { label: "أول خطوة", sub: "مطبخك بيكمل" };
-}
-
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function CartView() {
 	const items = useStore(cartItems);
 	const total = useStore(cartTotal);
 
-	// Wattage total — sum enrichment data across all items
-	const rawWatts = items.reduce((sum, item) => {
-		const e = item.sku ? getEnrichment(item.sku) : null;
-		return sum + (e?.wattage ?? 0) * item.quantity;
-	}, 0);
-
-	const animatedWatts = useCountUp(rawWatts);
 	const animatedTotal = useCountUp(total, 500);
-	const tier = rawWatts > 0 ? getPowerTier(rawWatts) : null;
+
+	const count = items.reduce((sum, item) => sum + item.quantity, 0);
 
 	const installmentMonthly = total >= 1000 ? Math.round(total / 12) : null;
 
@@ -117,7 +102,7 @@ export default function CartView() {
 					className="relative font-cairo text-sm mt-2 mb-10"
 					style={{ color: "var(--c-ink-muted)" }}
 				>
-					السلة فاضية — البلدوزر بيستنّاك
+					السلة فاضية — جهز مطبخك
 				</p>
 
 				<a
@@ -149,95 +134,31 @@ export default function CartView() {
 	return (
 		<div style={{ minHeight: "calc(100vh - 56px)" }}>
 
-			{/* ── Power Header ─────────────────────────────────────────────── */}
-			<div
-				className="relative overflow-hidden"
-				style={{ background: "#130F0C" }}
-			>
-				{/* Ember glow */}
-				<div
-					className="absolute inset-0 pointer-events-none"
-					style={{
-						background:
-							"radial-gradient(ellipse 70% 120% at 15% 50%, rgba(var(--c-brand-rgb),0.13) 0%, transparent 70%)",
-					}}
-				/>
-				{/* Grain */}
-				<div
-					className="absolute inset-0 pointer-events-none"
-					style={{
-						opacity: 0.05,
-						mixBlendMode: "overlay",
-						backgroundImage:
-							"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-					}}
-				/>
+			{/* ── Header — quiet utility band, theme-aware ────────────────────── */}
+			<div className="page-hero">
+				<div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-9">
+					<a
+						href="/products"
+						className="inline-flex items-center gap-1.5 font-cairo text-xs font-semibold mb-3 transition-colors"
+						style={{ color: "var(--c-ink-muted)" }}
+						onMouseEnter={(e) => (e.currentTarget.style.color = "var(--c-brand)")}
+						onMouseLeave={(e) => (e.currentTarget.style.color = "var(--c-ink-muted)")}
+					>
+						<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+							<path d="M4 8h8M8 4l4 4-4 4" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+						</svg>
+						متابعة التسوق
+					</a>
 
-				<div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-					<div className="flex items-end justify-between gap-4">
-
-						{/* Left: wattage + labels */}
-						<div>
-							<p
-								className="font-cairo text-xs mb-2"
-								style={{ color: "rgba(245,239,230,0.35)", letterSpacing: "0.06em" }}
-							>
-								سلتك
-							</p>
-
-							{/* The number — wattage when available, otherwise EGP total */}
-							<div className="flex items-baseline gap-2">
-								<span
-									className="font-cairo font-black leading-none tabular-nums"
-									style={{
-										fontSize: "clamp(3rem,10vw,5.5rem)",
-										color: "var(--c-brand)",
-										letterSpacing: "-0.03em",
-									}}
-								>
-									{rawWatts > 0 ? ar(animatedWatts) : arMoney(animatedTotal)}
-								</span>
-								<span
-									className="font-cairo font-bold text-lg"
-									style={{ color: "var(--c-brand)", opacity: 0.7 }}
-								>
-									{rawWatts > 0 ? "وات" : "ج.م"}
-								</span>
-							</div>
-
-							{/* Tier label (wattage mode) or brand promise (price mode) */}
-							{tier ? (
-								<div className="mt-2 flex items-center gap-2">
-									<span className="font-cairo font-bold text-sm" style={{ color: "var(--c-brass)" }}>
-										{tier.label}
-									</span>
-									<span className="font-cairo text-xs" style={{ color: "rgba(245,239,230,0.30)" }}>·</span>
-									<span className="font-cairo text-xs" style={{ color: "rgba(245,239,230,0.30)" }}>
-										{tier.sub}
-									</span>
-								</div>
-							) : (
-								<p className="font-cairo text-sm mt-2" style={{ color: "rgba(245,239,230,0.35)" }}>
-									بيتك دايما جاهز مع هفار
-								</p>
-							)}
-						</div>
-
-						{/* Right: decorative wattage ghost (desktop only) */}
-						{rawWatts > 0 && (
-							<p
-								className="hidden sm:block font-cairo font-black select-none pointer-events-none leading-none flex-shrink-0"
-								style={{
-									fontSize: "clamp(4rem,12vw,8rem)",
-									color: "var(--c-brand)",
-									opacity: 0.06,
-									letterSpacing: "-0.04em",
-								}}
-							>
-								{ar(rawWatts)}
-							</p>
-						)}
-					</div>
+					<h1
+						className="font-cairo font-extrabold leading-tight"
+						style={{ fontSize: "clamp(1.35rem,3.2vw,1.85rem)", color: "var(--c-ink)" }}
+					>
+						سلتك
+					</h1>
+					<p className="font-cairo text-sm mt-1" style={{ color: "var(--c-ink-muted)" }}>
+						{ar(count)} {count === 1 ? "منتج" : "منتجات"}
+					</p>
 				</div>
 			</div>
 
@@ -307,8 +228,8 @@ export default function CartView() {
 											<span
 												className="inline-block font-cairo font-bold text-[10px] px-1.5 py-0.5 rounded mt-1"
 												style={{
-													color: "var(--c-brass)",
-													background: "rgba(var(--c-brass-rgb),0.1)",
+													color: "var(--c-flame)",
+													background: "rgba(var(--c-flame-rgb),0.1)",
 												}}
 											>
 												{wattDisplay}
@@ -448,7 +369,7 @@ export default function CartView() {
 
 								{/* Installment hint */}
 								{installmentMonthly && (
-									<p className="font-cairo text-[11px] text-end" style={{ color: "var(--c-brass)" }}>
+									<p className="font-cairo text-[11px] text-end" style={{ color: "var(--c-flame)" }}>
 										أو ~ {arMoney(installmentMonthly)} ج.م/شهر مع فاليو · سهولة · أمان
 									</p>
 								)}

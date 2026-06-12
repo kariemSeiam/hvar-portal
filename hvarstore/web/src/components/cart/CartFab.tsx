@@ -9,6 +9,29 @@ export default function CartFab() {
 
 	const ariaLabel = `السلة — ${count} ${count === 1 ? "منتج" : "منتجات"}`;
 
+	const notifBadge = (
+		<span
+			className="absolute flex items-center justify-center rounded-full font-inter font-bold leading-none pointer-events-none"
+			style={{
+				top: "-9px",
+				insetInlineStart: "-9px",
+				minWidth: "20px",
+				height: "20px",
+				fontSize: "10px",
+				paddingInline: "3px",
+				background: "#fff",
+				color: "var(--c-brand)",
+				border: "2px solid #c0392b",
+				boxShadow: "0 2px 8px rgba(0,0,0,0.22)",
+				transform: hasItems ? "scale(1)" : "scale(0)",
+				transition: "transform 0.3s cubic-bezier(0.34,1.56,0.64,1)",
+				zIndex: 1,
+			}}
+		>
+			{count > 99 ? "99+" : count}
+		</span>
+	);
+
 	return (
 		<>
 			{/* ── Mobile pill — floats above bottom nav, visible only when cart has items ── */}
@@ -16,7 +39,7 @@ export default function CartFab() {
 				type="button"
 				onClick={() => cartDrawerOpen.set(true)}
 				aria-label={ariaLabel}
-				className="md:hidden fixed z-50 flex items-center gap-2 font-cairo font-bold text-white rounded-2xl"
+				className="cart-fab-pill md:hidden fixed z-50 flex items-center gap-2 font-cairo font-bold text-white rounded-2xl"
 				style={{
 					bottom: "calc(3.5rem + env(safe-area-inset-bottom, 0px) + 0.625rem)",
 					insetInlineEnd: "0.875rem",
@@ -33,33 +56,9 @@ export default function CartFab() {
 					fontSize: "0.875rem",
 				}}
 			>
-				{/* Bag icon + count badge */}
-				<span className="relative flex-shrink-0 flex items-center justify-center">
-					<ShoppingBag size={18} />
-					<span
-						className="absolute flex items-center justify-center rounded-full font-inter font-bold leading-none pointer-events-none"
-						style={{
-							top: "-6px",
-							insetInlineEnd: "-7px",
-							minWidth: "16px",
-							height: "16px",
-							fontSize: "9px",
-							paddingInline: "2px",
-							background: "#fff",
-							color: "var(--c-brand)",
-							opacity: hasItems ? 1 : 0,
-							transform: hasItems ? "scale(1)" : "scale(0)",
-							transition: "all 0.3s cubic-bezier(0.34,1.56,0.64,1)",
-						}}
-					>
-						{count > 99 ? "99+" : count}
-					</span>
-				</span>
-
-				{/* Label */}
+				<ShoppingBag size={18} />
 				<span>السلة</span>
-
-
+				{notifBadge}
 			</button>
 
 			{/* ── Desktop FAB ── */}
@@ -83,45 +82,19 @@ export default function CartFab() {
 					cursor: "pointer",
 				}}
 			>
-				<span className="relative flex items-center justify-center">
-					{/* Glow ring when active */}
-					{hasItems && (
-						<span
-							className="absolute inset-0 rounded-2xl pointer-events-none"
-							style={{
-								border: "1.5px solid rgba(255,107,82,0.32)",
-								animation: "fabGlow 2.4s ease-in-out infinite",
-							}}
-						/>
-					)}
-
-					<ShoppingBag
-						size={20}
+				{/* Glow ring when active */}
+				{hasItems && (
+					<span
+						className="absolute inset-0 rounded-2xl pointer-events-none"
 						style={{
-							color: hasItems ? "#fff" : "rgba(255,255,255,0.52)",
-							transition: "color 0.3s",
+							border: "1.5px solid rgba(255,107,82,0.32)",
+							animation: "fabGlow 2.4s ease-in-out infinite",
 						}}
 					/>
+				)}
 
-					{/* Count badge */}
-					<span
-						className="absolute flex items-center justify-center rounded-full font-inter font-bold leading-none pointer-events-none"
-						style={{
-							top: "-4px",
-							insetInlineEnd: "-4px",
-							minWidth: "18px",
-							height: "18px",
-							fontSize: "9px",
-							paddingInline: "3px",
-							background: hasItems ? "#fff" : "transparent",
-							color: hasItems ? "var(--c-brand)" : "transparent",
-							transform: hasItems ? "scale(1)" : "scale(0)",
-							transition: "all 0.3s cubic-bezier(0.34,1.56,0.64,1)",
-						}}
-					>
-						{count > 99 ? "99+" : count}
-					</span>
-				</span>
+				<ShoppingBag size={22} />
+				{notifBadge}
 			</button>
 		</>
 	);
