@@ -31,6 +31,8 @@ export interface Env {
 	PUBLIC_SITE_URL: string;
 	API_PORT: string;
 	ADMIN_PHONES: string;
+	FACEBOOK_APP_ID: string;
+	FACEBOOK_APP_SECRET: string;
 }
 
 export function loadEnv(): Env {
@@ -68,5 +70,7 @@ export function loadEnv(): Env {
 		PUBLIC_SITE_URL: e.PUBLIC_SITE_URL ?? "http://localhost:4321",
 		API_PORT: e.API_PORT ?? "5000",
 		ADMIN_PHONES: e.ADMIN_PHONES ?? "",
+		FACEBOOK_APP_ID: e.FACEBOOK_APP_ID ?? "",
+		FACEBOOK_APP_SECRET: e.FACEBOOK_APP_SECRET ?? "",
 	};
 }
