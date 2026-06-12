@@ -51,7 +51,7 @@ const pageTitle = activeCategory
   ? `${activeCategory.name} | هفار`
   : q
     ? `نتائج البحث: ${q} | هفار`
-    : 'تسوق أجهزة المطبخ — خلاطات، قلايات، مكاوي | هفار'
+    : 'تسوق أجهزة المطبخ: خلاطات، قلايات، مكاوي | هفار'
 
 function buildUrl(params: Record<string, string | number | undefined | null>) {
   const u = new URL(url)
@@ -66,96 +66,80 @@ function buildUrl(params: Record<string, string | number | undefined | null>) {
 
 <Base title={pageTitle}>
 
-  {/* ── When a category is active: show hero + separate search bar ── */}
+  {/* ── When a category is active: dark hero with integrated search ── */}
   {activeCategory && (
-    <>
-      <CategoryHero categoryName={activeCategory.name} productCount={products.length} />
-      <div style="background-color:var(--c-surface);border-bottom:1px solid var(--c-border)">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <form method="GET" action="/products" class="flex flex-wrap items-center gap-3">
-            <input type="hidden" name="category" value={String(categoryId)} />
+    <CategoryHero
+      categoryName={activeCategory.name}
+      productCount={products.length}
+      categoryId={categoryId}
+      searchQuery={q}
+    />
+  )}
+
+  {/* ── No active category, no search query: quiet utility band + integrated search ── */}
+  {!activeCategory && !q && (
+    <header class="page-hero">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-9">
+        <div class="reveal-section">
+
+          {/* Heading block */}
+          <p class="page-hero-label reveal-child mb-2">أجهزة هفار</p>
+          <h1 class="page-hero-title reveal-child">كل المنتجات</h1>
+          <p class="page-hero-sub reveal-child mt-1.5">من ٥٠٠ لـ ٨٠٠٠ وات — بيتك دايما جاهز</p>
+
+          {/* Search bar — theme-aware light field */}
+          <form method="GET" action="/products" class="reveal-child flex flex-wrap items-center gap-3 mt-5">
             <div class="relative flex-1 min-w-[200px] max-w-sm">
-              <input type="search" name="q" value={q ?? ''} placeholder={`ابحث في ${activeCategory.name}...`}
-                class="hvar-input w-full pr-10 pl-4 py-2.5 rounded-xl text-sm font-cairo transition-colors"
-                style="border-color:var(--c-border);background-color:var(--c-bg);color:var(--c-ink)" />
-              <svg class="absolute top-1/2 right-3 -translate-y-1/2" width="15" height="15" viewBox="0 0 20 20" fill="none" style="color:var(--c-ink-muted)">
+              <input
+                type="search"
+                name="q"
+                value=""
+                placeholder="ابحث عن منتج..."
+                class="hvar-input w-full pr-10 pl-4 py-2.5 rounded-xl font-cairo text-sm transition-colors"
+              />
+              <svg class="absolute top-1/2 right-3 -translate-y-1/2" width="15" height="15" viewBox="0 0 20 20" fill="none"
+                   style="color:var(--c-ink-muted)">
                 <circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.5"/>
                 <line x1="14" y1="14" x2="18" y2="18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
               </svg>
             </div>
-            {q && (
-              <a href={"/products?category=" + categoryId}
-                 class="px-3 py-2.5 rounded-xl border text-sm font-cairo transition-colors"
-                 style="border-color:var(--c-border);color:var(--c-ink-muted)">
-                مسح البحث
-              </a>
-            )}
+            <label class="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                name="in_stock"
+                value="1"
+                checked={inStock}
+                class="w-4 h-4 rounded accent-[var(--c-brand)]"
+              />
+              <span class="font-cairo text-sm" style="color:var(--c-ink-muted)">متاح فقط</span>
+            </label>
+            <button
+              type="submit"
+              class="px-4 py-2.5 rounded-xl font-cairo font-semibold text-sm text-white transition-colors"
+              style="background-color:var(--c-brand)"
+            >
+              بحث
+            </button>
           </form>
-        </div>
-      </div>
-    </>
-  )}
-
-  {/* ── No active category, no search query: dark brand banner ── */}
-  {!activeCategory && !q && (
-    <section class="relative overflow-hidden grain-overlay"
-             style="background-color:#130F0C;border-bottom:1px solid rgba(245,239,230,0.08)">
-
-      {/* Red ember glow — left side */}
-      <div class="absolute inset-0 pointer-events-none" aria-hidden="true"
-           style="background:radial-gradient(ellipse 60% 80% at 0% 50%, rgba(var(--c-brand-rgb),0.10) 0%, transparent 65%)">
-      </div>
-
-      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-        <div class="reveal-section flex items-end justify-between gap-4">
-
-          {/* Left: heading block */}
-          <div>
-            <p class="reveal-child font-cairo font-semibold text-[10px] uppercase tracking-[0.14em] mb-2"
-               style="color:#C8893B">
-              أجهزة هفار
-            </p>
-            <h1 class="reveal-child font-cairo font-black leading-none"
-                style="font-size:clamp(2rem,6vw,3.5rem);color:#F5EFE6;letter-spacing:-0.02em">
-              كل المنتجات
-            </h1>
-            <p class="reveal-child font-cairo text-sm mt-2"
-               style="color:rgba(245,239,230,0.40)">
-              من ٥٠٠ لـ ٨٠٠٠ وات — بيتك دايما جاهز
-            </p>
-          </div>
-
-          {/* Right: ghosted wattage number (desktop only) */}
-          <p class="hidden sm:block font-cairo font-black select-none pointer-events-none leading-none flex-shrink-0"
-             style="font-size:clamp(2.5rem,7vw,5rem);color:var(--c-brand);opacity:0.08;letter-spacing:-0.04em"
-             aria-hidden="true">
-            ٨٠٠٠
-          </p>
 
         </div>
       </div>
-    </section>
+    </header>
   )}
 
-  {/* ── No active category: search / browsing header ── */}
-  {!activeCategory && (
+  {/* ── No active category, has search query: light header with results context ── */}
+  {!activeCategory && q && (
     <div style="background-color:var(--c-surface);border-bottom:1px solid var(--c-border)">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
-        {q && (
-          <h1 class="font-cairo font-black text-2xl mb-4" style="color:var(--c-ink)">
-            {`نتائج: "${q}"`}
-          </h1>
-        )}
-
-        <!-- Search + filters bar -->
+        <h1 class="font-cairo font-black text-2xl mb-4" style="color:var(--c-ink)">
+          {`نتائج: "${q}"`}
+        </h1>
         <form method="GET" action="/products" class="flex flex-wrap items-center gap-3">
-
-          <!-- Search -->
           <div class="relative flex-1 min-w-[200px] max-w-sm">
             <input
               type="search"
               name="q"
-              value={q ?? ''}
+              value={q}
               placeholder="ابحث عن منتج..."
               class="hvar-input w-full pr-10 pl-4 py-2.5 rounded-xl font-cairo text-sm transition-colors"
             />
@@ -164,8 +148,6 @@ function buildUrl(params: Record<string, string | number | undefined | null>) {
               <line x1="14" y1="14" x2="18" y2="18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
           </div>
-
-          <!-- In-stock toggle -->
           <label class="flex items-center gap-2 cursor-pointer select-none">
             <input
               type="checkbox"
@@ -176,23 +158,18 @@ function buildUrl(params: Record<string, string | number | undefined | null>) {
             />
             <span class="font-cairo text-sm text-muted">متاح فقط</span>
           </label>
-
           <button
             type="submit"
             class="px-4 py-2.5 rounded-xl bg-brand hover:bg-[var(--c-brand-hover)] text-white font-cairo font-semibold text-sm transition-colors"
           >
             بحث
           </button>
-
-          {(q || inStock || categoryId || minPrice || maxPrice) && (
-            <a
-              href="/products"
-              class="px-3 py-2.5 rounded-xl border border-hvar text-muted font-cairo text-sm hover:border-[var(--c-brand)] hover:text-[var(--c-brand)] transition-colors"
-            >
-              مسح الفلاتر
-            </a>
-          )}
-
+          <a
+            href="/products"
+            class="px-3 py-2.5 rounded-xl border border-hvar text-muted font-cairo text-sm hover:border-[var(--c-brand)] hover:text-[var(--c-brand)] transition-colors"
+          >
+            مسح البحث
+          </a>
         </form>
       </div>
     </div>
@@ -326,6 +303,12 @@ function buildUrl(params: Record<string, string | number | undefined | null>) {
 <style>
   .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-none::-webkit-scrollbar { display: none; }
+
+  /* Dark-canvas search input focus ring */
+  input[type="search"]:focus {
+    border-color: rgba(var(--c-brand-rgb), 0.6) !important;
+    box-shadow: 0 0 0 1px rgba(var(--c-brand-rgb), 0.25);
+  }
 
   /* Chip row — scroll-snap */
   .chip-row {

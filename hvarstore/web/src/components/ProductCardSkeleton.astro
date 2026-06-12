@@ -21,6 +21,7 @@ const { carousel = false } = Astro.props
 
 <style>
   .pcs-wrap {
+    container-type: inline-size;
     height: 100%;
   }
   .pcs-wrap--carousel {
@@ -39,10 +40,16 @@ const { carousel = false } = Astro.props
     aspect-ratio: 1 / 1;
     background: var(--c-surface-2);
   }
+  /* Match ProductCard: shorter stage on wide desktop cards so there's no shift on load. */
+  @container (min-width: 17rem) {
+    .pcs-media {
+      aspect-ratio: 5 / 4;
+    }
+  }
   .pcs-body {
     display: flex;
     flex-direction: column;
-    padding: clamp(0.7rem, 5cqi, 1rem);
+    padding: clamp(0.8rem, 0.6rem + 2.5cqi, 1.15rem);
   }
   .pcs-bar {
     display: block;

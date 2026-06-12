@@ -22,7 +22,7 @@ const outOfStock = product.stock === 0
 
 const enrichment = getEnrichment(product.sku)
 const warrantyText = getWarrantyText(product.sku)
-const nickname = enrichment?.nickname
+const wattageDisplay = enrichment?.wattageDisplay ?? (enrichment?.wattage ? `${enrichment.wattage} وات` : null)
 const monthly = product.price >= 1000 ? Math.round(product.price / 12) : null
 const installmentShort = monthly ? `قسّطها من ${monthly.toLocaleString('ar-EG')} ج.م/شهر` : null
 
@@ -91,12 +91,24 @@ const addPayload = JSON.stringify({
         </svg>
       </button>
 
+      <!-- Add to cart — image corner (bottom trailing) -->
+      {!outOfStock && (
+        <button class="pc-add add-to-cart" aria-label={`أضيفي ${product.name} للسلة`} data-product={addPayload}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        </button>
+      )}
+
     </div>
 
     <!-- ── Body ───────────────────────────────────────────────── -->
     <div class="pc-body">
-      {product.categoryName && <span class="pc-cat font-cairo">{product.categoryName}</span>}
-      {nickname && <span class="pc-nick font-cairo">{nickname}</span>}
+      <div class="pc-meta">
+        {product.categoryName && <span class="pc-cat font-cairo">{product.categoryName}</span>}
+        {wattageDisplay && <span class="pc-spec font-cairo">{wattageDisplay}</span>}
+      </div>
 
       <a class="pc-name-link" href={href}>
         <h3 class="pc-name font-cairo">{product.name}</h3>
@@ -111,15 +123,6 @@ const addPayload = JSON.stringify({
               <span class="pc-price-old font-inter">{product.comparePrice!.toLocaleString('ar-EG')}</span>
             )}
           </div>
-
-          {!outOfStock && (
-            <button class="pc-add add-to-cart" aria-label={`أضيفي ${product.name} للسلة`} data-product={addPayload}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
-            </button>
-          )}
         </div>
 
         <p class="pc-trust font-cairo">{warrantyText} · شحن مجاني</p>
@@ -192,6 +195,14 @@ const addPayload = JSON.stringify({
   .pc-frame--ph {
     background: var(--c-surface-2);
   }
+  /* Wide desktop cards: a shorter landscape stage so the media stops towering over the
+     text and the card reads as product + info, not a giant photo. Narrow cards (mobile
+     2-col, carousels) keep the square — they're already short, and square avoids gutters. */
+  @container (min-width: 17rem) {
+    .pc-frame {
+      aspect-ratio: 5 / 4;
+    }
+  }
   .pc-spot {
     position: absolute;
     inset: 0;
@@ -205,7 +216,7 @@ const addPayload = JSON.stringify({
     width: 100%;
     height: 100%;
     object-fit: contain;
-    padding: clamp(0.6rem, 7cqi, 1.6rem);
+    padding: clamp(0.45rem, 5cqi, 1.1rem);
     transition: transform 0.5s var(--ease-spring);
   }
   @media (hover: hover) {
@@ -300,63 +311,71 @@ const addPayload = JSON.stringify({
     opacity: 0.55;
   }
 
-  /* ── Price row + inline add button ── */
+  /* ── Price row ── */
   .pc-price-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 0.4rem;
   }
+
+  /* ── Add-to-cart — image corner ── */
   .pc-add {
-    position: relative;
-    flex-shrink: 0;
+    position: absolute;
+    z-index: 5;
+    inset-block-end: clamp(0.5rem, 4cqi, 0.7rem);
+    inset-inline-end: clamp(0.5rem, 4cqi, 0.7rem);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2rem;
-    height: 2rem;
+    width: clamp(2.25rem, 14cqi, 2.75rem);
+    height: clamp(2.25rem, 14cqi, 2.75rem);
     border-radius: 9999px;
     color: #fff;
     background: var(--c-brand);
-    box-shadow: 0 2px 8px var(--c-brand-glow);
+    box-shadow: 0 4px 14px var(--c-brand-glow);
+    border: none;
+    cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    /* Desktop: hidden until card hover */
+    opacity: 0;
+    transform: scale(0.82);
     transition:
-      transform 0.2s var(--ease-spring),
+      opacity 0.2s ease,
+      transform 0.25s var(--ease-spring),
       background-color 0.2s ease,
       box-shadow 0.2s ease;
   }
-  /* Expand touch target to 44px without enlarging the visual circle */
-  .pc-add::before {
-    content: '';
-    position: absolute;
-    inset: -0.375rem;
-    border-radius: inherit;
-  }
-  /* Touch: make the visual circle itself 44px for easier tapping */
+  /* Touch devices: always visible */
   @media (pointer: coarse) {
     .pc-add {
-      width: 2.75rem;
-      height: 2.75rem;
+      opacity: 1;
+      transform: scale(1);
     }
-    .pc-add::before { inset: 0; }
   }
+  /* Desktop: reveal on card hover */
   @media (hover: hover) {
+    .pc:hover .pc-add {
+      opacity: 1;
+      transform: scale(1);
+    }
     .pc-add:hover {
       background: var(--c-brand-hover);
       transform: scale(1.1);
-      box-shadow: 0 4px 14px var(--c-brand-glow);
+      box-shadow: 0 6px 18px var(--c-brand-glow);
     }
   }
   .pc-add:active {
-    transform: scale(0.92);
+    transform: scale(0.9);
   }
   .pc-add:focus-visible {
     outline: 2px solid var(--c-brand);
-    outline-offset: 2px;
+    outline-offset: 3px;
   }
   .pc-add.added {
     background: var(--c-trust) !important;
     box-shadow: 0 2px 8px rgba(22, 163, 74, 0.28) !important;
+    opacity: 1 !important;
+    transform: scale(1) !important;
   }
 
   /* ── Wishlist heart ── */
@@ -416,32 +435,38 @@ const addPayload = JSON.stringify({
     display: flex;
     flex-direction: column;
     flex: 1;
-    padding: clamp(0.7rem, 5cqi, 1rem);
+    padding: clamp(0.8rem, 0.6rem + 2.5cqi, 1.15rem);
+  }
+  .pc-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.25rem;
+    margin-block-end: 0.2rem;
   }
   .pc-cat {
-    align-self: flex-start;
-    font-size: clamp(0.62rem, 3cqi, 0.72rem);
+    font-size: clamp(0.66rem, 0.52rem + 1.5cqi, 0.78rem);
     color: var(--c-ink-faint);
-    margin-block-end: 0.25rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 100%;
+    min-width: 0;
   }
-  .pc-nick {
+  .pc-spec {
     font-weight: 700;
-    font-size: clamp(0.74rem, 3.4cqi, 0.84rem);
-    color: var(--c-brass);
-    line-height: 1.2;
-    margin-block-end: 0.1rem;
+    font-size: clamp(0.6rem, 0.48rem + 1.1cqi, 0.7rem);
+    color: var(--c-flame);
+    white-space: nowrap;
+    flex-shrink: 0;
+    line-height: 1;
   }
   .pc-name-link {
     display: block;
   }
   .pc-name {
     font-weight: 600;
-    font-size: clamp(0.8rem, 3.6cqi, 0.92rem);
-    line-height: 1.45;
+    font-size: clamp(0.86rem, 0.62rem + 2.4cqi, 1.08rem);
+    line-height: 1.4;
     color: var(--c-ink);
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -456,7 +481,7 @@ const addPayload = JSON.stringify({
   }
   .pc-foot {
     margin-block-start: auto;
-    padding-block-start: 0.6rem;
+    padding-block-start: clamp(0.6rem, 0.4rem + 1.5cqi, 0.85rem);
   }
   .pc-price {
     display: flex;
@@ -465,37 +490,38 @@ const addPayload = JSON.stringify({
     flex-wrap: wrap;
   }
   .pc-price-amt {
-    font-weight: 700;
-    font-size: clamp(1rem, 4.6cqi, 1.18rem);
+    font-weight: 800;
+    font-size: clamp(1.05rem, 0.75rem + 3.2cqi, 1.4rem);
     color: var(--c-brand);
     line-height: 1;
   }
   .pc-price-cur {
-    font-size: clamp(0.66rem, 3cqi, 0.78rem);
+    font-weight: 600;
+    font-size: clamp(0.72rem, 0.58rem + 1.4cqi, 0.86rem);
     color: var(--c-brand);
   }
   .pc-price-old {
-    font-size: clamp(0.66rem, 3cqi, 0.78rem);
+    font-size: clamp(0.72rem, 0.58rem + 1.4cqi, 0.86rem);
     color: var(--c-ink-faint);
     text-decoration: line-through;
   }
   .pc-trust {
-    font-size: clamp(0.64rem, 3cqi, 0.72rem);
-    color: var(--c-ink-muted);
-    margin-block-start: 0.4rem;
+    font-size: clamp(0.7rem, 0.56rem + 1.5cqi, 0.82rem);
+    color: var(--c-ink-secondary);
+    margin-block-start: 0.45rem;
   }
   .pc-inst {
-    font-size: clamp(0.6rem, 2.8cqi, 0.68rem);
-    color: var(--c-brass);
-    margin-block-start: 0.15rem;
+    font-size: clamp(0.66rem, 0.54rem + 1.3cqi, 0.78rem);
+    color: var(--c-flame);
+    margin-block-start: 0.2rem;
   }
   .pc-low {
     display: flex;
     align-items: center;
     gap: 0.25rem;
-    font-size: clamp(0.64rem, 3cqi, 0.72rem);
+    font-size: clamp(0.7rem, 0.56rem + 1.4cqi, 0.8rem);
     color: #d97706;
-    margin-block-start: 0.4rem;
+    margin-block-start: 0.45rem;
   }
   :global(.dark) .pc-low {
     color: #fbbf24;
@@ -503,7 +529,7 @@ const addPayload = JSON.stringify({
 
   /* Compact mode for very narrow cards (dense 2-col on small phones) — drop category label. */
   @container (max-width: 10.5rem) {
-    .pc-cat {
+    .pc-meta {
       display: none;
     }
   }
@@ -540,6 +566,7 @@ const addPayload = JSON.stringify({
       const product = JSON.parse(btn.dataset.product ?? '{}')
       const { addToCart } = await import('../stores/cart')
       addToCart(product)
+      document.dispatchEvent(new CustomEvent('hvar:cartadd', { bubbles: true, detail: { name: product.name, image: product.image } }))
 
       const original = btn.innerHTML
       const label = btn.getAttribute('aria-label')

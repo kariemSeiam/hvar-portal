@@ -1,17 +1,17 @@
 ---
-import Doodles from '../Doodles.astro'
-
 interface Props {
   categoryName: string
   productCount: number
+  categoryId?: number
+  searchQuery?: string
 }
-const { categoryName, productCount } = Astro.props
+const { categoryName, productCount, categoryId, searchQuery } = Astro.props
 
 const HEROES: Record<string, { wattage: string; claim: string; tagline: string }> = {
-  "كبة":           { wattage: "٢٠٠٠ وات", claim: "البلدوزر",        tagline: "أقوى كبة في مصر" },
+  "كبة":           { wattage: "٢٠٠٠ وات", claim: "ماتور نحاس",      tagline: "أقوى كبة في مصر" },
   "خلاط":          { wattage: "٨٠٠٠ وات", claim: "٧ ملحقات",        tagline: "الأقوى في فئته" },
   "هاند بلندر":    { wattage: "١٥٠٠ وات", claim: "٤×١ نحاس",        tagline: "١٥ سرعة وتربو" },
-  "عجان":          { wattage: "٢٢٠٠ وات", claim: "المدفع",           tagline: "أقوى عجان في مصر" },
+  "عجان":          { wattage: "٢٢٠٠ وات", claim: "نحاس ١١ لتر",     tagline: "أقوى عجان في مصر" },
   "مضرب":          { wattage: "٥٠٠ وات",  claim: "نحاس",             tagline: "مع حلة أو بدونها" },
   "قلاية هوائية":  { wattage: "٢٤٠٠ وات", claim: "دبل هيتر",        tagline: "٩ لتر جامبو" },
   "مكواه":         { wattage: "٢٨٠٠ وات", claim: "سيراميك",          tagline: "بخار فوري" },
@@ -24,101 +24,106 @@ const HEROES: Record<string, { wattage: string; claim: string; tagline: string }
 const hero = HEROES[categoryName]
 ---
 
+{/* Known category — quiet utility band with claim, wattage chip, trust + search.
+   Theme-aware: warm surface + ink on هفار الأحمر, charcoal + ivory on هفار الليل. */}
 {hero && (
-  <section
-    class="relative overflow-hidden"
-    style="background-color:#130F0C;min-height:148px"
-  >
+  <header class="page-hero">
+    <div class="reveal-section max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-9">
 
-    <!-- Grain texture (Wilson P2) -->
-    <div
-      class="grain absolute inset-0 pointer-events-none"
-      aria-hidden="true"
-      style="opacity:0.06;mix-blend-mode:overlay"
-    ></div>
-
-    <!-- Ember glow left -->
-    <div
-      class="absolute inset-0 pointer-events-none"
-      aria-hidden="true"
-      style="background:radial-gradient(ellipse 55% 90% at 20% 50%, rgba(var(--c-brand-rgb),0.14) 0%, transparent 70%)"
-    ></div>
-
-    <!-- Brass glow bottom-right -->
-    <div
-      class="absolute inset-0 pointer-events-none"
-      aria-hidden="true"
-      style="background:radial-gradient(ellipse 40% 30% at 85% 85%, rgba(var(--c-brass-rgb),0.08) 0%, transparent 60%)"
-    ></div>
-
-    <!-- Ambient doodles (Wilson P1, band variant) -->
-    <Doodles variant="band" opacity={0.55} />
-
-    <!-- Content -->
-    <div class="reveal-section relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex items-center justify-between gap-6">
-
-      <!-- Left: text block (RTL: this is the right side visually) -->
-      <div class="min-w-0">
-        <!-- Product count -->
-        <p class="reveal-child font-cairo text-xs mb-1" style="color:rgba(245,239,230,0.45)">
-          {productCount} منتج
-        </p>
-        <!-- Claim (nickname/model) in brass -->
-        <p class="reveal-child font-cairo font-bold text-lg mb-0.5" style="color:var(--c-brass)">
-          {hero.claim}
-        </p>
-        <!-- Category name as main heading -->
-        <h1
-          class="reveal-child font-cairo font-black text-3xl sm:text-4xl leading-tight mb-1"
-          style="color:#F5EFE6"
-        >
-          {categoryName}
-        </h1>
-        <!-- Tagline -->
-        <p class="reveal-child font-cairo text-sm" style="color:rgba(245,239,230,0.50)">
-          {hero.tagline}
-        </p>
+      {/* Spec highlight in flame + wattage chip */}
+      <div class="reveal-child flex items-center gap-2.5 mb-1">
+        <span class="font-cairo font-bold text-base" style="color:var(--c-flame)">{hero.claim}</span>
+        {hero.wattage && (
+          <span class="page-hero-chip">{hero.wattage}</span>
+        )}
       </div>
 
-      <!-- Right: wattage number — only rendered when wattage is set (hidden on smallest mobile) -->
-      {hero.wattage && (
-        <div class="reveal-child hidden xs:block flex-shrink-0 text-end" style="line-height:1">
-          <p
-            class="font-cairo font-black"
-            style="font-size:clamp(2.8rem,7vw,4.5rem);color:var(--c-brand);opacity:0.88;line-height:1;letter-spacing:-0.02em"
-          >
-            {hero.wattage}
-          </p>
-        </div>
+      {/* Category name as main heading */}
+      <h1 class="page-hero-title reveal-child">{categoryName}</h1>
+
+      {/* Tagline + product count */}
+      <p class="page-hero-sub reveal-child mt-1.5">
+        {hero.tagline} · {productCount} منتج
+      </p>
+
+      {/* Trust line (Wilson P9) */}
+      <div class="trust-line reveal-child mt-3" style="justify-content:flex-start;gap:1.5rem">
+        <span class="font-cairo text-xs">ضمان أصلي</span>
+        <span class="font-cairo text-xs">شحن مجاني</span>
+        <span class="font-cairo text-xs">ادفع لما يوصل</span>
+      </div>
+
+      {/* Search bar — theme-aware light field */}
+      {categoryId !== undefined && (
+        <form method="GET" action="/products" class="reveal-child flex flex-wrap items-center gap-3 mt-5">
+          <input type="hidden" name="category" value={String(categoryId)} />
+          <div class="relative flex-1 min-w-[200px] max-w-sm">
+            <input
+              type="search"
+              name="q"
+              value={searchQuery ?? ''}
+              placeholder={`ابحث في ${categoryName}...`}
+              class="hvar-input w-full pr-10 pl-4 py-2.5 rounded-xl font-cairo text-sm transition-colors"
+            />
+            <svg class="absolute top-1/2 right-3 -translate-y-1/2" width="15" height="15" viewBox="0 0 20 20" fill="none"
+                 style="color:var(--c-ink-muted)">
+              <circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.5"/>
+              <line x1="14" y1="14" x2="18" y2="18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          {searchQuery && (
+            <a href={`/products?category=${categoryId}`}
+               class="px-3 py-2.5 rounded-xl border font-cairo text-sm transition-colors"
+               style="border-color:var(--c-border);color:var(--c-ink-muted)">
+              مسح البحث
+            </a>
+          )}
+        </form>
       )}
 
     </div>
-
-    <!-- Trust line (Wilson P9) -->
-    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
-      <div class="trust-line" style="justify-content:flex-start;gap:1.5rem">
-        <span style="color:rgba(245,239,230,0.35)" class="font-cairo text-xs">ضمان أصلي</span>
-        <span style="color:rgba(245,239,230,0.35)" class="font-cairo text-xs">شحن مجاني</span>
-        <span style="color:rgba(245,239,230,0.35)" class="font-cairo text-xs">ادفع لما يوصل</span>
-      </div>
-    </div>
-
-  </section>
+  </header>
 )}
 
-<!--
-  NOTE: #130F0C stays hardcoded — this section forces the brand dark canvas
-  regardless of active theme. rgba(245,239,230,...) is ivory-on-dark, not a
-  theme token. --c-brass and --c-brand replace the hardcoded #C8893B and
-  #d43533 hex values and are identical across both Hvar themes.
-  The .grain, .trust-line, .reveal-section, and .reveal-child classes come
-  from the global stylesheet. The .trust-line separator dots are rendered by
-  the global ::before pseudo-element rule, so no explicit · spans are needed.
--->
+{/* Fallback header for categories not in the HEROES map — same quiet band */}
+{!hero && (
+  <header class="page-hero">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-9">
+      <p class="page-hero-label mb-1.5">أجهزة هفار</p>
+      <h1 class="page-hero-title mb-4">{categoryName}</h1>
+      {categoryId !== undefined && (
+        <form method="GET" action="/products" class="flex flex-wrap items-center gap-3">
+          <input type="hidden" name="category" value={String(categoryId)} />
+          <div class="relative flex-1 min-w-[200px] max-w-sm">
+            <input
+              type="search"
+              name="q"
+              value={searchQuery ?? ''}
+              placeholder={`ابحث في ${categoryName}...`}
+              class="hvar-input w-full pr-10 pl-4 py-2.5 rounded-xl font-cairo text-sm transition-colors"
+            />
+            <svg class="absolute top-1/2 right-3 -translate-y-1/2" width="15" height="15" viewBox="0 0 20 20" fill="none"
+                 style="color:var(--c-ink-muted)">
+              <circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.5"/>
+              <line x1="14" y1="14" x2="18" y2="18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          {searchQuery && (
+            <a href={`/products?category=${categoryId}`}
+               class="px-3 py-2.5 rounded-xl border font-cairo text-sm transition-colors"
+               style="border-color:var(--c-border);color:var(--c-ink-muted)">
+              مسح البحث
+            </a>
+          )}
+        </form>
+      )}
+    </div>
+  </header>
+)}
 
 <style>
-  /* Tailwind does not ship an xs: breakpoint — add it manually */
-  @media (min-width: 400px) {
-    .xs\:block { display: block; }
+  input[type="search"]:focus {
+    border-color: rgba(var(--c-brand-rgb), 0.6) !important;
+    box-shadow: 0 0 0 1px rgba(var(--c-brand-rgb), 0.25);
   }
 </style>
