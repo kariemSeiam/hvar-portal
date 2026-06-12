@@ -1,10 +1,30 @@
 ---
 import ThemeToggle from './ThemeToggle'
 import NavAuthLink from './NavAuthLink'
-import CartBadge from './cart/CartBadge'
 import Doodles from './Doodles.astro'
+import { api } from '../lib/api'
+import type { Category } from '../lib/api'
+import { categoryIcon, ALL_CATEGORIES_ICON } from '../lib/categoryIcons'
 
 const path = Astro.url.pathname
+
+/* ── Categories — power the المنتجات dropdown (desktop) + drawer accordion (mobile).
+   Fetched once here so every page's header carries discovery; degrades to a plain
+   link if the API is unreachable (catalog already filters on numeric id). ── */
+let categories: Category[] = []
+try {
+  const res = await api.categories()
+  categories = res.items.filter((c) => c.productCount > 0)
+} catch {
+  categories = []
+}
+
+const activeCategoryId = Astro.url.searchParams.get('category')
+  ? Number(Astro.url.searchParams.get('category'))
+  : undefined
+
+// Arabic-Indic digits — matches the count style across the catalog
+const toAr = (n: number): string => String(n).replace(/[0-9]/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d])
 
 const navLinks = [
   {
@@ -26,6 +46,7 @@ const navLinks = [
     href: '/service/new',
     label: 'صيانة واستبدال',
     d: 'M14.5 4.5A4.5 4.5 0 006 8c0 .9.3 1.8.7 2.5L3 14.1A2 2 0 105.9 17l3.6-3.7A4.5 4.5 0 1014.5 4.5z',
+    soon: true,
   },
   {
     href: '/wishlist',
@@ -41,7 +62,69 @@ const navLinks = [
 
 const isActive = (href: string) =>
   href === '/' ? path === '/' : path.startsWith(href)
+
+/* ── Top utility strip — trust promises + contact (scrolls away above the nav) ── */
+const WHATSAPP      = 'https://wa.me/201204444196'
+const HOTLINE_TEL   = 'tel:17566'
+const HOTLINE_LABEL = '١٧٥٦٦'
+
+const trust = [
+  {
+    label: 'ضمان على كل المنتجات',
+    svg: `<path d="M12 2L4 6v6c0 5 3.5 9.5 8 11 4.5-1.5 8-6 8-11V6L12 2Z"/><polyline points="9 12 11 14 15 10"/>`,
+    wide: false,
+  },
+  {
+    label: 'شحن مجاني',
+    svg: `<rect x="3" y="9" width="11" height="8" rx="1"/><path d="M14 11h4l3 5H14"/><circle cx="7.5" cy="18.5" r="1.5"/><circle cx="17.5" cy="18.5" r="1.5"/>`,
+    wide: false,
+  },
+  {
+    label: 'افحصي قبل ما تدفعي',
+    svg: `<circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/><path d="M9.5 11a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0"/>`,
+    wide: false,
+  },
+  {
+    label: 'تقسيط متاح',
+    svg: `<line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>`,
+    wide: true,
+  },
+]
+
+const phoneSvg = `<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>`
+const waSvg    = `<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>`
 ---
+
+<!-- ─── Top utility strip — scrolling trust marquee + fixed contact ─── -->
+<div class="tb-strip" aria-label="مزايا الشراء من هفار">
+
+  <!-- Scrolling trust promises — full-bleed marquee, runs edge-to-edge under the contact -->
+  <div class="tb-marquee">
+    <div class="tb-track">
+      {Array.from({ length: 6 }, () => trust).flat().map(({ label, svg }, i) => (
+        <span class="tb-item" aria-hidden={i >= trust.length ? 'true' : undefined}>
+          <svg class="tb-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" set:html={svg} />
+          <span>{label}</span>
+        </span>
+      ))}
+    </div>
+  </div>
+
+  <!-- Contact floats at the end over the marquee; promises dissolve behind it, loop reappears in the end gap -->
+  <div class="tb-contact">
+    <a href={HOTLINE_TEL} class="tb-action">
+      <svg class="tb-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" set:html={phoneSvg} />
+      <span class="hidden lg:inline">الخط الساخن</span>
+      <span class="tb-num">{HOTLINE_LABEL}</span>
+    </a>
+    <span class="tb-sep-v" aria-hidden="true"></span>
+    <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" class="tb-action tb-wa" aria-label="واتساب">
+      <svg class="tb-ico" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" set:html={waSvg} />
+      <span class="hidden sm:inline">واتساب</span>
+    </a>
+  </div>
+
+</div>
 
 <!-- ─── Header bar ───────────────────────────────────────────────── -->
 <header
@@ -129,15 +212,70 @@ const isActive = (href: string) =>
         </div>
       </a>
 
-      <!-- Nav links (first 3 — desktop only) -->
+      <!-- Nav links — المنتجات carries a category dropdown (hover + keyboard) -->
       <nav class="flex items-center gap-0.5" aria-label="التنقل الرئيسي">
-        {navLinks.filter(({ href }) => href !== '/wishlist').map(({ href, label }) => (
-          <a
-            href={href}
-            class={`desktop-link ${isActive(href) ? 'desktop-link--on' : ''}`}
-          >
-            {label}
-          </a>
+        {navLinks.filter(({ href }) => href !== '/wishlist').map(({ href, label, soon }) => (
+          href === '/products' && categories.length > 0 ? (
+            <div class="nav-dd" data-nav-dd>
+              <a
+                href="/products"
+                class={`desktop-link nav-dd-trigger ${isActive('/products') ? 'desktop-link--on' : ''}`}
+                data-nav-dd-trigger
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                {label}
+                <svg class="nav-dd-chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+              </a>
+
+              <div class="nav-dd-panel">
+                <div class="nav-dd-card" role="menu" aria-label="أقسام المنتجات">
+                  <a
+                    href="/products"
+                    role="menuitem"
+                    class={`nav-dd-all ${!activeCategoryId ? 'is-active' : ''}`}
+                  >
+                    <span class="nav-dd-ico">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ALL_CATEGORIES_ICON} />
+                    </span>
+                    <span class="nav-dd-name">كل المنتجات</span>
+                    <svg class="nav-dd-go" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M10 4 6 8l4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </a>
+
+                  <span class="nav-dd-sep" aria-hidden="true"></span>
+
+                  <div class="nav-dd-list">
+                    {categories.map((cat) => (
+                      <a
+                        href={`/products?category=${cat.id}`}
+                        role="menuitem"
+                        class={`nav-dd-item ${activeCategoryId === cat.id ? 'is-active' : ''}`}
+                        aria-current={activeCategoryId === cat.id ? 'page' : undefined}
+                      >
+                        <span class="nav-dd-ico">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={categoryIcon(cat.slug)} />
+                        </span>
+                        <span class="nav-dd-name">{cat.name}</span>
+                        <span class="nav-dd-count font-inter">{toAr(cat.productCount)}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <a
+              href={href}
+              class={`desktop-link ${isActive(href) ? 'desktop-link--on' : ''}`}
+            >
+              {label}
+              {soon && <span class="soon-badge">قريباً</span>}
+            </a>
+          )
         ))}
       </nav>
 
@@ -157,7 +295,6 @@ const isActive = (href: string) =>
           </svg>
         </a>
 
-        <CartBadge client:idle />
         <ThemeToggle client:idle />
         <NavAuthLink client:idle />
       </div>
@@ -174,11 +311,11 @@ const isActive = (href: string) =>
   aria-hidden="true"
 ></div>
 
-<!-- ─── Drawer (slides from right — same side as hamburger) ──────── -->
+<!-- ─── Drawer (slides from left — matches hamburger position in RTL grid col-3) ──────── -->
 <div
   id="nav-drawer"
-  class="fixed top-0 right-0 z-50 h-full flex flex-col"
-  style="width:min(84vw,320px);background-color:var(--c-surface);box-shadow:-2px 0 60px rgba(0,0,0,0.18);transform:perspective(1200px) rotateY(12deg) translateX(100%);transition:transform 0.4s cubic-bezier(0.22,1,0.36,1)"
+  class="fixed top-0 left-0 z-50 h-full flex flex-col"
+  style="width:min(84vw,320px);background-color:var(--c-surface);box-shadow:2px 0 60px rgba(0,0,0,0.18);transform:perspective(1200px) rotateY(-12deg) translateX(-110%);transition:transform 0.4s cubic-bezier(0.22,1,0.36,1)"
   aria-hidden="true"
 >
 
@@ -208,16 +345,42 @@ const isActive = (href: string) =>
       </div>
       <span class="font-cairo font-black text-lg leading-none" style="color:var(--c-brand)">هفار ستور</span>
     </a>
-    <button
-      id="nav-close"
-      class="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
-      style="background:var(--c-border);color:var(--c-ink-muted)"
-      aria-label="إغلاق القائمة"
+    <!-- Theme + close pill — two controls, one grouped surface -->
+    <div
+      class="drawer-ctrl-pill flex items-center rounded-xl overflow-hidden"
+      style="border:1px solid var(--c-border);background-color:var(--c-surface-2)"
     >
-      <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <path d="M1 1l12 12M13 1L1 13"/>
-      </svg>
-    </button>
+      <button
+        id="drawer-theme"
+        class="drawer-ctrl-btn"
+        aria-label="تبديل المظهر"
+      >
+        <!-- Moon: shown in light mode (click → go dark) -->
+        <svg id="drawer-icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun: shown in dark mode (click → go light) -->
+        <svg id="drawer-icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <div class="self-stretch w-px flex-shrink-0" style="background-color:var(--c-border)" aria-hidden="true"></div>
+
+      <button
+        id="nav-close"
+        class="drawer-ctrl-btn"
+        aria-label="إغلاق القائمة"
+      >
+        <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <path d="M1 1l12 12M13 1L1 13"/>
+        </svg>
+      </button>
+    </div>
   </div>
 
   <!-- ── Drawer nav ── -->
@@ -227,8 +390,63 @@ const isActive = (href: string) =>
       القائمة
     </p>
 
-    {navLinks.map(({ href, label, d }, i) => {
+    {navLinks.map(({ href, label, d, soon }, i) => {
       const on = isActive(href)
+
+      // المنتجات → expandable category accordion (button, never an <a>, so the
+      // close-on-link handler doesn't dismiss the drawer when you expand it)
+      if (href === '/products' && categories.length > 0) {
+        return (
+          <div class="drawer-group">
+            <button
+              type="button"
+              class="drawer-link drawer-toggle w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-cairo font-semibold text-[0.93rem] transition-colors"
+              style={`color:${on ? 'var(--c-brand)' : 'var(--c-ink)'};${on ? 'background-color:var(--c-brand-tint);border-inline-start:2.5px solid var(--c-brand)' : ''};animation-delay:${(i + 1) * 45}ms`}
+              aria-expanded="false"
+              aria-controls="drawer-cats"
+              data-drawer-toggle
+            >
+              <span
+                class="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-lg transition-colors"
+                style={`background:${on ? 'rgba(var(--c-brand-rgb),0.12)' : 'var(--c-surface-2)'};color:${on ? 'var(--c-brand)' : 'var(--c-ink-faint)'}`}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d={d}/>
+                </svg>
+              </span>
+
+              {label}
+
+              <svg class="drawer-toggle-chev ms-auto flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M6 9l6 6 6-6"/>
+              </svg>
+            </button>
+
+            <div class="drawer-sub" id="drawer-cats" data-drawer-sub>
+              <a href="/products" class={`drawer-sublink ${!activeCategoryId ? 'is-active' : ''}`}>
+                <span class="drawer-sub-ico">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ALL_CATEGORIES_ICON} />
+                </span>
+                <span class="drawer-sub-name">كل المنتجات</span>
+              </a>
+              {categories.map((cat) => (
+                <a
+                  href={`/products?category=${cat.id}`}
+                  class={`drawer-sublink ${activeCategoryId === cat.id ? 'is-active' : ''}`}
+                  aria-current={activeCategoryId === cat.id ? 'page' : undefined}
+                >
+                  <span class="drawer-sub-ico">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={categoryIcon(cat.slug)} />
+                  </span>
+                  <span class="drawer-sub-name">{cat.name}</span>
+                  <span class="drawer-sub-count font-inter">{toAr(cat.productCount)}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        )
+      }
+
       return (
         <a
           href={href}
@@ -246,6 +464,8 @@ const isActive = (href: string) =>
           </span>
 
           {label}
+
+          {soon && <span class="soon-badge ms-1">قريباً</span>}
 
           {on && (
             <span class="ms-auto w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:var(--c-brand)"></span>
@@ -302,10 +522,10 @@ const isActive = (href: string) =>
   const backdrop = document.getElementById('nav-backdrop')!
   const links    = document.querySelectorAll<HTMLElement>('.drawer-link')
 
-  /* initial stagger state */
+  /* initial stagger state — enter from the left (drawer origin) */
   links.forEach((l) => {
     l.style.opacity   = '0'
-    l.style.transform = 'translateX(12px)'
+    l.style.transform = 'translateX(-12px)'
     l.style.transition =
       `opacity 0.3s cubic-bezier(0.22,1,0.36,1) var(--dl,0ms),
        transform 0.3s cubic-bezier(0.22,1,0.36,1) var(--dl,0ms),
@@ -328,7 +548,7 @@ const isActive = (href: string) =>
   }
 
   function close() {
-    drawer.style.transform = 'perspective(1200px) rotateY(12deg) translateX(100%)'
+    drawer.style.transform = 'perspective(1200px) rotateY(-12deg) translateX(-110%)'
     drawer.setAttribute('aria-hidden', 'true')
     backdrop.style.opacity       = '0'
     backdrop.style.pointerEvents = 'none'
@@ -336,8 +556,9 @@ const isActive = (href: string) =>
     document.body.style.overflow = ''
     links.forEach((l) => {
       l.style.opacity   = '0'
-      l.style.transform = 'translateX(12px)'
+      l.style.transform = 'translateX(-12px)'
     })
+    collapseGroups()
   }
 
   toggle.addEventListener('click', open)
@@ -345,6 +566,66 @@ const isActive = (href: string) =>
   backdrop.addEventListener('click', close)
   document.querySelectorAll('#nav-drawer a').forEach((a) => a.addEventListener('click', close))
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close() })
+
+  // Drawer theme toggle — mirrors ThemeToggle.tsx behaviour
+  const themeBtn  = document.getElementById('drawer-theme')!
+  const iconMoon  = document.getElementById('drawer-icon-moon') as HTMLElement
+  const iconSun   = document.getElementById('drawer-icon-sun')  as HTMLElement
+
+  function syncThemeIcon() {
+    const isDark = document.documentElement.classList.contains('dark')
+    iconMoon.style.display = isDark ? 'none'  : 'block'
+    iconSun.style.display  = isDark ? 'block' : 'none'
+  }
+  syncThemeIcon()
+
+  themeBtn.addEventListener('click', () => {
+    const isDark = document.documentElement.classList.contains('dark')
+    document.documentElement.classList.toggle('dark', !isDark)
+    localStorage.setItem('hvar-theme', isDark ? 'light' : 'dark')
+    syncThemeIcon()
+  })
+
+  /* ── Mobile drawer: المنتجات category accordion (measured-height expand) ── */
+  function collapseGroups() {
+    document.querySelectorAll<HTMLElement>('.drawer-group.is-open').forEach((g) => {
+      g.classList.remove('is-open')
+      const sub = g.querySelector<HTMLElement>('[data-drawer-sub]')
+      const tgl = g.querySelector<HTMLElement>('[data-drawer-toggle]')
+      if (sub) sub.style.maxHeight = '0px'
+      tgl?.setAttribute('aria-expanded', 'false')
+    })
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-drawer-toggle]').forEach((btn) => {
+    const group = btn.closest('.drawer-group')
+    const sub   = group?.querySelector<HTMLElement>('[data-drawer-sub]')
+    if (!group || !sub) return
+    btn.addEventListener('click', () => {
+      const willOpen = !group.classList.contains('is-open')
+      group.classList.toggle('is-open', willOpen)
+      btn.setAttribute('aria-expanded', String(willOpen))
+      sub.style.maxHeight = willOpen ? `${sub.scrollHeight}px` : '0px'
+    })
+  })
+
+  /* ── Desktop المنتجات dropdown: reflect open state + Escape to dismiss.
+     Open/close visuals are CSS (:hover / :focus-within); this only mirrors
+     aria-expanded and gives keyboard users an exit. ── */
+  document.querySelectorAll<HTMLElement>('[data-nav-dd]').forEach((dd) => {
+    const trigger = dd.querySelector<HTMLElement>('[data-nav-dd-trigger]')
+    if (!trigger) return
+    const reflect = (open: boolean) => trigger.setAttribute('aria-expanded', String(open))
+    dd.addEventListener('mouseenter', () => reflect(true))
+    dd.addEventListener('mouseleave', () => reflect(false))
+    dd.addEventListener('focusin',  () => reflect(true))
+    dd.addEventListener('focusout', (e) => {
+      if (!dd.contains(e.relatedTarget as Node)) reflect(false)
+    })
+    dd.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { reflect(false); trigger.blur() }
+    })
+  })
 </script>
 
 <style>
@@ -427,15 +708,408 @@ const isActive = (href: string) =>
     opacity: 0.5;
   }
 
+  /* ── Soon badge ── */
+  .soon-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    border-radius: 5px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 9.5px;
+    font-weight: 700;
+    line-height: 1.6;
+    background: rgba(232, 85, 46, 0.12);
+    color: #E8552E;
+    border: 1px solid rgba(232, 85, 46, 0.22);
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+
   /* ── Drawer link hover ── */
   .drawer-link:hover {
     background-color: var(--c-brand-tint);
     color: var(--c-brand);
   }
 
+  /* ════════════════════════════════════════════════════════════════
+     Desktop المنتجات → category dropdown
+     Theme-aware (never a dark island) · opens on hover OR keyboard focus
+     ════════════════════════════════════════════════════════════════ */
+  .nav-dd { position: relative; }
+
+  .nav-dd-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .nav-dd-chev {
+    opacity: 0.65;
+    transition: transform 0.28s var(--ease-spring), opacity 0.2s ease;
+  }
+  .nav-dd:hover .nav-dd-trigger .nav-dd-chev,
+  .nav-dd:focus-within .nav-dd-trigger .nav-dd-chev {
+    transform: rotate(180deg);
+    opacity: 1;
+  }
+
+  .nav-dd-panel {
+    position: absolute;
+    top: 100%;
+    inset-inline-start: 0;
+    z-index: 50;
+    padding-block-start: 0.6rem;            /* invisible hover bridge to the card */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(7px);
+    transition:
+      opacity 0.22s var(--ease-spring),
+      transform 0.22s var(--ease-spring),
+      visibility 0.22s;
+    pointer-events: none;
+  }
+  .nav-dd:hover .nav-dd-panel,
+  .nav-dd:focus-within .nav-dd-panel {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .nav-dd-card {
+    min-width: 17.5rem;
+    max-height: min(72vh, 30rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0.45rem;
+    border-radius: 1rem;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    box-shadow:
+      0 22px 55px -18px rgba(0, 0, 0, 0.32),
+      0 4px 14px rgba(0, 0, 0, 0.06);
+    scrollbar-width: thin;
+  }
+
+  .nav-dd-all,
+  .nav-dd-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.5rem 0.55rem;
+    border-radius: 0.7rem;
+    font-family: 'Cairo', system-ui, sans-serif;
+    text-decoration: none;
+    color: var(--c-ink);
+    transition: background-color 0.16s ease, color 0.16s ease;
+  }
+  .nav-dd-ico {
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.6rem;
+    background: rgba(var(--c-brand-rgb), 0.07);
+    color: var(--c-ink-muted);
+    transition: background-color 0.16s ease, color 0.16s ease;
+  }
+  .nav-dd-ico svg { width: 1.05rem; height: 1.05rem; }
+
+  /* "كل المنتجات" — the heading row */
+  .nav-dd-all { font-weight: 800; }
+  .nav-dd-all .nav-dd-name { flex: 1; font-size: 0.9rem; }
+  .nav-dd-go {
+    flex-shrink: 0;
+    color: var(--c-ink-faint);
+    transition: transform 0.2s var(--ease-spring), color 0.16s ease;
+  }
+  .nav-dd-all:hover { background: var(--c-brand-tint); color: var(--c-brand); }
+  .nav-dd-all:hover .nav-dd-ico,
+  .nav-dd-all.is-active .nav-dd-ico {
+    background: rgba(var(--c-brand-rgb), 0.14);
+    color: var(--c-brand);
+  }
+  .nav-dd-all:hover .nav-dd-go { color: var(--c-brand); transform: translateX(-2px); }
+  .nav-dd-all.is-active { background: var(--c-brand-tint); color: var(--c-brand); }
+
+  .nav-dd-sep {
+    display: block;
+    height: 1px;
+    margin: 0.4rem 0.4rem 0.45rem;
+    background: var(--c-border);
+  }
+
+  .nav-dd-list { display: flex; flex-direction: column; gap: 0.05rem; }
+  .nav-dd-item .nav-dd-name {
+    flex: 1;
+    font-weight: 600;
+    font-size: 0.875rem;
+    line-height: 1.3;
+  }
+  .nav-dd-count {
+    flex-shrink: 0;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--c-ink-faint);
+    font-feature-settings: 'tnum';
+  }
+  .nav-dd-item:hover {
+    background: var(--c-brand-tint);
+    color: var(--c-brand);
+  }
+  .nav-dd-item:hover .nav-dd-ico {
+    background: rgba(var(--c-brand-rgb), 0.14);
+    color: var(--c-brand);
+  }
+  .nav-dd-item:hover .nav-dd-name { color: var(--c-brand); }
+  .nav-dd-item.is-active {
+    background: var(--c-brand-tint);
+    color: var(--c-brand);
+    border-inline-start: 2.5px solid var(--c-brand);
+    padding-inline-start: calc(0.55rem - 2.5px);
+  }
+  .nav-dd-item.is-active .nav-dd-ico { background: rgba(var(--c-brand-rgb), 0.16); color: var(--c-brand); }
+  .nav-dd-item.is-active .nav-dd-name { color: var(--c-brand); font-weight: 700; }
+  .nav-dd-item.is-active .nav-dd-count { color: rgba(var(--c-brand-rgb), 0.7); }
+
+  /* ════════════════════════════════════════════════════════════════
+     Mobile drawer → المنتجات category accordion
+     ════════════════════════════════════════════════════════════════ */
+  .drawer-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: start;
+    font: inherit;
+  }
+  .drawer-toggle-chev {
+    color: var(--c-ink-faint);
+    transition: transform 0.3s var(--ease-spring), color 0.16s ease;
+  }
+  .drawer-group.is-open .drawer-toggle-chev { transform: rotate(180deg); color: var(--c-brand); }
+
+  .drawer-sub {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s var(--ease-spring);
+    padding-inline-start: 0.5rem;     /* nest categories under المنتجات */
+  }
+  .drawer-sublink {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.6rem;
+    margin-block-start: 0.15rem;
+    border-radius: 0.65rem;
+    font-family: 'Cairo', system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--c-ink-secondary);
+    text-decoration: none;
+    transition: background-color 0.16s ease, color 0.16s ease;
+  }
+  .drawer-sublink:first-child { margin-block-start: 0.25rem; }
+  .drawer-sublink:hover { background: var(--c-brand-tint); color: var(--c-brand); }
+  .drawer-sub-ico {
+    width: 1.7rem;
+    height: 1.7rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    background: rgba(var(--c-brand-rgb), 0.06);
+    color: var(--c-ink-faint);
+    transition: background-color 0.16s ease, color 0.16s ease;
+  }
+  .drawer-sub-ico svg { width: 0.95rem; height: 0.95rem; }
+  .drawer-sublink:hover .drawer-sub-ico { background: rgba(var(--c-brand-rgb), 0.13); color: var(--c-brand); }
+  .drawer-sub-name { flex: 1; line-height: 1.3; }
+  .drawer-sub-count {
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--c-ink-faint);
+    font-feature-settings: 'tnum';
+  }
+  .drawer-sublink.is-active {
+    background: var(--c-brand-tint);
+    color: var(--c-brand);
+    border-inline-start: 2.5px solid var(--c-brand);
+    padding-inline-start: calc(0.6rem - 2.5px);
+  }
+  .drawer-sublink.is-active .drawer-sub-ico { background: rgba(var(--c-brand-rgb), 0.15); color: var(--c-brand); }
+  .drawer-sublink.is-active .drawer-sub-count { color: rgba(var(--c-brand-rgb), 0.7); }
+
+  /* ── Drawer header control pill (theme + close) ── */
+  .drawer-ctrl-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 32px;
+    color: var(--c-ink-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color 0.18s ease, color 0.18s ease;
+  }
+  .drawer-ctrl-btn:hover {
+    background-color: var(--c-brand-tint);
+    color: var(--c-brand);
+  }
+
+  /* ── Top utility strip — theme-aware Hvar band ── */
+  .tb-strip {
+    position: relative;
+    z-index: 20;
+    height: 2.25rem;
+    overflow: hidden;
+    /* Hvar's own red — a deep ember gradient. Everything reads in the ivory/white family
+       (high contrast on red, fully legible); hierarchy comes from weight + colour, not fill.
+       Same red on الأحمر + الليل. */
+    background: linear-gradient(to left, #d43533 0%, #a81f1d 85%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+    --tb-fg:     rgba(252, 245, 238, 0.86);   /* warm ivory — trust labels */
+    --tb-strong: rgba(255, 252, 248, 1);       /* bright ivory — contact + number */
+    --tb-accent: rgba(255, 249, 244, 0.96);    /* bright ivory — icons (legible on red) */
+    --tb-dot:    rgba(255, 255, 255, 0.4);
+    --tb-line:   rgba(255, 255, 255, 0.2);
+    --tb-hover:  rgba(255, 255, 255, 0.16);
+  }
+  /* Soft seat line on the nav below */
+  .tb-strip::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.16);
+    pointer-events: none;
+    z-index: 4;
+  }
+
+  .tb-ico {
+    flex-shrink: 0;
+    margin-inline-end: 0.4rem;
+    color: var(--tb-accent);   /* trust icons glow flame */
+  }
+
+  /* ── Scrolling trust marquee ── */
+  .tb-marquee {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    /* LTR internally so the track anchors at the left and overflows right —
+       leftward scroll always has content feeding in, never an empty start. */
+    direction: ltr;
+  }
+  .tb-track {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    direction: ltr;                 /* marquee runs LTR; each item stays RTL */
+    animation: tb-marquee 40s linear infinite;
+  }
+  /* Never pauses — runs forever, looping the existing promises like an endless feed.
+     6 copies + loop on exactly -50% → set 4 lands where set 1 was: seamless, no gap */
+  @keyframes tb-marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .tb-item {
+    display: inline-flex;
+    align-items: center;
+    direction: rtl;                 /* icon + Arabic label lay out RTL inside */
+    font-family: 'Cairo', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: var(--tb-fg);
+    white-space: nowrap;
+  }
+  .tb-item:not(:first-child) {
+    position: relative;
+    margin-left: 1.75rem;
+  }
+  .tb-item:not(:first-child)::before {
+    content: '';
+    position: absolute;
+    left: -0.9rem;
+    top: 50%;
+    width: 3px;
+    height: 3px;
+    margin-top: -1.5px;
+    border-radius: 50%;
+    background: var(--tb-dot);
+  }
+
+  /* ── Contact — floats at the end over the marquee; promises dissolve behind it ── */
+  .tb-contact {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: clamp(0.75rem, 4vw, 1.75rem);   /* gap to the edge → loop shows after, to the end */
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+    padding-inline-start: 3rem;                        /* incoming buffer — promises fade here, before the text */
+  }
+  .tb-contact::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    /* red veil matching the bar — solid behind the text, fading over the last 3rem (incoming side) */
+    background: linear-gradient(to right, #a81f1d, #a81f1d calc(100% - 3rem), transparent);
+  }
+  .tb-action {
+    display: flex;
+    align-items: center;
+    font-family: 'Cairo', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: var(--tb-strong);
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.5rem;
+    transition: transform 0.18s ease;
+  }
+  .tb-action:hover { transform: translateY(-1px); }
+  .tb-num { font-weight: 700; letter-spacing: 0.01em; margin-inline-start: 0.3rem; color: var(--tb-strong); }
+  /* WhatsApp icon → green; hotline icon → warm gold-amber */
+  .tb-contact .tb-ico              { color: #3ee07f; }   /* WhatsApp */
+  .tb-action[href^="tel:"] .tb-ico { color: #f2c14e; }   /* hotline */
+  .tb-sep-v {
+    width: 1px;
+    height: 14px;
+    background-color: rgba(255, 255, 255, 0.22);
+    margin-inline: 0.2rem;
+    flex-shrink: 0;
+  }
+
+  /* Mobile: drop the contacts — the loop owns the full bar (cleaner on narrow widths;
+     WhatsApp still lives in the nav drawer). */
+  @media (max-width: 767px) {
+    .tb-contact { display: none; }
+  }
+
+  /* No-motion: stop the auto-scroll, allow manual swipe, drop the duplicates */
+  @media (prefers-reduced-motion: reduce) {
+    .tb-track { animation: none; }
+    .tb-marquee { overflow-x: auto; scrollbar-width: none; }
+    .tb-marquee::-webkit-scrollbar { display: none; }
+    .tb-item[aria-hidden="true"] { display: none; }
+  }
+
   /* ── Reduced motion ── */
   @media (prefers-reduced-motion: reduce) {
     .brand-glow { animation: none; opacity: 0.7; }
     .drawer-link { transition: color 0.15s, background-color 0.15s !important; }
+    .nav-dd-panel { transition: opacity 0.15s ease, visibility 0.15s !important; transform: none !important; }
+    .nav-dd-chev, .drawer-toggle-chev { transition: none !important; }
+    .drawer-sub { transition: none !important; }
   }
 </style>
